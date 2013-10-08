@@ -24,4 +24,8 @@ public class Main {
         // TODO Auto-generated method stub
     	System.out.println("blah blubb 2");
     }
+    
+    public static void cookMeth() {
+    	System.out.println("cooking meth..");
+    }
 }
