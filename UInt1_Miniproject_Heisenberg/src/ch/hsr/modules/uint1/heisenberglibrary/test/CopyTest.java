@@ -1,7 +1,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.test;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Book;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
 import junit.framework.TestCase;
 
 public class CopyTest extends TestCase {

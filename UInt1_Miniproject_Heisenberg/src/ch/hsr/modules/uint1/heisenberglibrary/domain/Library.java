@@ -3,6 +3,8 @@ package ch.hsr.modules.uint1.heisenberglibrary.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+
 public class Library {
 
 	private List<Copy> copies;
@@ -47,7 +49,7 @@ public class Library {
 
 	public Book findByBookTitle(String title) {
 		for (Book b : books) {
-			if (b.getName().equals(title)) {
+			if (b.getTitle().equals(title)) {
 				return b;
 			}
 		}

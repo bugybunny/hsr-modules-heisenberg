@@ -65,7 +65,7 @@ public class Loan {
 
 	@Override
 	public String toString() {
-		return "Loan of: " + copy.getTitle().getName() + "\tFrom: "
+		return "Loan of: " + copy.getTitle().getTitle() + "\tFrom: "
 				+ customer.getName() + " " + customer.getSurname()
 				+ "\tPick up: " + getFormattedDate(pickupDate) + "\tReturn: "
 				+ getFormattedDate(returnDate) + "\tDays: "

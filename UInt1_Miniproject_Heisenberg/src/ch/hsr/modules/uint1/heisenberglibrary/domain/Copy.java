@@ -1,5 +1,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.domain;
 
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+
 public class Copy {
 	
 	public enum Condition {NEW, GOOD, DAMAGED, WASTE, LOST }

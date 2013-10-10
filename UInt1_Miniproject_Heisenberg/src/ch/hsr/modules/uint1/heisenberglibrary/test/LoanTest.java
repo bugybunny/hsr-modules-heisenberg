@@ -3,6 +3,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.test;
 import java.util.GregorianCalendar;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.*;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
 import junit.framework.TestCase;
 
 public class LoanTest extends TestCase {
@@ -11,7 +12,7 @@ public class LoanTest extends TestCase {
 		Loan l = createSampleLoan();
 		assertTrue(new GregorianCalendar().equals(l.getPickupDate()));
 		assertEquals("Keller",l.getCustomer().getName());
-		assertEquals("Design Pattern", l.getCopy().getTitle().getName());
+		assertEquals("Design Pattern", l.getCopy().getTitle().getTitle());
 	}
 
 	private Loan createSampleLoan() {
