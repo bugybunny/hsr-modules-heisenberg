@@ -15,7 +15,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,10 +24,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy.Condition;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 
-public class BookDetailJDialog extends JDialog implements Observer {
+public class BookDetailJDialog extends AbstractDefaultJDialog implements
+        Observer {
 
     private BookDO                    displayedBookDO;
 
@@ -70,16 +69,19 @@ public class BookDetailJDialog extends JDialog implements Observer {
         }
     }
 
-    public BookDetailJDialog(BookDO aBookDo) {
-        this();
+    public BookDetailJDialog(JFrame anOwner, BookDO aBookDo) {
+        super(anOwner, aBookDo.getTitle());
         setBookDO(aBookDo);
     }
 
-    /**
-     * Create the frame.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ch.hsr.modules.uint1.heisenberglibrary.view.AbstractDefaultJDialog#
+     * initComponents()
      */
-    public BookDetailJDialog() {
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    @Override
+    protected void initComponents() {
         setBounds(100, 100, 482, 358);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -184,7 +186,7 @@ public class BookDetailJDialog extends JDialog implements Observer {
         gbc_conditionLabel.gridy = 5;
         northPanel.add(conditionLabel, gbc_conditionLabel);
 
-        comboBox = new JComboBox<Condition>();
+        comboBox = new JComboBox<>();
         for (Copy.Condition tempBookCondition : Copy.Condition.values()) {
             comboBox.addItem(tempBookCondition);
         }
@@ -218,10 +220,6 @@ public class BookDetailJDialog extends JDialog implements Observer {
         southPanel.add(buttonAddCopy);
     }
 
-    /**
-     * Initialize the contents of the frame.
-     */
-
     @Override
     public void update(Observable o, Object arg) {
         updateDisplay();
@@ -244,5 +242,14 @@ public class BookDetailJDialog extends JDialog implements Observer {
             publisherTextfield.setText(displayedBookDO.getPublisher());
             publisherTextfield.setEnabled(false);
         }
+    }
+
+    /**
+     * Saves the content from all fields to the bookDO.
+     */
+    @Override
+    protected boolean save() {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

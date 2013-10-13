@@ -43,8 +43,8 @@ public class BookMasterJFrame extends JFrame implements Observer {
         editButtonMasterList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BookDetailJDialog frame = new BookDetailJDialog(bookJList
-                        .getSelectedValue());
+                BookDetailJDialog frame = new BookDetailJDialog(
+                        BookMasterJFrame.this, bookJList.getSelectedValue());
                 frame.setVisible(true);
             }
         });
