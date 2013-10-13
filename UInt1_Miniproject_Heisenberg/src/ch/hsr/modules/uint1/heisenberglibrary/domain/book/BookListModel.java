@@ -14,6 +14,7 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.domain.book;
 
+import java.util.Collection;
 import java.util.Set;
 
 import javax.swing.DefaultListModel;
@@ -31,7 +32,7 @@ public class BookListModel extends DefaultListModel<Book> {
     public BookListModel() {
     }
 
-    public BookListModel(Set<Book> aBookSet) {
+    public BookListModel(Collection<Book> aBookSet) {
         for (Book tempBook : aBookSet) {
             addElement(tempBook);
         }

@@ -20,11 +20,15 @@ import ch.hsr.modules.uint1.heisenberglibrary.domain.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookListModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
 
 public class LibraryApp {
     public static void main(String[] args) throws Exception {
         Library library = new Library();
         initLibrary(library);
+		BookMasterJFrame frame = new BookMasterJFrame();
+		frame.bookJList.setModel(new BookListModel(library.getBooks()));
     }
 
     private static void initLibrary(Library library)
@@ -58,6 +62,8 @@ public class LibraryApp {
         for (Loan l : library.getOverdueLoans()) {
             System.out.println(l.getDaysOverdue());
         }
+        
+        
     }
 
     private static void createBooksAndLoans(Library library)
