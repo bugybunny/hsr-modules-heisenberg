@@ -1,13 +1,13 @@
 package ch.hsr.modules.uint1.heisenberglibrary.test;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 import junit.framework.TestCase;
 
 public class BookTest extends TestCase {
 
 	public void testBookCreation() {
-		Book b = new Book("The Definitive ANTLR Reference");
+		BookDO b = new BookDO("The Definitive ANTLR Reference");
 		b.setTitle("The Definitive ANTLR Reference");
 		b.setAuthor("Terence Parr");
 		b.setPublisher("The Pragmatic Programmers");

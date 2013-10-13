@@ -4,16 +4,16 @@ import ch.hsr.modules.uint1.heisenberglibrary.domain.AbstractObservableDO;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
 
 /**
- * 
+ * TODO comment
  * 
  * @author msyfrig
  */
-public class Book extends AbstractObservableDO {
+public class BookDO extends AbstractObservableDO {
 
     private String title, author, publisher;
     private Shelf  shelf;
 
-    public Book(String name) {
+    public BookDO(String name) {
         this.title = name;
     }
 

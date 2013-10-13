@@ -5,7 +5,7 @@ import java.util.List;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Loan;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 import junit.framework.TestCase;
 
 public class LibraryTest extends TestCase {
@@ -18,9 +18,9 @@ public class LibraryTest extends TestCase {
 		library = new Library();
 		
 		// Books
-		Book b1 = library.createAndAddBook("Design Pattern");
-		Book b2 = library.createAndAddBook("Refactoring");
-		Book b3 = library.createAndAddBook("Clean Code");
+		BookDO b1 = library.createAndAddBook("Design Pattern");
+		BookDO b2 = library.createAndAddBook("Refactoring");
+		BookDO b3 = library.createAndAddBook("Clean Code");
 		
 		// Books
 		library.createAndAddCopy(b1);
@@ -42,18 +42,18 @@ public class LibraryTest extends TestCase {
 
 	public void testGetBooksPerTitle() {
 		
-		Book t = library.findByBookTitle("Design Pattern");
+		BookDO t = library.findByBookTitle("Design Pattern");
 		assertEquals(3, library.getCopiesOfBook(t).size());
 		
-		Book t2 = library.findByBookTitle("Clean Code");
+		BookDO t2 = library.findByBookTitle("Clean Code");
 		assertEquals(1, library.getCopiesOfBook(t2).size());
 		
-		Book t3 = library.findByBookTitle("noTitle");
+		BookDO t3 = library.findByBookTitle("noTitle");
 		assertEquals(0, library.getCopiesOfBook(t3).size());
 	}
 	
 	public void testLoans() {
-		Book t = library.findByBookTitle("Design Pattern");
+		BookDO t = library.findByBookTitle("Design Pattern");
 		
 		assertEquals(0, library.getLentCopiesOfBook(t).size());
 		
@@ -75,7 +75,7 @@ public class LibraryTest extends TestCase {
 	public void testAvailability () {
 		assertEquals(library.getCopies().size(),library.getAvailableCopies().size());
 		
-		Book t = library.findByBookTitle("Refactoring");
+		BookDO t = library.findByBookTitle("Refactoring");
 		Customer c = library.getCustomers().get(1);
 		library.createAndAddLoan(c, library.getCopiesOfBook(t).get(0));
 		

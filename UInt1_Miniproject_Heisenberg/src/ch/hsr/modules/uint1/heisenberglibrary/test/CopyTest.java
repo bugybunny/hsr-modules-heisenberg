@@ -1,13 +1,13 @@
 package ch.hsr.modules.uint1.heisenberglibrary.test;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 import junit.framework.TestCase;
 
 public class CopyTest extends TestCase {
 
 	public void testBook() {
-		Book t = new Book("Design Pattern");
+		BookDO t = new BookDO("Design Pattern");
 		Copy c1 = new Copy(t);
 		assertEquals(Copy.nextInventoryNumber -1, c1.getInventoryNumber());
 		Copy c2 = new Copy(t);

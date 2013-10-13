@@ -1,36 +1,38 @@
 package ch.hsr.modules.uint1.heisenberglibrary.domain;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 
 public class Copy {
-	
-	public enum Condition {NEW, GOOD, DAMAGED, WASTE, LOST }
-	
-	public static long nextInventoryNumber = 1;
-	
-	private final long inventoryNumber;
-	private final Book book;
-	private Condition condition;
-	
-	public Copy(Book title) {
-		this.book = title;
-		inventoryNumber = nextInventoryNumber++;
-		condition = Condition.NEW;
-	}
 
-	public Book getTitle() {
-		return book;
-	}
+    public enum Condition {
+        NEW, GOOD, DAMAGED, WASTE, LOST
+    }
 
-	public Condition getCondition() {
-		return condition;
-	}
+    public static long   nextInventoryNumber = 1;
 
-	public void setCondition(Condition condition) {
-		this.condition = condition;
-	}
+    private final long   inventoryNumber;
+    private final BookDO bookDO;
+    private Condition    condition;
 
-	public long getInventoryNumber() {
-		return inventoryNumber;
-	}
+    public Copy(BookDO title) {
+        this.bookDO = title;
+        inventoryNumber = nextInventoryNumber++;
+        condition = Condition.NEW;
+    }
+
+    public BookDO getTitle() {
+        return bookDO;
+    }
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Condition condition) {
+        this.condition = condition;
+    }
+
+    public long getInventoryNumber() {
+        return inventoryNumber;
+    }
 }

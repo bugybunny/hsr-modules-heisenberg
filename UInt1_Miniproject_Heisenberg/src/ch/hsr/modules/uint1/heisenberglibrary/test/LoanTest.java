@@ -3,7 +3,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.test;
 import java.util.GregorianCalendar;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.*;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 import junit.framework.TestCase;
 
 public class LoanTest extends TestCase {
@@ -17,7 +17,7 @@ public class LoanTest extends TestCase {
 
 	private Loan createSampleLoan() {
 		Customer customer = new Customer("Keller", "Peter");
-		Book title = new Book("Design Pattern");
+		BookDO title = new BookDO("Design Pattern");
 		Copy copy = new Copy(title);
 		Loan loan = new Loan(customer,copy);
 		return loan;
@@ -50,7 +50,7 @@ public class LoanTest extends TestCase {
 		assertTrue(l.isLent());
 		try {
 			l.returnCopy(new GregorianCalendar(2008,12,31));
-			fail("Book cannot retuned before the pickup date");
+			fail("BookDO cannot retuned before the pickup date");
 		} catch (IllegalLoanOperationException e) {
 
 		}

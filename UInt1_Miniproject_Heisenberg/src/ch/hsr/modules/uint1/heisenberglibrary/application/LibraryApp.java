@@ -19,7 +19,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.domain.IllegalLoanOperationExcepti
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.Book;
+import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookListModel;
 import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
 
@@ -27,8 +27,9 @@ public class LibraryApp {
     public static void main(String[] args) throws Exception {
         Library library = new Library();
         initLibrary(library);
-		BookMasterJFrame frame = new BookMasterJFrame();
-		frame.bookJList.setModel(new BookListModel(library.getBooks()));
+        BookMasterJFrame frame = new BookMasterJFrame();
+        frame.bookJList.setModel(new BookListModel(library.getBooks()));
+        frame.setVisible(true);
     }
 
     private static void initLibrary(Library library)
@@ -62,8 +63,7 @@ public class LibraryApp {
         for (Loan l : library.getOverdueLoans()) {
             System.out.println(l.getDaysOverdue());
         }
-        
-        
+
     }
 
     private static void createBooksAndLoans(Library library)
@@ -110,7 +110,7 @@ public class LibraryApp {
         NodeList titles = doc2.getElementsByTagName("title");
         for (int i = 0; i < titles.getLength(); i++) {
             Node title = titles.item(i);
-            Book b = library.createAndAddBook(getTextContentOf(title, "name"));
+            BookDO b = library.createAndAddBook(getTextContentOf(title, "name"));
             b.setAuthor(getTextContentOf(title, "author"));
             b.setPublisher(getTextContentOf(title, "publisher"));
             b.setShelf(Shelf.A1);
