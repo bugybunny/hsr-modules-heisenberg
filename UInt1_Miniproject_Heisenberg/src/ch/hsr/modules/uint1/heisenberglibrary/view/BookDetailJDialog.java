@@ -6,8 +6,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -134,18 +132,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
         northPanel.add(titleTextfield, gbc_titleTextfield);
         titleTextfield.setColumns(10);
 
-        titleTextfield.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent aKeyEvent) {
-                int cp = titleTextfield.getCaretPosition();
-                if (displayedBookDO != null) {
-                    displayedBookDO.setTitle(titleTextfield.getText());
-                    titleTextfield.setCaretPosition(cp); // needed to survive
-                                                         // update
-                }
-            }
-        });
-
         authorLabel = new JLabel("Author:");
         GridBagConstraints gbc_authorLabel = new GridBagConstraints();
         gbc_authorLabel.anchor = GridBagConstraints.NORTH;
@@ -247,9 +233,15 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
     /**
      * Saves the content from all fields to the bookDO.
      */
+    // TODO Herr Stolze fragen ob wir eigentlich immer updaten müssen wenn ein
+    // Key gedrückt würde, das Buch wird ja sowieso nur in einem Dialog angzeigt
+    // und es verursacht unnnötige Updates
+    // TODO mit Theo abklären
     @Override
     protected boolean save() {
-        // TODO Auto-generated method stub
-        return false;
+        displayedBookDO.set(titleTextfield.getText(),
+                authorTextfield.getText(), publisherTextfield.getText(),
+                displayedBookDO.getShelf());
+        return true;
     }
 }

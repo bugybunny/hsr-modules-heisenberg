@@ -88,6 +88,7 @@ public abstract class AbstractDefaultJDialog extends JDialog {
         initComponents();
         addKeyHandlers(aGlobalKeyListener != null ? aGlobalKeyListener
                 : new DefaultDialogKeyHandler());
+        setLocationByPlatform(true);
     }
 
     /**
@@ -127,6 +128,7 @@ public abstract class AbstractDefaultJDialog extends JDialog {
         initComponents();
         addKeyHandlers(aGlobalKeyListener != null ? aGlobalKeyListener
                 : new DefaultDialogKeyHandler());
+        setLocationByPlatform(true);
     }
 
     /**
