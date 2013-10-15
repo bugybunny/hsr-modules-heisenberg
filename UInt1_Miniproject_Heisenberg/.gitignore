@@ -1,6 +1,3 @@
-/bin
-.project
-/.settings
-.checkstyle
-.classpath
-.project
+bin
+/
+.settings
