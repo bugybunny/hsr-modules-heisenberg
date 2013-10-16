@@ -116,7 +116,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
                 editButtonMasterList.setEnabled(false);
                 UiComponentStrings
                         .getString("BookMasterJFrame.button.edit.disabled.tooltip");
-            }
+            } 
         }
     }
 }
