@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -44,6 +45,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         JPanel topPane = new JPanel();
         contentPane.add(topPane, BorderLayout.NORTH);
+        topPane.setLayout(new BoxLayout(topPane, BoxLayout.X_AXIS));
 
         JPanel bottomPane = new JPanel();
         contentPane.add(bottomPane, BorderLayout.SOUTH);
