@@ -129,5 +129,8 @@ public class BookTableModel extends AbstractTableModel {
 		// default
 		return String.class;
 	}
+	public BookDO getBookByRowNumber(int i) {
+	    return data.get(i);
+	}
 
 }
