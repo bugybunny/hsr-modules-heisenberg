@@ -31,7 +31,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
 
     private static final long         serialVersionUID = 5145001889718027524L;
     private JPanel                    contentPane;
-    private JTextField                isbnTextfield;
     private JTextField                titleTextfield;
     private JLabel                    authorLabel;
     private JTextField                authorTextfield;
@@ -45,13 +44,18 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
     private Component                 glue;
     private Component                 rigidArea;
 
+    public BookDetailJDialog(JFrame anOwner, BookDO aBookDo) {
+        super(anOwner, aBookDo.getTitle());
+        setBookDO(aBookDo);
+    }
+
     /**
-     * Create the application.
+     * Sets the model for this dialog and adds observer to it or removes the
+     * observer if a new book is set (which should never happen).
      * 
      * @param book
      */
-
-    public void setBookDO(BookDO aNewBookDo) {
+    private void setBookDO(BookDO aNewBookDo) {
         // do nothing if same book is set
         if (aNewBookDo != displayedBookDO) {
             // delete observers for this old, not anymore displayed book
@@ -65,11 +69,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
             }
             updateDisplay();
         }
-    }
-
-    public BookDetailJDialog(JFrame anOwner, BookDO aBookDo) {
-        super(anOwner, aBookDo.getTitle());
-        setBookDO(aBookDo);
     }
 
     /*
@@ -88,122 +87,130 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
 
         JPanel northPanel = new JPanel();
         northPanel.setBorder(new TitledBorder(UIManager
-                .getBorder("TitledBorder.border"), "Title Information",
+                .getBorder("TitledBorder.border"),//$NON-NLS-1$
+                UiComponentStrings
+                        .getString("BookDetailJDialog.border.title.label"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         contentPane.add(northPanel, BorderLayout.CENTER);
-        GridBagLayout gbl_panel = new GridBagLayout();
-        gbl_panel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
-        gbl_panel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0 };
-        gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0,
+        GridBagLayout gblPanel = new GridBagLayout();
+        gblPanel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
+        gblPanel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0 };
+        gblPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0,
                 Double.MIN_VALUE };
-        gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        gblPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 Double.MIN_VALUE };
-        northPanel.setLayout(gbl_panel);
+        northPanel.setLayout(gblPanel);
 
-        JLabel isbnLabel = new JLabel("ISBN:");
-        GridBagConstraints gbc_isbnLabel = new GridBagConstraints();
-        gbc_isbnLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_isbnLabel.gridx = 1;
-        gbc_isbnLabel.gridy = 1;
-        northPanel.add(isbnLabel, gbc_isbnLabel);
-
-        isbnTextfield = new JTextField();
-        GridBagConstraints gbc_isbnTextfield = new GridBagConstraints();
-        gbc_isbnTextfield.insets = new Insets(0, 0, 5, 0);
-        gbc_isbnTextfield.fill = GridBagConstraints.HORIZONTAL;
-        gbc_isbnTextfield.gridx = 3;
-        gbc_isbnTextfield.gridy = 1;
-        northPanel.add(isbnTextfield, gbc_isbnTextfield);
-        isbnTextfield.setColumns(10);
-
-        JLabel titleLabel = new JLabel("Title:");
-        GridBagConstraints gbc_titleLabel = new GridBagConstraints();
-        gbc_titleLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_titleLabel.gridx = 1;
-        gbc_titleLabel.gridy = 2;
-        northPanel.add(titleLabel, gbc_titleLabel);
+        JLabel titleLabel = new JLabel(
+                UiComponentStrings
+                        .getString("BookDetailJDialog.label.title.label")); //$NON-NLS-1$
+        GridBagConstraints gbcTitleLabel = new GridBagConstraints();
+        gbcTitleLabel.insets = new Insets(0, 0, 5, 5);
+        gbcTitleLabel.gridx = 1;
+        gbcTitleLabel.gridy = 1;
+        northPanel.add(titleLabel, gbcTitleLabel);
 
         titleTextfield = new JTextField();
-        GridBagConstraints gbc_titleTextfield = new GridBagConstraints();
-        gbc_titleTextfield.fill = GridBagConstraints.HORIZONTAL;
-        gbc_titleTextfield.insets = new Insets(0, 0, 5, 0);
-        gbc_titleTextfield.gridx = 3;
-        gbc_titleTextfield.gridy = 2;
-        northPanel.add(titleTextfield, gbc_titleTextfield);
+        GridBagConstraints gbcTitleTextfield = new GridBagConstraints();
+        gbcTitleTextfield.fill = GridBagConstraints.HORIZONTAL;
+        gbcTitleTextfield.insets = new Insets(0, 0, 5, 0);
+        gbcTitleTextfield.gridx = 3;
+        gbcTitleTextfield.gridy = 1;
+        northPanel.add(titleTextfield, gbcTitleTextfield);
         titleTextfield.setColumns(10);
 
-        authorLabel = new JLabel("Author:");
-        GridBagConstraints gbc_authorLabel = new GridBagConstraints();
-        gbc_authorLabel.anchor = GridBagConstraints.NORTH;
-        gbc_authorLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_authorLabel.gridx = 1;
-        gbc_authorLabel.gridy = 3;
-        northPanel.add(authorLabel, gbc_authorLabel);
+        authorLabel = new JLabel(
+                UiComponentStrings
+                        .getString("BookDetailJDialog.label.author.label")); //$NON-NLS-1$
+        GridBagConstraints gbcAuthorLabel = new GridBagConstraints();
+        gbcAuthorLabel.anchor = GridBagConstraints.NORTH;
+        gbcAuthorLabel.insets = new Insets(0, 0, 5, 5);
+        gbcAuthorLabel.gridx = 1;
+        gbcAuthorLabel.gridy = 2;
+        northPanel.add(authorLabel, gbcAuthorLabel);
 
         authorTextfield = new JTextField();
-        GridBagConstraints gbc_authorTextfield = new GridBagConstraints();
-        gbc_authorTextfield.insets = new Insets(0, 0, 5, 0);
-        gbc_authorTextfield.fill = GridBagConstraints.HORIZONTAL;
-        gbc_authorTextfield.gridx = 3;
-        gbc_authorTextfield.gridy = 3;
-        northPanel.add(authorTextfield, gbc_authorTextfield);
+        GridBagConstraints gbcAuthorTextfield = new GridBagConstraints();
+        gbcAuthorTextfield.insets = new Insets(0, 0, 5, 0);
+        gbcAuthorTextfield.fill = GridBagConstraints.HORIZONTAL;
+        gbcAuthorTextfield.gridx = 3;
+        gbcAuthorTextfield.gridy = 2;
+        northPanel.add(authorTextfield, gbcAuthorTextfield);
         authorTextfield.setColumns(10);
 
-        publisherLabel = new JLabel("Publisher:");
-        GridBagConstraints gbc_publisherLabel = new GridBagConstraints();
-        gbc_publisherLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_publisherLabel.gridx = 1;
-        gbc_publisherLabel.gridy = 4;
-        northPanel.add(publisherLabel, gbc_publisherLabel);
+        publisherLabel = new JLabel(
+                UiComponentStrings
+                        .getString("BookDetailJDialog.label.publisher.label")); //$NON-NLS-1$
+        GridBagConstraints gbcPublisherLabel = new GridBagConstraints();
+        gbcPublisherLabel.insets = new Insets(0, 0, 5, 5);
+        gbcPublisherLabel.gridx = 1;
+        gbcPublisherLabel.gridy = 3;
+        northPanel.add(publisherLabel, gbcPublisherLabel);
 
         publisherTextfield = new JTextField();
-        GridBagConstraints gbc_publisherTextfield = new GridBagConstraints();
-        gbc_publisherTextfield.insets = new Insets(0, 0, 5, 0);
-        gbc_publisherTextfield.fill = GridBagConstraints.HORIZONTAL;
-        gbc_publisherTextfield.gridx = 3;
-        gbc_publisherTextfield.gridy = 4;
-        northPanel.add(publisherTextfield, gbc_publisherTextfield);
+        GridBagConstraints gbcPublisherTextfield = new GridBagConstraints();
+        gbcPublisherTextfield.insets = new Insets(0, 0, 5, 0);
+        gbcPublisherTextfield.fill = GridBagConstraints.HORIZONTAL;
+        gbcPublisherTextfield.gridx = 3;
+        gbcPublisherTextfield.gridy = 3;
+        northPanel.add(publisherTextfield, gbcPublisherTextfield);
         publisherTextfield.setColumns(10);
 
-        conditionLabel = new JLabel("Condition:");
-        GridBagConstraints gbc_conditionLabel = new GridBagConstraints();
-        gbc_conditionLabel.insets = new Insets(0, 0, 0, 5);
-        gbc_conditionLabel.gridx = 1;
-        gbc_conditionLabel.gridy = 5;
-        northPanel.add(conditionLabel, gbc_conditionLabel);
+        conditionLabel = new JLabel(
+                UiComponentStrings
+                        .getString("BookDetailJDialog.label.condition.label")); //$NON-NLS-1$
+        GridBagConstraints gbcConditionLabel = new GridBagConstraints();
+        gbcConditionLabel.insets = new Insets(0, 0, 0, 5);
+        gbcConditionLabel.gridx = 1;
+        gbcConditionLabel.gridy = 4;
+        northPanel.add(conditionLabel, gbcConditionLabel);
 
         comboBox = new JComboBox<>();
         for (Copy.Condition tempBookCondition : Copy.Condition.values()) {
             comboBox.addItem(tempBookCondition);
         }
-        GridBagConstraints gbc_comboBox = new GridBagConstraints();
-        gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_comboBox.gridx = 3;
-        gbc_comboBox.gridy = 5;
-        northPanel.add(comboBox, gbc_comboBox);
+        GridBagConstraints gbcComboBox = new GridBagConstraints();
+        gbcComboBox.fill = GridBagConstraints.HORIZONTAL;
+        gbcComboBox.gridx = 3;
+        gbcComboBox.gridy = 4;
+        northPanel.add(comboBox, gbcComboBox);
 
         JPanel southPanel = new JPanel();
-        southPanel.setBorder(new TitledBorder(null, "Inventory Information",
+        southPanel.setBorder(new TitledBorder(null, UiComponentStrings
+                .getString("BookDetailJDialog.border.inventory.label"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         contentPane.add(southPanel, BorderLayout.SOUTH);
         southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.X_AXIS));
 
-        labelCopies = new JLabel("Total Copies: 8");
+        labelCopies = new JLabel("Total Copies: 8"); //$NON-NLS-1$
         labelCopies.setAlignmentX(Component.RIGHT_ALIGNMENT);
         southPanel.add(labelCopies);
 
         rigidArea = Box.createRigidArea(new Dimension(20, 20));
         southPanel.add(rigidArea);
 
-        labelAvailable = new JLabel("Total available: 2");
+        labelAvailable = new JLabel("Total available: 2"); //$NON-NLS-1$
         southPanel.add(labelAvailable);
 
         glue = Box.createGlue();
         southPanel.add(glue);
 
-        buttonAddCopy = new JButton("Add a copy");
+        buttonAddCopy = new JButton(
+                UiComponentStrings
+                        .getString("BookDetailJDialog.button.addcopy.text")); //$NON-NLS-1$
         buttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
         southPanel.add(buttonAddCopy);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ch.hsr.modules.uint1.heisenberglibrary.view.AbstractDefaultJDialog#
+     * initHandlers()
+     */
+    @Override
+    protected void initHandlers() {
+
     }
 
     @Override
@@ -212,36 +219,36 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
     }
 
     private void updateDisplay() {
+        // this case should never happen, that the book is null but it still
+        // prevents us from a npe
         if (displayedBookDO == null) {
-            titleTextfield.setText("");
+            titleTextfield.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             titleTextfield.setEnabled(true);
-            authorTextfield.setText("");
+            authorTextfield.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             authorLabel.setEnabled(true);
-            publisherTextfield.setText("");
+            publisherTextfield.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             publisherLabel.setEnabled(true);
 
         } else {
             titleTextfield.setText(displayedBookDO.getTitle());
             titleTextfield.setEnabled(true);
+            titleTextfield.setCaretPosition(0);
             authorTextfield.setText(displayedBookDO.getAuthor());
-            authorTextfield.setEnabled(false);
+            authorTextfield.setEnabled(true);
             publisherTextfield.setText(displayedBookDO.getPublisher());
-            publisherTextfield.setEnabled(false);
+            publisherTextfield.setEnabled(true);
         }
     }
 
     /**
      * Saves the content from all fields to the bookDO.
      */
-    // TODO Herr Stolze fragen ob wir eigentlich immer updaten müssen wenn ein
-    // Key gedrückt würde, das Buch wird ja sowieso nur in einem Dialog angzeigt
-    // und es verursacht unnnötige Updates
-    // TODO mit Theo abklären
     @Override
-    protected boolean save() {
+    public boolean save() {
         displayedBookDO.set(titleTextfield.getText(),
                 authorTextfield.getText(), publisherTextfield.getText(),
                 displayedBookDO.getShelf());
+        // TODO getShelf anpassen sobald implementiert im GUI
         return true;
     }
 }

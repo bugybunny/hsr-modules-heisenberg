@@ -14,23 +14,23 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Frame;
-import java.awt.event.KeyAdapter;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.security.InvalidParameterException;
-import java.util.HashSet;
-import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 /**
- * Superclass for all dialogs in this project. All dialogs need to be modal and
- * have a title.
+ * Superclass for all dialogs in this project. All dialogs need to be non-modal
+ * and have a title.
  * 
  * <br>The default exit operation is dispose but can be overridden.
  * 
@@ -50,6 +50,9 @@ import javax.swing.JFrame;
  */
 public abstract class AbstractDefaultJDialog extends JDialog {
     private static final long serialVersionUID = 2551909774692437970L;
+
+    private Action            saveAction;
+    private Action            disposeAction;
 
     /**
      * Creates a new dialog and sets the owner and title. Initializes all
@@ -79,16 +82,7 @@ public abstract class AbstractDefaultJDialog extends JDialog {
     public AbstractDefaultJDialog(Frame anOwner, String aTitle,
             KeyListener aGlobalKeyListener) {
         super(anOwner, aTitle);
-        if (aTitle.isEmpty()) {
-            // TODO dient nur dazu, dass wir nicht ausversehen irgendwo den
-            // titel vergessen
-            throw new InvalidParameterException("please set a title");
-        }
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        initComponents();
-        addKeyHandlers(aGlobalKeyListener != null ? aGlobalKeyListener
-                : new DefaultDialogKeyHandler());
-        setLocationByPlatform(true);
+        initEverything(aTitle, aGlobalKeyListener);
     }
 
     /**
@@ -119,6 +113,10 @@ public abstract class AbstractDefaultJDialog extends JDialog {
     public AbstractDefaultJDialog(Dialog anOwner, String aTitle,
             KeyListener aGlobalKeyListener) {
         super(anOwner, aTitle);
+        initEverything(aTitle, aGlobalKeyListener);
+    }
+
+    private void initEverything(String aTitle, KeyListener aGlobalKeyListener) {
         if (aTitle.isEmpty()) {
             // TODO dient nur dazu, dass wir nicht ausversehen irgendwo den
             // titel vergessen
@@ -126,8 +124,25 @@ public abstract class AbstractDefaultJDialog extends JDialog {
         }
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         initComponents();
-        addKeyHandlers(aGlobalKeyListener != null ? aGlobalKeyListener
-                : new DefaultDialogKeyHandler());
+        initHandlers();
+
+        saveAction = new SaveAction("save");
+        disposeAction = new DisposeAction("dispose");
+
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                        disposeAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(disposeAction.getValue(Action.NAME),
+                disposeAction);
+
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                        saveAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(saveAction.getValue(Action.NAME),
+                saveAction);
+
         setLocationByPlatform(true);
     }
 
@@ -137,9 +152,18 @@ public abstract class AbstractDefaultJDialog extends JDialog {
     protected abstract void initComponents();
 
     /**
+     * Adds all listeners/handlers. This is just so we separate the code and it
+     * becomes more readable.
+     */
+    protected abstract void initHandlers();
+
+    /**
+     * Subclasses need to implement this function. In the default behavior (if
+     * {@link #AbstractDefaultJDialog(Dialog, String)} or
+     * {@link #AbstractDefaultJDialog(Frame, String)} has been called) the save
+     * action is called as soon as the user presses enter.
      * 
-     * 
-     * @return
+     * @return if the save was successful or not if any values were invalid
      */
     protected abstract boolean save();
 
@@ -148,80 +172,47 @@ public abstract class AbstractDefaultJDialog extends JDialog {
         throw new UnsupportedOperationException("cannot change modality");
     }
 
-    /**
-     * Adds a default keyhandler to all components in this dialog. Should be
-     * called when all components have been added and not before.
-     */
-    protected void addKeyHandlers() {
-        addKeyHandlers(new DefaultDialogKeyHandler());
-    }
+    private class SaveAction extends AbstractAction {
+        private static final long serialVersionUID = -4275362945903839390L;
 
-    /**
-     * Adds a default keyhandler to all components in this dialog. Should be
-     * called when all components have been added and not before.
-     * 
-     * @param aCustomKeyListener
-     *            keyhandler to for all componens
-     */
-    protected void addKeyHandlers(KeyListener aCustomKeyListener) {
-        for (Component tempComponent : getAllSubComponents(getContentPane())) {
-            tempComponent.addKeyListener(aCustomKeyListener);
-        }
-    }
-
-    /**
-     * Recursively iterates over all components from a given parent container
-     * and returns them.
-     * 
-     * @param aParentContainer
-     *            parent container from where to start the iteration
-     * @return set of all subcomponents in the given container
-     * 
-     * @author msyfrig
-     */
-    private Set<Component> getAllSubComponents(Container aParentContainer) {
-        Set<Component> subComponents = new HashSet<>();
-        for (Component tempComponent : aParentContainer.getComponents()) {
-            if (tempComponent instanceof Container) {
-                subComponents
-                        .addAll(getAllSubComponents((Container) tempComponent));
-            }
-            subComponents.add(tempComponent);
+        private SaveAction(String anActionName) {
+            super(anActionName);
         }
 
-        return subComponents;
-    }
-
-    /**
-     * Default keyhandler for dialogs.
-     * 
-     * <br> Escape: closes the dialog and discards all changes
-     * 
-     * <br> Enter: closes the dialog and saves all changes
-     * 
-     * @author msyfrig
-     */
-    private class DefaultDialogKeyHandler extends KeyAdapter {
         /*
          * (non-Javadoc)
          * 
-         * @see java.awt.event.KeyAdapter#keyReleased(java.awt.event.KeyEvent)
+         * @see
+         * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
+         * )
          */
         @Override
-        public void keyReleased(KeyEvent aKeyEvent) {
-            int releasedKeyCode = aKeyEvent.getKeyCode();
-            switch (releasedKeyCode) {
-                case KeyEvent.VK_ESCAPE:
-                    dispose();
-                    break;
-                case KeyEvent.VK_ENTER:
-                    save();
-                    dispose();
-                    break;
-                default:
-                    // nothing
-                    break;
-            }
+        public void actionPerformed(ActionEvent anActionEvent) {
+            save();
+            dispose();
+        }
+    }
+
+    private class DisposeAction extends AbstractAction {
+        private static final long serialVersionUID = 2752048542262499446L;
+
+        /**
+         * Creates a new instance of this class.
+         */
+        private DisposeAction(String anActionName) {
+            super(anActionName);
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see
+         * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
+         * )
+         */
+        @Override
+        public void actionPerformed(ActionEvent aE) {
+            dispose();
         }
     }
 }
