@@ -23,6 +23,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.JTableHeader;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.BookTableModel;
@@ -40,16 +42,18 @@ public class BookMasterJFrame extends JFrame implements Observer {
     private JPanel               inventory;
     private JTabbedPane          tabbedPane;
     private JPanel               Books;
-    private JButton              btnNewButton;
-    private JLabel               lblDd;
-    private JLabel               lblAnzahlExemplare;
-    private JTextField           textField;
-    private JCheckBox            chckbxNewCheckBox;
+    private JButton              selectButtonMasterList;
+    private JLabel               numberOfBooksLable;
+    private JLabel               numberOfExemplarsLable;
+    private JTextField           searchFieldBooksMasterList;
+    private JCheckBox            onlyAvailableCheckboxMasterList;
     private Component            horizontalStrut;
     private JPanel               Lending;
     private Component            horizontalStrut_1;
     private JPanel               panel;
     private JLabel               lblNewLabel;
+    private JPanel BookInventory;
+    private JPanel Statistics;
 
     /**
      * Create the frame.
@@ -68,88 +72,94 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         Books = new JPanel();
         tabbedPane.addTab("Books", null, Books, null);
-        Books.setLayout(new BorderLayout(0, 0));
-
-        JPanel topPane = new JPanel();
-        Books.add(topPane, BorderLayout.NORTH);
-        topPane.setLayout(new BoxLayout(topPane, BoxLayout.Y_AXIS));
-
-        statistics = new JPanel();
-        FlowLayout flowLayout_1 = (FlowLayout) statistics.getLayout();
-        flowLayout_1.setAlignment(FlowLayout.LEFT);
-        topPane.add(statistics);
-
-        lblDd = new JLabel(
-                UiComponentStrings.getString("BookMasterJFrame.lblDd.text")); //$NON-NLS-1$
-        statistics.add(lblDd);
-
-        horizontalStrut_1 = Box.createHorizontalStrut(100);
-        statistics.add(horizontalStrut_1);
-
-        lblAnzahlExemplare = new JLabel(
-                UiComponentStrings
-                        .getString("BookMasterJFrame.lblAnzahlExemplare.text")); //$NON-NLS-1$
-        statistics.add(lblAnzahlExemplare);
-
-        panel = new JPanel();
-        FlowLayout flowLayout_2 = (FlowLayout) panel.getLayout();
-        flowLayout_2.setAlignment(FlowLayout.LEFT);
-        topPane.add(panel);
-
-        lblNewLabel = new JLabel(
-                UiComponentStrings
-                        .getString("BookMasterJFrame.lblNewLabel.text")); //$NON-NLS-1$
-        panel.add(lblNewLabel);
-
-        inventory = new JPanel();
-        topPane.add(inventory);
-        inventory.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-
-        textField = new JTextField();
-        inventory.add(textField);
-        textField.setText(UiComponentStrings
-                .getString("BookMasterJFrame.textField.text_1"));
-        textField.setColumns(10);
-
-        chckbxNewCheckBox = new JCheckBox(
-                UiComponentStrings
-                        .getString("BookMasterJFrame.chckbxNewCheckBox.text"));
-        inventory.add(chckbxNewCheckBox);
-
-        horizontalStrut = Box.createHorizontalStrut(400);
-        inventory.add(horizontalStrut);
-
-        btnNewButton = new JButton(
-                UiComponentStrings
-                        .getString("BookMasterJFrame.btnNewButton.text")); //$NON-NLS-1$
-        inventory.add(btnNewButton);
-
-        editButtonMasterList = new JButton(
-                UiComponentStrings
-                        .getString("BookMasterJFrame.button.edit.label"));
-        inventory.add(editButtonMasterList);
-        editButtonMasterList.setToolTipText(UiComponentStrings
-                .getString("BookMasterJFrame.button.edit.disabled.tooltip")); //$NON-NLS-1$
-        editButtonMasterList.addActionListener(new EditButtonListener());
-        editButtonMasterList.setEnabled(false);
-        editButtonMasterList.setMnemonic('e');
-
-        centerPane = new JPanel();
-        Books.add(centerPane, BorderLayout.CENTER);
-
-        centerPane.setLayout(new BorderLayout(0, 0));
-
-        table = new JTable();
-        JTableHeader header = table.getTableHeader();
-        table.setCellSelectionEnabled(true);
-        table.setFillsViewportHeight(true);
-
-        JScrollPane jsp = new JScrollPane(table);
-        centerPane.add(jsp);
-
-        JPanel bottomPane = new JPanel();
-        FlowLayout flowLayout = (FlowLayout) bottomPane.getLayout();
-        Books.add(bottomPane, BorderLayout.EAST);
+        Books.setLayout(new BoxLayout(Books, BoxLayout.Y_AXIS));
+        
+        Statistics = new JPanel();
+        Statistics.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Inventory Statistics", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        Books.add(Statistics);
+                Statistics.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        
+                statistics = new JPanel();
+                Statistics.add(statistics);
+                FlowLayout flowLayout_1 = (FlowLayout) statistics.getLayout();
+                flowLayout_1.setAlignment(FlowLayout.LEFT);
+                
+                        numberOfBooksLable = new JLabel(
+                                UiComponentStrings.getString("BookMasterJFrame.lblDd.text")); //$NON-NLS-1$
+                        statistics.add(numberOfBooksLable);
+                        
+                                horizontalStrut_1 = Box.createHorizontalStrut(50);
+                                statistics.add(horizontalStrut_1);
+                                
+                                        numberOfExemplarsLable = new JLabel(
+                                                UiComponentStrings
+                                                        .getString("BookMasterJFrame.lblAnzahlExemplare.text")); //$NON-NLS-1$
+                                        statistics.add(numberOfExemplarsLable);
+        
+        BookInventory = new JPanel();
+        BookInventory.setBorder(new TitledBorder(null, "Book Inventory", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        Books.add(BookInventory);
+        BookInventory.setLayout(new BorderLayout(0, 0));
+                
+                        JPanel topPane = new JPanel();
+                        BookInventory.add(topPane, BorderLayout.NORTH);
+                        topPane.setLayout(new BoxLayout(topPane, BoxLayout.Y_AXIS));
+                        
+                                panel = new JPanel();
+                                FlowLayout flowLayout_2 = (FlowLayout) panel.getLayout();
+                                flowLayout_2.setAlignment(FlowLayout.LEFT);
+                                topPane.add(panel);
+                                
+                                        lblNewLabel = new JLabel(
+                                                UiComponentStrings
+                                                        .getString("BookMasterJFrame.lblNewLabel.text")); //$NON-NLS-1$
+                                        panel.add(lblNewLabel);
+                                        
+                                                inventory = new JPanel();
+                                                topPane.add(inventory);
+                                                inventory.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+                                                
+                                                        searchFieldBooksMasterList = new JTextField();
+                                                        inventory.add(searchFieldBooksMasterList);
+                                                        searchFieldBooksMasterList.setText(UiComponentStrings
+                                                                .getString("BookMasterJFrame.textField.text_1"));
+                                                        searchFieldBooksMasterList.setColumns(10);
+                                                        
+                                                                onlyAvailableCheckboxMasterList = new JCheckBox(
+                                                                        UiComponentStrings
+                                                                                .getString("BookMasterJFrame.chckbxNewCheckBox.text"));
+                                                                inventory.add(onlyAvailableCheckboxMasterList);
+                                                                
+                                                                        horizontalStrut = Box.createHorizontalStrut(50);
+                                                                        inventory.add(horizontalStrut);
+                                                                        
+                                                                                selectButtonMasterList = new JButton(
+                                                                                        UiComponentStrings
+                                                                                                .getString("BookMasterJFrame.btnNewButton.text")); //$NON-NLS-1$
+                                                                                inventory.add(selectButtonMasterList);
+                                                                                
+                                                                                        editButtonMasterList = new JButton(
+                                                                                                UiComponentStrings
+                                                                                                        .getString("BookMasterJFrame.button.edit.label"));
+                                                                                        inventory.add(editButtonMasterList);
+                                                                                        editButtonMasterList.setToolTipText(UiComponentStrings
+                                                                                                .getString("BookMasterJFrame.button.edit.disabled.tooltip")); //$NON-NLS-1$
+                                                                                        editButtonMasterList.addActionListener(new EditButtonListener());
+                                                                                        editButtonMasterList.setEnabled(false);
+                                                                                        editButtonMasterList.setMnemonic('e');
+        
+                centerPane = new JPanel();
+                BookInventory.add(centerPane, BorderLayout.CENTER);
+                
+                        centerPane.setLayout(new BorderLayout(0, 0));
+                        
+                                table = new JTable();
+                                JTableHeader header = table.getTableHeader();
+                                table.setCellSelectionEnabled(true);
+                                table.setFillsViewportHeight(true);
+                                
+                                        JScrollPane jsp = new JScrollPane(table);
+                                        centerPane.add(jsp);
 
         Lending = new JPanel();
         tabbedPane.addTab("Lending", null, Lending, null);
