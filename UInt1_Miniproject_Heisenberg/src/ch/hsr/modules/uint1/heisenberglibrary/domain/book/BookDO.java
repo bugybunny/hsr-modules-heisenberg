@@ -4,7 +4,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.domain.AbstractObservableDO;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
 
 /**
- * TODO comment
+ * Represents a book object.
  * 
  * @author msyfrig
  */
