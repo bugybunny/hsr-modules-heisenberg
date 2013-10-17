@@ -12,13 +12,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.table.JTableHeader;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 
@@ -27,9 +25,9 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
     private JPanel               contentPane;
     private JPanel               centerPane;
-    public JList<BookDO>         bookJList;
     private Map<BookDO, JDialog> openBookDialogMap = new HashMap<>();
     private JButton              editButtonMasterList;
+    public JTable table;
 
     /**
      * Create the frame.
@@ -62,20 +60,28 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         centerPane = new JPanel();
         contentPane.add(centerPane, BorderLayout.CENTER);
-
-        bookJList = new JList<>();
-        bookJList.addListSelectionListener(new BookListSelectionListener());
-
-        JScrollPane jsp = new JScrollPane(bookJList,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+     
+        centerPane.setLayout(new BorderLayout(0, 0));
+        
+        table = new JTable();
+        JTableHeader header = table.getTableHeader();
+        table.setCellSelectionEnabled(true);
+        table.setFillsViewportHeight(true);
+        
+        JScrollPane jsp = new JScrollPane(table);
         centerPane.add(jsp);
+        
+
+
+        //table.setAutoResizeMode(1);
+        
     }
 
     @Override
     public void update(Observable o, Object arg) {
         // TODO updatet erst bei erneuter Selektion
-        bookJList.repaint();
+        //bookJList.repaint();
     }
 
     private class EditButtonListener implements ActionListener {
@@ -85,7 +91,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
          * will be placed on top and focused.
          */
         @Override
-        public void actionPerformed(ActionEvent aE) {
+        public void actionPerformed(ActionEvent aE) {/*
             for (BookDO tempBook : bookJList.getSelectedValuesList()) {
                 System.out.println(tempBook.getTitle());
                 // check first if the dialog for this dialog is already open
@@ -100,25 +106,6 @@ public class BookMasterJFrame extends JFrame implements Observer {
                     openBookDialogMap.put(tempBook, bookDetailDialog);
                 }
             }
-        }
-    }
-
-    private class BookListSelectionListener implements ListSelectionListener {
-        /**
-         * Enables the edit button if at least one book is selected, else
-         * disables it.
-         */
-        @Override
-        public void valueChanged(ListSelectionEvent aSelectionEvent) {
-            if (bookJList.getSelectedIndices().length > 0) {
-                editButtonMasterList.setEnabled(true);
-                UiComponentStrings
-                        .getString("BookMasterJFrame.button.edit.enabled.tooltip");
-            } else {
-                editButtonMasterList.setEnabled(false);
-                UiComponentStrings
-                        .getString("BookMasterJFrame.button.edit.disabled.tooltip");
-            } 
-        }
+       */ }
     }
 }

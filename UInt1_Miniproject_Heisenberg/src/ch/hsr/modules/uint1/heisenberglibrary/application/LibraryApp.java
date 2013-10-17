@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import ch.hsr.modules.uint1.heisenberglibrary.domain.BookTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.IllegalLoanOperationException;
@@ -20,7 +21,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.domain.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookListModel;
 import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
 
 public class LibraryApp {
@@ -28,7 +28,7 @@ public class LibraryApp {
         Library library = new Library();
         initLibrary(library);
         BookMasterJFrame frame = new BookMasterJFrame();
-        frame.bookJList.setModel(new BookListModel(library.getBooks()));
+        frame.table.setModel(new BookTableModel(library.getBooks()));
         frame.setVisible(true);
     }
 
