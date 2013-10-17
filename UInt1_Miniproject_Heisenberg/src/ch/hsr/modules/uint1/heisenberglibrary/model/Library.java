@@ -1,4 +1,4 @@
-package ch.hsr.modules.uint1.heisenberglibrary.domain;
+package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import java.util.ArrayList;
 import java.util.List;

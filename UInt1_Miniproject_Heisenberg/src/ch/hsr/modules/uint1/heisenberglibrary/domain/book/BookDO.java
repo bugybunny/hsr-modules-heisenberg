@@ -1,7 +1,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.domain.book;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.AbstractObservableDO;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
+import ch.hsr.modules.uint1.heisenberglibrary.model.AbstractObservableDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 
 /**
  * Represents a book object.

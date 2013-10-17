@@ -1,6 +1,6 @@
 package ch.hsr.modules.uint1.heisenberglibrary.test;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Customer;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import junit.framework.TestCase;
 
 public class CustomerTest extends TestCase {

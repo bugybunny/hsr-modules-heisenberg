@@ -21,8 +21,8 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 
 public class BookDetailJDialog extends AbstractDefaultJDialog implements
         Observer {

@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.hsr.modules.uint1.heisenberglibrary.domain;
+package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import java.util.Observable;
 
@@ -50,12 +50,13 @@ public abstract class AbstractObservableDO extends Observable {
         setChanged();
         notifyObservers();
     }
-    
+
     /**
-     * Sets the state to changed and notifies all registered observers with anUpdatedObject.
+     * Sets the state to changed and notifies all registered observers with
+     * anUpdatedObject.
      */
     protected void doNotify(Object anUpdatedObject) {
         setChanged();
-        notifyObservers();
+        notifyObservers(anUpdatedObject);
     }
 }

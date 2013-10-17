@@ -1,7 +1,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.test;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import junit.framework.TestCase;
 
 public class BookTest extends TestCase {

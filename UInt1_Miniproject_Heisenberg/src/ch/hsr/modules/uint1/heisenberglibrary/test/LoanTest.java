@@ -3,11 +3,11 @@ package ch.hsr.modules.uint1.heisenberglibrary.test;
 import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Copy;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Customer;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.IllegalLoanOperationException;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IllegalLoanOperationException;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 
 public class LoanTest extends TestCase {
 

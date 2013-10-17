@@ -2,10 +2,10 @@ package ch.hsr.modules.uint1.heisenberglibrary.test;
 
 import java.util.List;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Customer;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.domain.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import junit.framework.TestCase;
 
 public class LibraryTest extends TestCase {

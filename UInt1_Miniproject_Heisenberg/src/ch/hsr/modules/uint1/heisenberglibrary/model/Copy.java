@@ -1,4 +1,4 @@
-package ch.hsr.modules.uint1.heisenberglibrary.domain;
+package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 
