@@ -50,4 +50,12 @@ public abstract class AbstractObservableDO extends Observable {
         setChanged();
         notifyObservers();
     }
+    
+    /**
+     * Sets the state to changed and notifies all registered observers with anUpdatedObject.
+     */
+    protected void doNotify(Object anUpdatedObject) {
+        setChanged();
+        notifyObservers();
+    }
 }

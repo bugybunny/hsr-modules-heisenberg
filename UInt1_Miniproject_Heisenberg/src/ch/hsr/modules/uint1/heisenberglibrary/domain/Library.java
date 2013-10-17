@@ -5,7 +5,7 @@ import java.util.List;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
 
-public class Library {
+public class Library extends AbstractObservableDO{
 
     private List<Copy>     copies;
     private List<Customer> customers;
@@ -23,6 +23,7 @@ public class Library {
         if (!isCopyLent(copy)) {
             Loan l = new Loan(customer, copy);
             loans.add(l);
+            doNotify();
             return l;
         } else {
             return null;
@@ -32,18 +33,21 @@ public class Library {
     public Customer createAndAddCustomer(String name, String surname) {
         Customer c = new Customer(name, surname);
         customers.add(c);
+        doNotify();
         return c;
     }
 
     public BookDO createAndAddBook(String name) {
         BookDO b = new BookDO(name);
         bookDOs.add(b);
+        doNotify(Integer.valueOf(getBooks().size()));
         return b;
     }
 
     public Copy createAndAddCopy(BookDO title) {
         Copy c = new Copy(title);
         copies.add(c);
+        doNotify(Integer.valueOf(getCopies().size()));
         return c;
     }
 

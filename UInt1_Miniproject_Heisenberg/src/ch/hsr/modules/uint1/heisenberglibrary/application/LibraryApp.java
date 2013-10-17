@@ -61,7 +61,7 @@ public class LibraryApp {
                 + library.getOverdueLoans().size());
 
         for (Loan l : library.getOverdueLoans()) {
-            System.out.println(l.getDaysOverdue());
+            //System.out.println(l.getDaysOverdue());
         }
 
     }
