@@ -68,34 +68,40 @@ public class BookTableModel extends AbstractTableModel implements Observer {
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
         BookDO book = data.get(aRowIndex);
+        Object ret = null;
 
         switch (aColumnIndex) {
             case 0:
-                return "1 (todo)"; //$NON-NLS-1$
+                ret = "1 (todo)"; //$NON-NLS-1$
             case 1:
-                return book.getTitle();
+                ret = book.getTitle();
             case 2:
-                return book.getAuthor();
+                ret = book.getAuthor();
             case 3:
-                return book.getPublisher();
+                ret = book.getPublisher();
+            default:
+                ret = "";
         }
-
-        return data;
+        return ret;
     }
 
     @Override
     public void setValueAt(Object value, int aRowIndex, int aColumnIndex) {
         BookDO book = data.get(aRowIndex);
-
         switch (aColumnIndex) {
             case 0:
                 break; // TODO: availability
             case 1:
                 book.setTitle((String) value);
+                break;
             case 2:
                 book.setAuthor((String) value);
+                break;
             case 3:
                 book.setPublisher((String) value);
+                break;
+            default:
+                // do nothing
         }
         fireTableCellUpdated(aRowIndex, aColumnIndex);
     }
@@ -107,7 +113,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public String getColumnName(int aColumn) {
-        // TODO Auto-generated method stub
         return columnNames[aColumn];
     }
 
@@ -118,8 +123,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public Class<?> getColumnClass(int aColumnIndex) {
-        // TODO Auto-generated method stub
-
         switch (aColumnIndex) {
             case 0:
             case 1:
@@ -140,6 +143,30 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public void update(Observable anObservable, Object anArgument) {
+        saveSelectedCells();
+        /*
+         * since we cannot easily determine the column or even the row that has
+         * changed we have to update the whole table (done in some miliseconds)
+         * the problem is, that rows can be added or deleted and we cannot just
+         * search for the index of the updatet book and update this row and also
+         * the shown data can be reduced by filtering
+         */
         fireTableDataChanged();
+    }
+
+    /**
+     * Updates all table cells with the data from the model and reselects all
+     * previously selected cells if they still exist. More technically, all
+     * selected books with their fields are saved in a collection and reselected
+     * after the update if they still can be found. Very bad performance but
+     * user friendly.
+     */
+    private void updateTableData() {
+        // TODO implement, as suggested by Stolze, this model should know the
+        // jtable instance. easiest way
+    }
+
+    private void saveSelectedCells() {
+
     }
 }

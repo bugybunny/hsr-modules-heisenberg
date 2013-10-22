@@ -16,17 +16,10 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.Dialog;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.security.InvalidParameterException;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.KeyStroke;
 
 /**
  * Superclass for all dialogs in this project. All dialogs need to be non-modal
@@ -35,15 +28,9 @@ import javax.swing.KeyStroke;
  * <br>The default exit operation is dispose but can be overridden.
  * 
  * <br> The contract for the subclasses is, that they implement the
- * {@link #save()} method to save all changes before the dialog is closed and
- * {@link #initComponents()}. All constructors already call
- * {@link #initComponents()} and after this {@link #addKeyHandlers()} to ensure
- * the default behavior.
- * 
- * <br> Adds a keyhandler for <ESC> and <Enter> button to all components.
- * Subclasses need to call {@link #addKeyHandlers()} to add the default behavior
- * or {@link #addKeyHandlers(KeyListener)} to add custom behavior after they
- * added all components.
+ * {@link #initComponents()} method and optionally {@link #initHandlers()}. All
+ * constructors already call {@link #initComponents()} and after this
+ * {@link #addKeyHandlers()} to ensure the default behavior.
  * 
  * @author msyfrig
  * @see #setDefaultCloseOperation(int)
@@ -51,72 +38,39 @@ import javax.swing.KeyStroke;
 public abstract class AbstractDefaultJDialog extends JDialog {
     private static final long serialVersionUID = 2551909774692437970L;
 
-    private Action            saveAction;
-    private Action            disposeAction;
-
     /**
      * Creates a new dialog and sets the owner and title. Initializes all
-     * components and adds the default keyhandler.
+     * components and sets the title.
      * 
+     * @see #initComponents()
+     * @see #initHandlers()
      * @param anOwner
      *            frame owner of this dialog
      * @param aTitle
      *            title of this dialog, no empty strings allowed
      */
     public AbstractDefaultJDialog(Frame anOwner, String aTitle) {
-        this(anOwner, aTitle, null);
-    }
-
-    /**
-     * Creates a new dialog and sets the owner and title. Initializes all
-     * components and a given keyhandler.
-     * 
-     * @param anOwner
-     *            frame owner of this dialog
-     * @param aTitle
-     *            title of this dialog, no empty strings allowed
-     * @param aGlobalKeyListener
-     *            keylistener that listen for events on all components in this
-     *            dialog. {@code null} for the default behavior.
-     */
-    public AbstractDefaultJDialog(Frame anOwner, String aTitle,
-            KeyListener aGlobalKeyListener) {
         super(anOwner, aTitle);
-        initEverything(aTitle, aGlobalKeyListener);
+        initEverything(aTitle);
     }
 
     /**
      * Creates a new dialog and sets the owner and title. Initializes all
-     * components and adds the default keyhandler.
+     * components and sets the title.
      * 
+     * @see AbstractDefaultJDialog#initComponents()
+     * @see #initHandlers()d
      * @param anOwner
      *            dialog owner of this dialog
      * @param aTitle
      *            title of this dialog, no empty strings allowed
      */
     public AbstractDefaultJDialog(Dialog anOwner, String aTitle) {
-        this(anOwner, aTitle, null);
-    }
-
-    /**
-     * Creates a new dialog and sets the owner and title. Initializes all
-     * components and adds the given keyhandler.
-     * 
-     * @param anOwner
-     *            dialog owner of this dialog
-     * @param aTitle
-     *            title of this dialog, no empty strings allowed
-     * @param aGlobalKeyListener
-     *            keylistener that listen for events on all components in this
-     *            dialog. {@code null} for the default behavior.
-     */
-    public AbstractDefaultJDialog(Dialog anOwner, String aTitle,
-            KeyListener aGlobalKeyListener) {
         super(anOwner, aTitle);
-        initEverything(aTitle, aGlobalKeyListener);
+        initEverything(aTitle);
     }
 
-    private void initEverything(String aTitle, KeyListener aGlobalKeyListener) {
+    private void initEverything(String aTitle) {
         if (aTitle.isEmpty()) {
             // TODO dient nur dazu, dass wir nicht ausversehen irgendwo den
             // titel vergessen
@@ -125,23 +79,6 @@ public abstract class AbstractDefaultJDialog extends JDialog {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         initComponents();
         initHandlers();
-
-        saveAction = new SaveAction("save");
-        disposeAction = new DisposeAction("dispose");
-
-        getRootPane()
-                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                        disposeAction.getValue(Action.NAME));
-        getRootPane().getActionMap().put(disposeAction.getValue(Action.NAME),
-                disposeAction);
-
-        getRootPane()
-                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-                        saveAction.getValue(Action.NAME));
-        getRootPane().getActionMap().put(saveAction.getValue(Action.NAME),
-                saveAction);
 
         setLocationByPlatform(true);
     }
@@ -153,9 +90,11 @@ public abstract class AbstractDefaultJDialog extends JDialog {
 
     /**
      * Adds all listeners/handlers. This is just so we separate the code and it
-     * becomes more readable.
+     * becomes more readable. <br> Can be empty and does not need to be
+     * implemented.
      */
-    protected abstract void initHandlers();
+    protected void initHandlers() {
+    }
 
     /**
      * Subclasses need to implement this function. In the default behavior (if
@@ -170,49 +109,5 @@ public abstract class AbstractDefaultJDialog extends JDialog {
     @Override
     public void setModal(boolean aModal) {
         throw new UnsupportedOperationException("cannot change modality");
-    }
-
-    private class SaveAction extends AbstractAction {
-        private static final long serialVersionUID = -4275362945903839390L;
-
-        private SaveAction(String anActionName) {
-            super(anActionName);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
-         * )
-         */
-        @Override
-        public void actionPerformed(ActionEvent anActionEvent) {
-            save();
-            dispose();
-        }
-    }
-
-    private class DisposeAction extends AbstractAction {
-        private static final long serialVersionUID = 2752048542262499446L;
-
-        /**
-         * Creates a new instance of this class.
-         */
-        private DisposeAction(String anActionName) {
-            super(anActionName);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
-         * )
-         */
-        @Override
-        public void actionPerformed(ActionEvent aE) {
-            dispose();
-        }
     }
 }

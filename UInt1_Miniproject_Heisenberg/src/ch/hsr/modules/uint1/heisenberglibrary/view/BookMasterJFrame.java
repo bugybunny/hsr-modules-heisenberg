@@ -5,11 +5,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -17,7 +13,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,31 +33,34 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
 public class BookMasterJFrame extends JFrame implements Observer {
-    private static final long    serialVersionUID  = 8186612854405487707L;
+    private static final long           serialVersionUID = 8186612854405487707L;
 
-    private JPanel               contentPanel;
-    private JPanel               centerPanel;
-    private Map<BookDO, JDialog> openBookDialogMap = new HashMap<>();
-    private JButton              viewSelectedButton;
-    private JButton              addBookButton;
-    public JTable                bookTable;
-    private JPanel               inventoryStatisticsPanel;
-    private JPanel               inventoryPanel;
-    private JTabbedPane          tabbedPane;
-    private JPanel               booksPanel;
-    private JLabel               numberOfBooksLabel;
-    private JLabel               numberOfExemplarsLabel;
-    private JTextField           searchField;
-    private JCheckBox            onlyAvailableCheckboxMasterList;
-    private Component            horizontalStrut;
-    private JPanel               lendingPanel;
-    private JPanel               panel;
-    private JLabel               lblNewLabel;
-    private JPanel               bookInventoryPanel;
-    private JPanel               outerStatisticsPanel;
+    private JPanel                      contentPanel;
+    private JPanel                      centerPanel;
+    private JButton                     viewSelectedButton;
+    private JButton                     addBookButton;
+    public JTable                       bookTable;
+    private JPanel                      inventoryStatisticsPanel;
+    private JPanel                      inventoryPanel;
+    private JTabbedPane                 tabbedPane;
+    private JPanel                      booksPanel;
+    private JLabel                      numberOfBooksLabel;
+    private JLabel                      numberOfExemplarsLabel;
+    private JTextField                  searchField;
+    private JCheckBox                   onlyAvailableCheckboxMasterList;
+    private Component                   horizontalStrut;
+    private JPanel                      lendingPanel;
+    private JPanel                      panel;
+    private JLabel                      lblNewLabel;
+    private JPanel                      bookInventoryPanel;
+    private JPanel                      outerStatisticsPanel;
+    // TODO überlegen ob wir mehrere DetailDialog erlauben wollen, damit man
+    // nicht ein Fenster mit 20 Tabs hat und es so übersichtlicher zu machen,
+    // würde aber den ganzen Code viel komplexer machen
+    private BookDetailJDialog bookDetailDialog;
     // TODO wahrscheinlich rauslöschen, oder wieso wird das gebraucht? muss
     // nicht global sein
-    private int                  numberOfBooks     = 0;
+    private int                         numberOfBooks    = 0;
 
     /**
      * Create the frame.
@@ -80,14 +78,16 @@ public class BookMasterJFrame extends JFrame implements Observer {
         contentPanel.add(tabbedPane);
 
         booksPanel = new JPanel();
-        tabbedPane.addTab("Books", null, booksPanel, null);
+        tabbedPane
+                .addTab(UiComponentStrings
+                        .getString("BookMasterJFrame.tab.books.text"), null, booksPanel, null); //$NON-NLS-1$
         booksPanel.setLayout(new BoxLayout(booksPanel, BoxLayout.Y_AXIS));
 
         outerStatisticsPanel = new JPanel();
         outerStatisticsPanel.setBorder(new TitledBorder(new EtchedBorder(
-                EtchedBorder.LOWERED, null, null),
-                "Inventory outerStatisticsPanel", TitledBorder.LEADING,
-                TitledBorder.TOP, null, null));
+                EtchedBorder.LOWERED, null, null), UiComponentStrings
+                .getString("BookMasterJFrame.border.inventory.text"), //$NON-NLS-1$
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
         booksPanel.add(outerStatisticsPanel);
         outerStatisticsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
@@ -112,7 +112,8 @@ public class BookMasterJFrame extends JFrame implements Observer {
         inventoryStatisticsPanel.add(numberOfExemplarsLabel);
 
         bookInventoryPanel = new JPanel();
-        bookInventoryPanel.setBorder(new TitledBorder(null, "Book Inventory",
+        bookInventoryPanel.setBorder(new TitledBorder(null, UiComponentStrings
+                .getString("BookMasterJFrame.border.bookinventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         booksPanel.add(bookInventoryPanel);
         bookInventoryPanel.setLayout(new BorderLayout(0, 0));
@@ -150,12 +151,12 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         addBookButton = new JButton(
                 UiComponentStrings
-                        .getString("BookMasterJFrame.button.addbook.label")); //$NON-NLS-1$
+                        .getString("BookMasterJFrame.button.addbook.text")); //$NON-NLS-1$
         inventoryPanel.add(addBookButton);
 
         viewSelectedButton = new JButton(
                 UiComponentStrings
-                        .getString("BookMasterJFrame.button.viewselected.label")); //$NON-NLS-1$
+                        .getString("BookMasterJFrame.button.viewselected.text")); //$NON-NLS-1$
         inventoryPanel.add(viewSelectedButton);
         viewSelectedButton
                 .setToolTipText(UiComponentStrings
@@ -170,8 +171,10 @@ public class BookMasterJFrame extends JFrame implements Observer {
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         bookTable = new JTable();
+        bookTable.setAutoCreateRowSorter(true);
         bookTable.setCellSelectionEnabled(true);
         bookTable.setFillsViewportHeight(true);
+        bookTable.setColumnSelectionAllowed(false);
         bookTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
         bookTable.getSelectionModel().setSelectionMode(
@@ -181,26 +184,32 @@ public class BookMasterJFrame extends JFrame implements Observer {
         centerPanel.add(jsp);
 
         lendingPanel = new JPanel();
-        tabbedPane.addTab("Lending", null, lendingPanel, null);
+        tabbedPane
+                .addTab(UiComponentStrings
+                        .getString("BookMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$
 
         // TODO: Wahrscheinlich schlecht, wegen update schauen.
-
-        System.out.println("BLUBB" + numberOfBooks);
+        System.out.println("BLUBB" + numberOfBooks); //$NON-NLS-1$
 
         // numberOfBooksJLable.setText(UiComponentStrings.getString("BookMasterJFrame.numberOfBooksJLable.text")+numberOfBooks);
-
     }
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anObservable instanceof Library) {
-            System.out.println("number of books: " + anArgument);
+            System.out.println("number of books" + anArgument); //$NON-NLS-1$
         }
         ((AbstractTableModel) bookTable.getModel()).fireTableDataChanged();
         // numberOfBooks =
         // TODO updatet erst bei erneuter Selektion
     }
 
+    /**
+     * Listener to open the selected book rows in {@code bookTable} in a
+     * {@link BookDetailJPanel} detail tab.
+     * 
+     * @author msyfrig
+     */
     private class ViewSelectedButtonListener implements ActionListener {
         /**
          * Opens all selected booksPanel and their detailview. If a dialog for a
@@ -209,31 +218,20 @@ public class BookMasterJFrame extends JFrame implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
+            // check first if the detaildialog is already opened, if so bring it
+            // to the front
+            if (bookDetailDialog == null) {
+                bookDetailDialog = new BookDetailJDialog(
+                        BookMasterJFrame.this);
+            }
+            bookDetailDialog.setVisible(true);
+            bookDetailDialog.toFront();
+
             for (int tempBook : bookTable.getSelectedRows()) {
                 final BookDO selectedBook = ((BookTableModel) bookTable
                         .getModel()).getBookByRowNumber(bookTable
                         .convertRowIndexToModel(tempBook));
-                // check first if the dialog for this dialog is already open if
-                // so, bring it to the top and focus it
-                JDialog bookDetailDialog = openBookDialogMap.get(selectedBook);
-                if (bookDetailDialog != null) {
-                    bookDetailDialog.toFront();
-                } else {
-                    bookDetailDialog = new BookDetailJDialog(
-                            BookMasterJFrame.this, selectedBook);
-                    bookDetailDialog.addWindowListener(new WindowAdapter() {
-                        // remove the dialog from the list of opened
-                        // detaildialogs
-                        @Override
-                        public void windowClosed(WindowEvent aWindowEvent) {
-                            openBookDialogMap.remove(selectedBook);
-                        }
-                    });
-                    ;
-                    bookDetailDialog.setVisible(true);
-
-                    openBookDialogMap.put(selectedBook, bookDetailDialog);
-                }
+                bookDetailDialog.openBookTab(selectedBook);
             }
         }
     }
