@@ -73,12 +73,16 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         switch (aColumnIndex) {
             case 0:
                 ret = "1 (todo)"; //$NON-NLS-1$
+                break;
             case 1:
                 ret = book.getTitle();
+                break;
             case 2:
                 ret = book.getAuthor();
+                break;
             case 3:
                 ret = book.getPublisher();
+                break;
             default:
                 ret = "";
         }
