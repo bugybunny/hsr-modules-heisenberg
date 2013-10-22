@@ -16,6 +16,8 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,11 +52,29 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
 
     @Override
     protected void initComponents() {
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setBounds(100, 100, 900, 400);
         getContentPane().setLayout(new BorderLayout());
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    @Override
+    protected void initHandlers() {
+        addComponentListener(new ComponentAdapter() {
+            /**
+             * All opened book tabs are closed before hiding this dialog so they
+             * are not still open if the user selects a new book and expects to
+             * open a completely new dialog.
+             */
+            @Override
+            public void componentHidden(ComponentEvent aComponentHiddenEvent) {
+                openBookTabMap.clear();
+                tabbedPane.removeAll();
+            }
+        });
+
     }
 
     /**
@@ -68,19 +88,9 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         BookDetailJPanel detailBookPanel = openBookTabMap.get(aBookToOpen);
         if (detailBookPanel == null) {
             detailBookPanel = new BookDetailJPanel(aBookToOpen);
+            String tabTitle = (aBookToOpen.toString().length() >= 15) ? aBookToOpen
+                    .toString().substring(0, 15) : toString();
 
-            // title of the tab consists of the first 15 chars of the title, if
-            // the title is too short, 15 first chars from title, author and
-            // publisher are used, if this is still too short, we just display
-            // the whole BookDO.toString()
-            String tabTitle;
-            if (aBookToOpen.getTitle().length() >= 15) {
-                tabTitle = aBookToOpen.getTitle().substring(0, 15);
-            } else if (aBookToOpen.toString().length() >= 15) {
-                tabTitle = aBookToOpen.toString().substring(0, 15);
-            } else {
-                tabTitle = aBookToOpen.toString();
-            }
             tabbedPane.addTab(tabTitle, null, detailBookPanel,
                     aBookToOpen.toString());
 
@@ -94,7 +104,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
             detailBookPanel.setAncestorActions(actionMapForBookTab);
 
             openBookTabMap.put(aBookToOpen, detailBookPanel);
-
         } else {
             tabbedPane.setSelectedComponent(detailBookPanel);
         }
@@ -108,7 +117,8 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
 
     /**
      * Closes an opened tab for a book, removes it from the list of opened books
-     * so it can be reopened.
+     * so it can be reopened. If the closed tab was the last one, this dialog is
+     * closed.
      * 
      * <br> Instance is set to null because it is unknown if the gc would
      * collect it, most likely the panels won't be set to null if we close it
@@ -121,6 +131,9 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         if (aBookDetailTabToClose != null) {
             tabbedPane.remove(aBookDetailTabToClose);
             openBookTabMap.remove(aBookDetailTabToClose.getDisplayedBookDO());
+            if (openBookTabMap.isEmpty()) {
+                dispose();
+            }
         }
     }
 
