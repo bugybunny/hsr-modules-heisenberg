@@ -1,38 +1,73 @@
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
+import javax.swing.JTable;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
- * Lists all Books in a jTable with Rows: Available, Title, Author and
+ * Lists all books in a JTable with columns: Available, Title, Author and
  * Publisher.
  * 
  * @author twinter
  */
 public class BookTableModel extends AbstractTableModel implements Observer {
+    private static final long   serialVersionUID = 4449419618706874102L;
+    private static List<String> columnNames      = new ArrayList<>(4);
 
-    private static final long serialVersionUID = 4449419618706874102L;
-    private String[]          columnNames      = {
-            UiComponentStrings
-                    .getString("BookTableModel.bookTableColumn.available"),  //$NON-NLS-1$
-            UiComponentStrings
-                    .getString("BookTableModel.bookTableColumn.title"), //$NON-NLS-1$
-            UiComponentStrings
-                    .getString("BookTableModel.bookTableColumn.author"),  //$NON-NLS-1$
-            UiComponentStrings
-                    .getString("BookTableModel.bookTableColumn.publisher") };  //$NON-NLS-1$
-    // private Object[][] data = {{}}; //todo
-    // Test
-    private List<BookDO>      data;
+    static {
+        columnNames.add(UiComponentStrings
+                .getString("BookTableModel.bookTableColumn.available"));  //$NON-NLS-1$
+        columnNames.add(UiComponentStrings
+                .getString("BookTableModel.bookTableColumn.title")); //$NON-NLS-1$
+        columnNames.add(UiComponentStrings
+                .getString("BookTableModel.bookTableColumn.author"));  //$NON-NLS-1$
+        columnNames.add(UiComponentStrings
+                .getString("BookTableModel.bookTableColumn.publisher"));  //$NON-NLS-1$
+    }
+    // TODO auf Set ändern und jedes mal wenn etwas hinzugefügt werden will
+    // prüfen ob es nicht hinzugefügt wird/eine exception gibt, falls ja ist ein
+    // duplikat
+    private List<BookDO>        data;
+    /**
+     * The instance that holds this tablemodel. This is only needed to save the
+     * selection before the {@link #fireTableCellUpdated(int, int)} is called
+     * and restore it after since we have no possibility to get the selection
+     * without the jtable instance and we would have to save the whole selection
+     * if the selection changes if we implemented it in {@link BookMasterJFrame}
+     * . So that means, add a selectionlistener, check for removed or added
+     * selections or always get all selected books and add it into a collection
+     * and additionally add a {@link TableModelListener} and after an update
+     * restore the selection. So it's much easier (despite having bad code and
+     * know the instance of the holding jtable) to do this hear, much more
+     * efficient.
+     */
+    private JTable              table;
 
-    public BookTableModel(List<BookDO> someBooks) {
+    /**
+     * 
+     * Creates a new instance of this class.
+     * 
+     * @param anAssociatedTable
+     *            the {@code JTable} instance that holds this model. This is
+     *            only needed to save the selection before
+     * @param someBooks
+     *            the books to display
+     */
+    public BookTableModel(JTable anAssociatedTable, List<BookDO> someBooks) {
         data = someBooks;
+        table = anAssociatedTable;
 
         for (BookDO tempBook : someBooks) {
             tempBook.addObserver(this);
@@ -56,7 +91,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public int getColumnCount() {
-        return columnNames.length;
+        return columnNames.size();
     }
 
     /*
@@ -117,7 +152,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public String getColumnName(int aColumn) {
-        return columnNames[aColumn];
+        return columnNames.get(aColumn);
     }
 
     /*
@@ -147,15 +182,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        saveSelectedCells();
-        /*
-         * since we cannot easily determine the column or even the row that has
-         * changed we have to update the whole table (done in some miliseconds)
-         * the problem is, that rows can be added or deleted and we cannot just
-         * search for the index of the updatet book and update this row and also
-         * the shown data can be reduced by filtering
-         */
-        fireTableDataChanged();
+        updateTableData();
     }
 
     /**
@@ -166,11 +193,52 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      * user friendly.
      */
     private void updateTableData() {
-        // TODO implement, as suggested by Stolze, this model should know the
-        // jtable instance. easiest way
+        Collection<BookDO> previouslySelectedBooks = saveSelectedRows();
+        /*
+         * since we cannot easily determine the column or even the row that has
+         * changed we have to update the whole table (done in some miliseconds)
+         * the problem is, that rows can be added or deleted and we cannot just
+         * search for the index of the updatet book and update this row and also
+         * the shown data can be reduced by filtering
+         */
+        fireTableDataChanged();
+        restoreSelectedRows(previouslySelectedBooks);
+
     }
 
-    private void saveSelectedCells() {
+    /**
+     * Saves the selected books in the table. The actual book instances are
+     * saved since books can be added or removed so only saving the row index is
+     * not enough.
+     * 
+     * @return
+     */
+    private Set<BookDO> saveSelectedRows() {
+        Set<BookDO> selectedBooks = new HashSet<>(table.getSelectedRowCount());
+        for (int selectionIndex : table.getSelectedRows()) {
+            BookDO singleSelectedBook = getBookByRowNumber(table
+                    .convertRowIndexToModel(selectionIndex));
+            selectedBooks.add(singleSelectedBook);
+        }
+        return selectedBooks;
+    }
 
+    /**
+     * Reselect the given books in the table if they still exist.
+     * 
+     * @param someBooksToSelect
+     *            the books to select
+     */
+    private void restoreSelectedRows(Collection<BookDO> someBooksToSelect) {
+        for (BookDO tempBookToSelect : someBooksToSelect) {
+            int indexInList = data.indexOf(tempBookToSelect);
+            // do nothing if not found and books has been removed
+            if (indexInList > -1) {
+                int indexToSelectInView = table
+                        .convertRowIndexToView(indexInList);
+                table.getSelectionModel().addSelectionInterval(
+                        indexToSelectInView, indexToSelectInView);
+            }
+        }
     }
 }

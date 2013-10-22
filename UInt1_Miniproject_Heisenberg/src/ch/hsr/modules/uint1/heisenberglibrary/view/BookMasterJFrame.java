@@ -33,34 +33,34 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
 public class BookMasterJFrame extends JFrame implements Observer {
-    private static final long           serialVersionUID = 8186612854405487707L;
+    private static final long serialVersionUID = 8186612854405487707L;
 
-    private JPanel                      contentPanel;
-    private JPanel                      centerPanel;
-    private JButton                     viewSelectedButton;
-    private JButton                     addBookButton;
-    public JTable                       bookTable;
-    private JPanel                      inventoryStatisticsPanel;
-    private JPanel                      inventoryPanel;
-    private JTabbedPane                 tabbedPane;
-    private JPanel                      booksPanel;
-    private JLabel                      numberOfBooksLabel;
-    private JLabel                      numberOfExemplarsLabel;
-    private JTextField                  searchField;
-    private JCheckBox                   onlyAvailableCheckboxMasterList;
-    private Component                   horizontalStrut;
-    private JPanel                      lendingPanel;
-    private JPanel                      panel;
-    private JLabel                      lblNewLabel;
-    private JPanel                      bookInventoryPanel;
-    private JPanel                      outerStatisticsPanel;
+    private JPanel            contentPanel;
+    private JPanel            centerPanel;
+    private JButton           viewSelectedButton;
+    private JButton           addBookButton;
+    public JTable             bookTable;
+    private JPanel            inventoryStatisticsPanel;
+    private JPanel            inventoryPanel;
+    private JTabbedPane       tabbedPane;
+    private JPanel            booksPanel;
+    private JLabel            numberOfBooksLabel;
+    private JLabel            numberOfExemplarsLabel;
+    private JTextField        searchField;
+    private JCheckBox         onlyAvailableCheckboxMasterList;
+    private Component         horizontalStrut;
+    private JPanel            lendingPanel;
+    private JPanel            panel;
+    private JLabel            lblNewLabel;
+    private JPanel            bookInventoryPanel;
+    private JPanel            outerStatisticsPanel;
     // TODO überlegen ob wir mehrere DetailDialog erlauben wollen, damit man
     // nicht ein Fenster mit 20 Tabs hat und es so übersichtlicher zu machen,
     // würde aber den ganzen Code viel komplexer machen
     private BookDetailJDialog bookDetailDialog;
     // TODO wahrscheinlich rauslöschen, oder wieso wird das gebraucht? muss
     // nicht global sein
-    private int                         numberOfBooks    = 0;
+    private int               numberOfBooks    = 0;
 
     /**
      * Create the frame.
@@ -177,6 +177,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
         bookTable.setColumnSelectionAllowed(false);
         bookTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
+
         bookTable.getSelectionModel().setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -221,8 +222,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (bookDetailDialog == null) {
-                bookDetailDialog = new BookDetailJDialog(
-                        BookMasterJFrame.this);
+                bookDetailDialog = new BookDetailJDialog(BookMasterJFrame.this);
             }
             bookDetailDialog.setVisible(true);
             bookDetailDialog.toFront();

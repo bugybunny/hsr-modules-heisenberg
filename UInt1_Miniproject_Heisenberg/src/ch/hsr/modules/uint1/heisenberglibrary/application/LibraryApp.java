@@ -43,7 +43,9 @@ public class LibraryApp {
         }
 
         BookMasterJFrame frame = new BookMasterJFrame();
-        frame.bookTable.setModel(new BookTableModel(library.getBooks()));
+        // TODO ugliest codepiece ever
+        frame.bookTable.setModel(new BookTableModel(frame.bookTable, library
+                .getBooks()));
         frame.setVisible(true);
     }
 
