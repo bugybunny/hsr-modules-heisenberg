@@ -3,8 +3,6 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
-
 public class Library extends AbstractObservableDO{
 
     private List<Copy>     copies;

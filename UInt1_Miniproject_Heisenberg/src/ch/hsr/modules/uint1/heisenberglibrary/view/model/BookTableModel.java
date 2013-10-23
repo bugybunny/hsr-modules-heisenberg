@@ -1,4 +1,4 @@
-package ch.hsr.modules.uint1.heisenberglibrary.model;
+package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 

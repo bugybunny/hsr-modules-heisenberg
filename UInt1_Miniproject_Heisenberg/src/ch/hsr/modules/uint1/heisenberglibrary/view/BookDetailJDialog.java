@@ -28,7 +28,9 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 
 /**
  * This dialog holds all opened details views for all books. Each tab represents
@@ -102,6 +104,10 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
                     KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                     new SaveAction("save", detailBookPanel)); //$NON-NLS-1$
             detailBookPanel.setAncestorActions(actionMapForBookTab);
+            // add asteriks in tabtitle if tab has unsaved changes
+            detailBookPanel
+                    .addModelStateChangeListener(new BookDetailModelChangeListener(
+                            detailBookPanel));
 
             openBookTabMap.put(aBookToOpen, detailBookPanel);
         } else {
@@ -197,4 +203,36 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         }
     }
 
+    /**
+     * Lists for changes in the model for a specific tab and if it has unsaved
+     * changes, the title gets an asterisk indicating the unsaved changes in
+     * this tab.
+     * 
+     * @author msyfrig
+     */
+    private class BookDetailModelChangeListener implements
+            ModelStateChangeListener {
+        private BookDetailJPanel associatedDetailView;
+
+        public BookDetailModelChangeListener(
+                BookDetailJPanel anAssociatedDetailView) {
+            associatedDetailView = anAssociatedDetailView;
+        }
+
+        @Override
+        public void stateChanged(ModelStateChangeEvent aModelStateChange) {
+            int tabIndex = tabbedPane.indexOfComponent(associatedDetailView);
+            String oldTitle = tabbedPane.getTitleAt(tabIndex);
+            switch (aModelStateChange.getState()) {
+                case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
+                    tabbedPane.setTitleAt(tabIndex, "*" + oldTitle);
+                    break;
+                case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
+                    tabbedPane.setTitleAt(tabIndex, oldTitle.substring(1));
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }

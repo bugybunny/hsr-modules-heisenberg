@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.hsr.modules.uint1.heisenberglibrary.domain.book;
+package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import java.util.Collection;
 

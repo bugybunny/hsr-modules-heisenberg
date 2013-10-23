@@ -1,4 +1,4 @@
-package ch.hsr.modules.uint1.heisenberglibrary.application;
+package ch.hsr.modules.uint1.heisenberglibrary.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
-import ch.hsr.modules.uint1.heisenberglibrary.model.BookTableModel;
+import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IllegalLoanOperationException;
@@ -24,6 +23,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
 public class LibraryApp {
     public static void main(String[] args) throws Exception {

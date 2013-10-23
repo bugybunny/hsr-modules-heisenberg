@@ -42,7 +42,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 
 /**
@@ -317,11 +319,32 @@ public class BookDetailJPanel extends JPanel implements Observer {
     }
 
     /**
-     * @param aDirty
+     * @param isDirty
      *            the dirty to set
      */
-    public void setDirty(boolean aDirty) {
-        dirty = aDirty;
+    public void setDirty(boolean isDirty) {
+        ModelStateChangeEvent newState = null;
+        if (dirty) {
+            if (isDirty) {
+                newState = new ModelStateChangeEvent(this,
+                        ModelStateChangeEvent.MODEL_STILL_DIRTY);
+            } else {
+                newState = new ModelStateChangeEvent(this,
+                        ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED);
+            }
+        } else {
+            if (isDirty) {
+                newState = new ModelStateChangeEvent(this,
+                        ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY);
+            }
+        }
+
+        dirty = isDirty;
+
+        for (ModelStateChangeListener tempListener : listenerList
+                .getListeners(ModelStateChangeListener.class)) {
+            tempListener.stateChanged(newState);
+        }
     }
 
     /**
@@ -336,6 +359,19 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     public BookDO getDisplayedBookDO() {
         return displayedBookDO;
+    }
+
+    /**
+     * Adds a listener that listens for events when any object in this panel has
+     * changed and {@link #isDirty()} returns {@code true} now.
+     */
+    public void addModelStateChangeListener(ModelStateChangeListener aListener) {
+        listenerList.add(ModelStateChangeListener.class, aListener);
+    }
+
+    public void removeModelStateChangeListener(
+            ModelStateChangeListener aListener) {
+        listenerList.remove(ModelStateChangeListener.class, aListener);
     }
 
     /*
@@ -409,7 +445,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         public void changedUpdate(DocumentEvent aDocumentChangedEvent) {
             checkIfModified();
         }
-
     }
 
 }

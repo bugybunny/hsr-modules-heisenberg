@@ -28,9 +28,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import ch.hsr.modules.uint1.heisenberglibrary.domain.book.BookDO;
-import ch.hsr.modules.uint1.heisenberglibrary.model.BookTableModel;
+import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
 public class BookMasterJFrame extends JFrame implements Observer {
     private static final long serialVersionUID = 8186612854405487707L;
@@ -171,12 +171,17 @@ public class BookMasterJFrame extends JFrame implements Observer {
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         bookTable = new JTable();
+        bookTable.getTableHeader().setReorderingAllowed(false);
         bookTable.setAutoCreateRowSorter(true);
         bookTable.setCellSelectionEnabled(true);
         bookTable.setFillsViewportHeight(true);
         bookTable.setColumnSelectionAllowed(false);
         bookTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
+        //
+        // TableRowSorter<BookTableModel> rowSorter = new TableRowSorter<>(
+        // (BookTableModel) bookTable.getModel());
+        // bookTable.setRowSorter(rowSorter);
 
         bookTable.getSelectionModel().setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
