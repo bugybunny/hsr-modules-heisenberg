@@ -84,7 +84,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
     }
 
     private void initComponents() {
-        setTitle("BookMaster"); //$NON-NLS-1$
+        setTitle(UiComponentStrings.getString("BookMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1200, 441);
         contentPanel = new JPanel();
