@@ -43,8 +43,9 @@ import javax.swing.JTextField;
  *      <td>"abc" in normal color</td>
  *  </tr>
  *  
- * Based on an example from stackoverflow. Added all comments, implemented
- * foreground color and code cleanup.
+ * Based on an example from stackoverflow {@link http://stackoverflow.com/a/1739037}.
+ * Added all comments, implemented foreground color and code cleanup.
+ * 
  * @author msyfrig
  */
 //@formatter:on
