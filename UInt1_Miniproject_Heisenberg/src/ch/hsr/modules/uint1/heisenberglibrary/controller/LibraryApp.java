@@ -23,7 +23,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
-import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
 public class LibraryApp {
     public static void main(String[] args) throws Exception {
@@ -42,10 +41,7 @@ public class LibraryApp {
             // do nothing and just use the default look and feel for the os
         }
 
-        BookMasterJFrame frame = new BookMasterJFrame();
-        // TODO ugliest codepiece ever
-        frame.bookTable.setModel(new BookTableModel(frame.bookTable, library
-                .getBooks()));
+        BookMasterJFrame frame = new BookMasterJFrame(library.getBooks());
         frame.setVisible(true);
     }
 

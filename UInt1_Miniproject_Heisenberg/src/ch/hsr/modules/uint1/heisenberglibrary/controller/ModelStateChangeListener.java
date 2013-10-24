@@ -22,5 +22,10 @@ import java.util.EventListener;
  * @author msyfrig
  */
 public interface ModelStateChangeListener extends EventListener {
+    /**
+     * Invoked when the target model of the listener has changed its state.
+     * 
+     * @param aModelStateChange
+     */
     public void stateChanged(ModelStateChangeEvent aModelStateChange);
 }

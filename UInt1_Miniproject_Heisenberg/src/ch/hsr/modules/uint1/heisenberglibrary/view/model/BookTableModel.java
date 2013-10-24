@@ -1,19 +1,14 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 
-import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
+import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
-import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -40,34 +35,15 @@ public class BookTableModel extends AbstractTableModel implements Observer {
     // prüfen ob es nicht hinzugefügt wird/eine exception gibt, falls ja ist ein
     // duplikat
     private List<BookDO>        data;
-    /**
-     * The instance that holds this tablemodel. This is only needed to save the
-     * selection before the {@link #fireTableCellUpdated(int, int)} is called
-     * and restore it after since we have no possibility to get the selection
-     * without the jtable instance and we would have to save the whole selection
-     * if the selection changes if we implemented it in {@link BookMasterJFrame}
-     * . So that means, add a selectionlistener, check for removed or added
-     * selections or always get all selected books and add it into a collection
-     * and additionally add a {@link TableModelListener} and after an update
-     * restore the selection. So it's much easier (despite having bad code and
-     * know the instance of the holding jtable) to do this hear, much more
-     * efficient.
-     */
-    private JTable              table;
 
     /**
-     * 
      * Creates a new instance of this class.
      * 
-     * @param anAssociatedTable
-     *            the {@code JTable} instance that holds this model. This is
-     *            only needed to save the selection before
      * @param someBooks
      *            the books to display
      */
-    public BookTableModel(JTable anAssociatedTable, List<BookDO> someBooks) {
+    public BookTableModel(List<BookDO> someBooks) {
         data = someBooks;
-        table = anAssociatedTable;
 
         for (BookDO tempBook : someBooks) {
             tempBook.addObserver(this);
@@ -142,6 +118,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
             default:
                 // do nothing
         }
+        notifyListenersBeforeUpdate();
         fireTableCellUpdated(aRowIndex, aColumnIndex);
     }
 
@@ -173,8 +150,23 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         }
     }
 
-    public BookDO getBookByRowNumber(int i) {
-        return data.get(i);
+    /**
+     * Adds a listener that listens for events when this model is about to fire
+     * a {@link #fireTableDataChanged()} or any other table data updates.
+     */
+    public void addTableModelChangeListener(TableModelChangeListener aListener) {
+        listenerList.add(TableModelChangeListener.class, aListener);
+    }
+
+    /**
+     * Removes a {@code TableModelChangeListener} from this table model.
+     * 
+     * @param aListener
+     *            the listener to remove
+     */
+    public void removeTableModelChangeListener(
+            TableModelChangeListener aListener) {
+        listenerList.remove(TableModelChangeListener.class, aListener);
     }
 
     /**
@@ -193,7 +185,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      * user friendly.
      */
     private void updateTableData() {
-        Collection<BookDO> previouslySelectedBooks = saveSelectedRows();
+        notifyListenersBeforeUpdate();
         /*
          * since we cannot easily determine the column or even the row that has
          * changed we have to update the whole table (done in some miliseconds)
@@ -202,43 +194,20 @@ public class BookTableModel extends AbstractTableModel implements Observer {
          * the shown data can be reduced by filtering
          */
         fireTableDataChanged();
-        restoreSelectedRows(previouslySelectedBooks);
 
-    }
-
-    /**
-     * Saves the selected books in the table. The actual book instances are
-     * saved since books can be added or removed so only saving the row index is
-     * not enough.
-     * 
-     * @return
-     */
-    private Set<BookDO> saveSelectedRows() {
-        Set<BookDO> selectedBooks = new HashSet<>(table.getSelectedRowCount());
-        for (int selectionIndex : table.getSelectedRows()) {
-            BookDO singleSelectedBook = getBookByRowNumber(table
-                    .convertRowIndexToModel(selectionIndex));
-            selectedBooks.add(singleSelectedBook);
+        for (TableModelChangeListener tempListener : listenerList
+                .getListeners(TableModelChangeListener.class)) {
+            tempListener.tableChanged();
         }
-        return selectedBooks;
     }
 
     /**
-     * Reselect the given books in the table if they still exist.
-     * 
-     * @param someBooksToSelect
-     *            the books to select
+     * Notifies all listeners that the model is about to change.
      */
-    private void restoreSelectedRows(Collection<BookDO> someBooksToSelect) {
-        for (BookDO tempBookToSelect : someBooksToSelect) {
-            int indexInList = data.indexOf(tempBookToSelect);
-            // do nothing if not found and books has been removed
-            if (indexInList > -1) {
-                int indexToSelectInView = table
-                        .convertRowIndexToView(indexInList);
-                table.getSelectionModel().addSelectionInterval(
-                        indexToSelectInView, indexToSelectInView);
-            }
+    private void notifyListenersBeforeUpdate() {
+        for (TableModelChangeListener tempListener : listenerList
+                .getListeners(TableModelChangeListener.class)) {
+            tempListener.tableIsAboutToUpdate();
         }
     }
 }

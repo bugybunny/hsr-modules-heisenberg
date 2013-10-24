@@ -364,11 +364,20 @@ public class BookDetailJPanel extends JPanel implements Observer {
     /**
      * Adds a listener that listens for events when any object in this panel has
      * changed and {@link #isDirty()} returns {@code true} now.
+     * 
+     * @param aListener
+     *            the listener to add
      */
     public void addModelStateChangeListener(ModelStateChangeListener aListener) {
         listenerList.add(ModelStateChangeListener.class, aListener);
     }
 
+    /**
+     * Removes a {@code ModelStateChangeListener} from this panel.
+     * 
+     * @param aListener
+     *            the listener to remove
+     */
     public void removeModelStateChangeListener(
             ModelStateChangeListener aListener) {
         listenerList.remove(ModelStateChangeListener.class, aListener);
