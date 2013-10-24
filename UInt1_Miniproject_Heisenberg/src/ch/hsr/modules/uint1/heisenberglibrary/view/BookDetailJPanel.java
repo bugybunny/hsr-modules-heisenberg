@@ -34,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -46,6 +47,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -82,6 +84,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private JComboBox<Copy.Condition> comboBox;
     private Component                 glue;
     private Component                 rigidArea;
+    private JTable                    bookExemplarTable;
 
     /**
      * Creates a new instance of this class and sets model.
@@ -228,26 +231,39 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 .getString("BookDetailJDialog.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(southPanel, BorderLayout.SOUTH);
-        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.X_AXIS));
+        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
+
+        JPanel southInformationPanel = new JPanel();
+        southPanel.add(southInformationPanel);
+        southInformationPanel.setLayout(new BoxLayout(southInformationPanel,
+                BoxLayout.X_AXIS));
 
         JLabel labelCopies = new JLabel("Total Copies: 8"); //$NON-NLS-1$
+        southInformationPanel.add(labelCopies);
         labelCopies.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        southPanel.add(labelCopies);
 
         rigidArea = Box.createRigidArea(new Dimension(20, 20));
-        southPanel.add(rigidArea);
+        southInformationPanel.add(rigidArea);
 
-        JLabel labelAvailable = new JLabel("Total available: 2"); //$NON-NLS-1$
-        southPanel.add(labelAvailable);
+        JLabel labelAvailable = new JLabel("Total available: 2");
+        southInformationPanel.add(labelAvailable);
 
         glue = Box.createGlue();
-        southPanel.add(glue);
+        southInformationPanel.add(glue);
 
         buttonAddCopy = new JButton(
                 UiComponentStrings
                         .getString("BookDetailJDialog.button.addcopy.text")); //$NON-NLS-1$
+        southInformationPanel.add(buttonAddCopy);
         buttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        southPanel.add(buttonAddCopy);
+
+        JPanel southBookList = new JPanel();
+        southPanel.add(southBookList);
+
+        
+        bookExemplarTable = new JTable();
+        southBookList.add(bookExemplarTable);
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, null));
     }
 
     /**
@@ -455,5 +471,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
             checkIfModified();
         }
     }
+    
+    
 
 }
