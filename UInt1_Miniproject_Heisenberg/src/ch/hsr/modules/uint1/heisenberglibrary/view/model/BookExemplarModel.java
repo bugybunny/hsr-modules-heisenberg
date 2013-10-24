@@ -50,8 +50,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      */
     @Override
     public int getRowCount() {
-        
-        return data.size();
+        return data.getCopies().size();
     }
 
     /* (non-Javadoc)
