@@ -49,8 +49,7 @@ import javax.swing.JTextField;
  */
 //@formatter:on
 public class GhostHintJTextField extends JTextField implements FocusListener {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2764559471513955654L;
     private final String      hint;
     private boolean           showingHint;
 
