@@ -15,6 +15,7 @@ import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -23,14 +24,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
@@ -38,39 +43,40 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
 public class BookMasterJFrame extends JFrame implements Observer {
-    private static final long serialVersionUID = 8186612854405487707L;
+    private static final long              serialVersionUID = 8186612854405487707L;
 
     /**
      * The table that displays all different booktypes in the library, not the
      * actual copies.
      */
-    private JTable            bookTable;
-    private JPanel            contentPanel;
-    private JPanel            centerPanel;
-    private JButton           viewSelectedButton;
-    private JButton           addBookButton;
-    private JPanel            inventoryStatisticsPanel;
-    private JPanel            inventoryPanel;
-    private JTabbedPane       tabbedPane;
-    private JPanel            booksPanel;
-    private JLabel            numberOfBooksLabel;
-    private JLabel            numberOfExemplarsLabel;
-    private JTextField        searchField;
-    private JCheckBox         onlyAvailableCheckboxMasterList;
-    private Component         horizontalStrut;
-    private JPanel            lendingPanel;
-    private JPanel            panel;
-    private JLabel            lblNewLabel;
-    private JPanel            bookInventoryPanel;
-    private JPanel            outerStatisticsPanel;
+    private JTable                         bookTable;
+    private TableRowSorter<BookTableModel> tableSorter;
+    private JPanel                         contentPanel;
+    private JPanel                         centerPanel;
+    private JButton                        viewSelectedButton;
+    private JButton                        addBookButton;
+    private JPanel                         inventoryStatisticsPanel;
+    private JPanel                         inventoryPanel;
+    private JTabbedPane                    tabbedPane;
+    private JPanel                         booksPanel;
+    private JLabel                         numberOfBooksLabel;
+    private JLabel                         numberOfExemplarsLabel;
+    private GhostHintJTextField            searchTextField;
+    private JCheckBox                      onlyAvailableCheckboxMasterList;
+    private Component                      horizontalStrut;
+    private JPanel                         lendingPanel;
+    private JPanel                         panel;
+    private JLabel                         lblNewLabel;
+    private JPanel                         bookInventoryPanel;
+    private JPanel                         outerStatisticsPanel;
     // TODO überlegen ob wir mehrere DetailDialog erlauben wollen, damit man
     // nicht ein Fenster mit 20 Tabs hat und es so übersichtlicher zu machen,
     // würde aber den ganzen Code viel komplexer machen
-    private BookDetailJDialog bookDetailDialog;
+    private BookDetailJDialog              bookDetailDialog;
     // TODO wahrscheinlich rauslöschen, oder wieso wird das gebraucht? muss
     // nicht global sein
-    private int               numberOfBooks    = 0;
-    private List<BookDO>      bookList;
+    private int                            numberOfBooks    = 0;
+    private List<BookDO>                   bookList;
 
     /**
      * Creates the frame.
@@ -84,6 +90,9 @@ public class BookMasterJFrame extends JFrame implements Observer {
     }
 
     private void initComponents() {
+        ImageIcon frameIcon = new ImageIcon(
+                BookMasterJFrame.class.getResource("/images/library.png"));
+        setIconImage(frameIcon.getImage());
         setTitle(UiComponentStrings.getString("BookMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1200, 441);
@@ -153,11 +162,11 @@ public class BookMasterJFrame extends JFrame implements Observer {
         topPane.add(inventoryPanel);
         inventoryPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-        searchField = new JTextField();
-        inventoryPanel.add(searchField);
-        searchField.setText(UiComponentStrings
+        searchTextField = new GhostHintJTextField("Search");
+        inventoryPanel.add(searchTextField);
+        searchTextField.setText(UiComponentStrings
                 .getString("BookMasterJFrame.textfield.search.defaulttext")); //$NON-NLS-1$
-        searchField.setColumns(10);
+        searchTextField.setColumns(10);
 
         onlyAvailableCheckboxMasterList = new JCheckBox(
                 UiComponentStrings
@@ -188,12 +197,16 @@ public class BookMasterJFrame extends JFrame implements Observer {
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         bookTable = new JTable();
+        bookTable.setRowSorter(tableSorter);
         bookTable.setModel(new BookTableModel(bookList));
+        tableSorter = new TableRowSorter<>(
+                (BookTableModel) bookTable.getModel());
         bookTable.getTableHeader().setReorderingAllowed(false);
-        bookTable.setAutoCreateRowSorter(true);
+        // bookTable.setAutoCreateRowSorter(true);
         bookTable.setCellSelectionEnabled(true);
         bookTable.setFillsViewportHeight(true);
         bookTable.setColumnSelectionAllowed(false);
+
         //
         // TableRowSorter<BookTableModel> rowSorter = new TableRowSorter<>(
         // (BookTableModel) bookTable.getModel());
@@ -235,6 +248,9 @@ public class BookMasterJFrame extends JFrame implements Observer {
                         restoreSelectedRows(previouslySelectedBooks);
                     }
                 });
+
+        searchTextField.getDocument().addDocumentListener(
+                new SearchFieldDocumentListener(searchTextField));
     }
 
     /**
@@ -242,7 +258,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
      * saved since books can be added or removed so only saving the row index is
      * not enough.
      * 
-     * @return
+     * @return set of currently selected books
      */
     private Set<BookDO> saveSelectedRows() {
         Set<BookDO> selectedBooks = new HashSet<>(
@@ -273,6 +289,26 @@ public class BookMasterJFrame extends JFrame implements Observer {
                         indexToSelectInView, indexToSelectInView);
             }
         }
+    }
+
+    private void newTableFilter() {
+        RowFilter<TableModel, Object> rowFilter = new RowFilter<TableModel, Object>() {
+            @Override
+            public boolean include(
+                    javax.swing.RowFilter.Entry<? extends TableModel, ? extends Object> anEntry) {
+                for (int i = 0; i < anEntry.getValueCount(); i++) {
+                    if (anEntry.getStringValue(i).toLowerCase()
+                            .contains(searchTextField.getText().toLowerCase())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+        tableSorter.setRowFilter(rowFilter);
+        // TODO Stolze fragen wieso zur Hölle ich das noch machen
+        // muss?!?!<?!?!?!?! DAS HAT MICH FUCKING MEHRERE STUNDEN GEKOSTET
+        bookTable.setRowSorter(tableSorter);
     }
 
     @Override
@@ -307,7 +343,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
             bookDetailDialog.toFront();
 
             for (int tempBook : bookTable.getSelectedRows()) {
-                final BookDO selectedBook = bookList.get(bookTable
+                BookDO selectedBook = bookList.get(bookTable
                         .convertRowIndexToModel(tempBook));
                 bookDetailDialog.openBookTab(selectedBook);
             }
@@ -330,6 +366,35 @@ public class BookMasterJFrame extends JFrame implements Observer {
                 UiComponentStrings
                         .getString("BookMasterJFrame.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
             }
+        }
+    }
+
+    private class SearchFieldDocumentListener implements DocumentListener {
+        private GhostHintJTextField searchField;
+
+        public SearchFieldDocumentListener(GhostHintJTextField aSearchField) {
+            searchField = aSearchField;
+        }
+
+        private void filter() {
+            if (!searchField.isShowingHint() && !searchField.isEmpty()) {
+                newTableFilter();
+            }
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent anInsertUpdateEvent) {
+            filter();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent aRemoveUpdateEvent) {
+            filter();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent aChangedUpdateEvent) {
+            filter();
         }
     }
 }

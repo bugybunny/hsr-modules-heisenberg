@@ -43,7 +43,7 @@ import javax.swing.JTextField;
  *      <td>"abc" in normal color</td>
  *  </tr>
  *  
- * Based on an example from stackoverflow {@link http://stackoverflow.com/a/1739037}.
+ * Based on an example from stackoverflow {@link http://stackoverflow.com/a/1739037}, cc license.
  * Added all comments, implemented foreground color and code cleanup.
  * 
  * @author msyfrig
@@ -53,6 +53,13 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
     private static final long serialVersionUID = 2764559471513955654L;
     private final String      hint;
     private boolean           showingHint;
+
+    /**
+     * @return the showingHint
+     */
+    public boolean isShowingHint() {
+        return showingHint;
+    }
 
     /**
      * Creates a new textfield with the given hint.
@@ -93,5 +100,15 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
     @Override
     public String getText() {
         return showingHint ? "" : super.getText();
+    }
+
+    /**
+     * Returns whether this textfield contains text or if just the hint is set.
+     * 
+     * @return {@code true} only the hint is set or textfield has the focus and
+     *         is really empty {@code false} if there is some user entered text
+     */
+    public boolean isEmpty() {
+        return showingHint ? true : getText().isEmpty();
     }
 }
