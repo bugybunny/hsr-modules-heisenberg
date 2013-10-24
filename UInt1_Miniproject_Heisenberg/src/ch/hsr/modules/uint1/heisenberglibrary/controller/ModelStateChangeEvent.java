@@ -24,17 +24,26 @@ import javax.swing.event.ChangeEvent;
  */
 public class ModelStateChangeEvent extends ChangeEvent {
     private static final long serialVersionUID               = 6099763792690518779L;
+    /** The model had no unsaved changes before and now has (=is dirty). */
     public static final byte  MODEL_CHANGED_TO_DIRTY         = 1;
+    /** The content in the model changed but was already dirty before. */
     public static final byte  MODEL_STILL_DIRTY              = 2;
+    /** The model received and indirect update, not in the registered view. */
     public static final byte  MODEL_UPDATE_FROM_OTHER_SOURCE = 4;
+    /** Model changed from dirty to saved. */
     public static final byte  MODEL_CHANGED_TO_SAVED         = 8;
 
+    /** The state of the model when this event has been created. */
     private byte              state;
 
     /**
-     * Creates a new instance of this class.
+     * Creates a new instance of this class and sets the source where the model
+     * has changed and the new state of it.
      * 
      * @param aSource
+     *            the source where the model has been changed
+     * @param aNewState
+     *            the new state of this models. See constants in this class
      */
     public ModelStateChangeEvent(Object aSource, byte aNewState) {
         super(aSource);

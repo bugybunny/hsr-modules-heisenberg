@@ -19,7 +19,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -40,10 +42,25 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
  * @author msyfrig
  */
 public class BookDetailJDialog extends AbstractDefaultJDialog {
-    private static final long             serialVersionUID = 439819991326389792L;
-    private JTabbedPane                   tabbedPane;
+    private static final long      serialVersionUID = 439819991326389792L;
+    /** The tabbed pane that holds all detailviews as tabs for all books. */
+    private JTabbedPane            tabbedPane;
 
-    private Map<BookDO, BookDetailJPanel> openBookTabMap   = new HashMap<>();
+    /**
+     * The list of all opened book detailviews. To check wheter a {@link BookDO}
+     * is already open an iteration over all items is necessary and then call
+     * {@link BookDetailJPanel#getDisplayedBookDO()} and compare it is
+     * necessary.
+     * 
+     * <br> And if you ask yourself why this is not implemented as a map with
+     * the book as key and the opened tab as value: the behavior for mutated
+     * keys is undefined and since we can modify the book it would not be
+     * possible to ever delete this book instance. See javadoc of map for
+     * undefined behavior for mutable objects as keys.
+     * 
+     * @see Map
+     */
+    private List<BookDetailJPanel> openBookTabList  = new ArrayList<>();
 
     /**
      * Create the dialog.
@@ -72,11 +89,10 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
              */
             @Override
             public void componentHidden(ComponentEvent aComponentHiddenEvent) {
-                openBookTabMap.clear();
+                openBookTabList.clear();
                 tabbedPane.removeAll();
             }
         });
-
     }
 
     /**
@@ -87,7 +103,15 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
      *            the book domain object to open in a tab
      */
     public void openBookTab(BookDO aBookToOpen) {
-        BookDetailJPanel detailBookPanel = openBookTabMap.get(aBookToOpen);
+        BookDetailJPanel detailBookPanel = null;
+        // check if a tab with the given tab is already open
+        for (BookDetailJPanel tempBookDetailView : openBookTabList) {
+            if (tempBookDetailView.getDisplayedBookDO() == aBookToOpen) {
+                detailBookPanel = tempBookDetailView;
+            }
+        }
+
+        // if not open yet, create it and all listeners and actions
         if (detailBookPanel == null) {
             detailBookPanel = new BookDetailJPanel(aBookToOpen);
             String tabTitle = (aBookToOpen.toString().length() >= 15) ? aBookToOpen
@@ -108,9 +132,10 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
             detailBookPanel
                     .addModelStateChangeListener(new BookDetailModelChangeListener(
                             detailBookPanel));
-
-            openBookTabMap.put(aBookToOpen, detailBookPanel);
-        } else {
+            openBookTabList.add(detailBookPanel);
+        }
+        // if already opened, just bring this tab to the front
+        else {
             tabbedPane.setSelectedComponent(detailBookPanel);
         }
     }
@@ -136,8 +161,10 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
     private void closeTab(BookDetailJPanel aBookDetailTabToClose) {
         if (aBookDetailTabToClose != null) {
             tabbedPane.remove(aBookDetailTabToClose);
-            openBookTabMap.remove(aBookDetailTabToClose.getDisplayedBookDO());
-            if (openBookTabMap.isEmpty()) {
+            openBookTabList.remove(aBookDetailTabToClose);
+
+            // close this dialog if this was the last open tab
+            if (openBookTabList.isEmpty()) {
                 dispose();
             }
         }
@@ -221,17 +248,23 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
 
         @Override
         public void stateChanged(ModelStateChangeEvent aModelStateChange) {
-            int tabIndex = tabbedPane.indexOfComponent(associatedDetailView);
-            String oldTitle = tabbedPane.getTitleAt(tabIndex);
-            switch (aModelStateChange.getState()) {
-                case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
-                    tabbedPane.setTitleAt(tabIndex, "*" + oldTitle);
-                    break;
-                case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
-                    tabbedPane.setTitleAt(tabIndex, oldTitle.substring(1));
-                    break;
-                default:
-                    break;
+            if (associatedDetailView != null) {
+                int tabIndex = tabbedPane
+                        .indexOfComponent(associatedDetailView);
+                if (tabIndex >= 0) {
+                    String oldTitle = tabbedPane.getTitleAt(tabIndex);
+                    switch (aModelStateChange.getState()) {
+                        case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
+                            tabbedPane.setTitleAt(tabIndex, "*" + oldTitle);
+                            break;
+                        case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
+                            tabbedPane.setTitleAt(tabIndex,
+                                    oldTitle.substring(1));
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
         }
     }
