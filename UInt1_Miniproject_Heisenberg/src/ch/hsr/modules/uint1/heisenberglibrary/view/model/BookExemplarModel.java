@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -31,13 +32,20 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
     }
     
     private Library             data;
-    private JTable              table;
     private BookDO              specificBook;
 
     
+    /**
+     * Creates a new instance of this class.
+     * 
+     * @param aDisplayedBookDO
+     *            the specific book from the DetailPanel
+     */
     public BookExemplarModel(BookDO aDisplayedBookDO, Library aLibrary) {
         specificBook = aDisplayedBookDO;
-        data = aLibrary;
+      //  data = aLibrary;
+        
+     //  data = Library; 
 
 
         aLibrary.addObserver(this);
@@ -50,7 +58,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      */
     @Override
     public int getRowCount() {
-        return data.getCopies().size();
+        return data.getCopiesOfBook(specificBook).size();
     }
 
     /* (non-Javadoc)
@@ -66,23 +74,22 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      */
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
-        Library library = data.get(aRowIndex);
-        Object ret = null;
+        Copy copyOfSpecificBook = data.getCopiesOfBook(specificBook).get(aRowIndex);
+        List<Loan> loans= data.getLoans();
         
-        //library.getCopiesOfBook(specificBook);
+        ArrayList<Copy> listOfLoanedBooks = new ArrayList<Copy>();
+        
+        for (int i=0; i<loans.size(); i++){
+
+            if(loans.get(i).getCopy().getInventoryNumber() == copyOfSpecificBook.getInventoryNumber()) {
+                listOfLoanedBooks.add(loans.get(i).getCopy());
+            }
+        }
+        Object ret = null;
 
         switch (aColumnIndex) {
             case 0:
-                ret = library.ge
-                break;
-            case 1:
-                ret = book.get
-                break;
-            case 2:
-                ret = book.getAuthor();
-                break;
-            case 3:
-                ret = book.getPublisher();
+                ret = copyOfSpecificBook.getInventoryNumber();
                 break;
             default:
                 ret = "";
