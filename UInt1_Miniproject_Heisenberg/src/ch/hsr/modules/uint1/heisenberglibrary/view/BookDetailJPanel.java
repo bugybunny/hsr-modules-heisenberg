@@ -47,8 +47,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -264,7 +262,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         
         bookExemplarTable = new JTable();
         southBookList.add(bookExemplarTable);
-        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, Library.this));
+        //bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO));
     }
 
     /**

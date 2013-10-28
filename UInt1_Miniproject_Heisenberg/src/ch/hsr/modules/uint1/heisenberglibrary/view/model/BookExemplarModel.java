@@ -41,16 +41,15 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      * @param aDisplayedBookDO
      *            the specific book from the DetailPanel
      */
-    public BookExemplarModel(BookDO aDisplayedBookDO, Library aLibrary) {
+    public BookExemplarModel(BookDO aDisplayedBookDO) {
         specificBook = aDisplayedBookDO;
       //  data = aLibrary;
         
      //  data = Library; 
 
 
-        aLibrary.addObserver(this);
+       // aLibrary.addObserver(this);
     }    
-    
  
     
     /* (non-Javadoc)
