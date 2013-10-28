@@ -5,7 +5,10 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +37,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
@@ -251,6 +253,13 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         searchTextField.getDocument().addDocumentListener(
                 new SearchFieldDocumentListener(searchTextField));
+        onlyAvailableCheckboxMasterList.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent anItemChangeEvent) {
+                filterTable(searchTextField.getText());
+            }
+        });
     }
 
     /**
@@ -291,24 +300,37 @@ public class BookMasterJFrame extends JFrame implements Observer {
         }
     }
 
-    private void newTableFilter() {
-        RowFilter<TableModel, Object> rowFilter = new RowFilter<TableModel, Object>() {
-            @Override
-            public boolean include(
-                    javax.swing.RowFilter.Entry<? extends TableModel, ? extends Object> anEntry) {
-                for (int i = 0; i < anEntry.getValueCount(); i++) {
-                    if (anEntry.getStringValue(i).toLowerCase()
-                            .contains(searchTextField.getText().toLowerCase())) {
-                        return true;
-                    }
+    /**
+     * Filters the booktable based on some rules. The search field
+     */
+    private void filterTable(final String aSearchText) {
+        List<RowFilter<BookTableModel, Object>> combiningRowFilterList = new ArrayList<>(
+                2);
+        combiningRowFilterList
+                .add(new TextBookTableFilter<BookTableModel, Object>(
+                        aSearchText));
+        if (onlyAvailableCheckboxMasterList.isSelected()) {
+            RowFilter<BookTableModel, Object> onlyAvailableFilter = new RowFilter<BookTableModel, Object>() {
+                @Override
+                public boolean include(
+                        javax.swing.RowFilter.Entry<? extends BookTableModel, ? extends Object> anEntry) {
+                    int copiesAvailable = ((Integer) anEntry
+                            .getModel()
+                            .getValueAt(
+                                    ((Integer) anEntry.getIdentifier())
+                                            .intValue(),
+                                    0)).intValue();
+                    return copiesAvailable > 0;
                 }
-                return false;
-            }
-        };
-        tableSorter.setRowFilter(rowFilter);
+            };
+            combiningRowFilterList.add(onlyAvailableFilter);
+        }
+        long start = System.currentTimeMillis();
+        tableSorter.setRowFilter(RowFilter.andFilter(combiningRowFilterList));
         // TODO Stolze fragen wieso zur Hölle ich das noch machen
         // muss?!?!<?!?!?!?! DAS HAT MICH FUCKING MEHRERE STUNDEN GEKOSTET
         bookTable.setRowSorter(tableSorter);
+        System.out.println(System.currentTimeMillis() - start);
     }
 
     @Override
@@ -377,8 +399,8 @@ public class BookMasterJFrame extends JFrame implements Observer {
         }
 
         private void filter() {
-            if (!searchField.isShowingHint() && !searchField.isEmpty()) {
-                newTableFilter();
+            if (!searchField.isShowingHint()) {
+                filterTable(searchField.getText());
             }
         }
 

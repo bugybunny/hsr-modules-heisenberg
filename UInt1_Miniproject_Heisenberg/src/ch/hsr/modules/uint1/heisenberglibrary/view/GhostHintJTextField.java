@@ -78,8 +78,10 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
     public void focusGained(FocusEvent aFocusGainedEvent) {
         if (this.getText().isEmpty()) {
             setForeground(null);
-            setText(UiComponentStrings.getString("empty"));
             showingHint = false;
+            // setTexts needs to be called after showinHint=true because it
+            // causes a document changed event
+            setText(UiComponentStrings.getString("empty"));
         }
     }
 
@@ -87,8 +89,10 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
     public void focusLost(FocusEvent aFocusLostEvent) {
         if (this.getText().isEmpty()) {
             setForeground(Color.LIGHT_GRAY);
-            setText(hint);
             showingHint = true;
+            // setTexts needs to be called after showinHint=true because it
+            // causes a document changed event
+            setText(hint);
         }
     }
 

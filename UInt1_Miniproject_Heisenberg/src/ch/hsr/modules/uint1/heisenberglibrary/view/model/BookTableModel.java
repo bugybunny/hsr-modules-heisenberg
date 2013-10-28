@@ -70,6 +70,14 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         return columnNames.size();
     }
 
+    /**
+     * First column is not editable.
+     */
+    @Override
+    public boolean isCellEditable(int aRowIndex, int aColumnIndex) {
+        return aColumnIndex != 0;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -83,7 +91,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 
         switch (aColumnIndex) {
             case 0:
-                ret = "1 (todo)"; //$NON-NLS-1$
+                ret = Integer.valueOf(aRowIndex % 7);
                 break;
             case 1:
                 ret = book.getTitle();
@@ -104,8 +112,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
     public void setValueAt(Object value, int aRowIndex, int aColumnIndex) {
         BookDO book = data.get(aRowIndex);
         switch (aColumnIndex) {
-            case 0:
-                break; // TODO: availability
             case 1:
                 book.setTitle((String) value);
                 break;
@@ -141,6 +147,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
     public Class<?> getColumnClass(int aColumnIndex) {
         switch (aColumnIndex) {
             case 0:
+                return Integer.class;
             case 1:
             case 2:
             case 3:
