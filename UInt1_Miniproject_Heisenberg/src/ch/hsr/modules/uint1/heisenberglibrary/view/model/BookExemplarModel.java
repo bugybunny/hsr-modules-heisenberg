@@ -18,6 +18,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
  *
  * @author twinter
  */
+
 public class BookExemplarModel extends AbstractTableModel implements Observer {
     private static final long serialVersionUID = -1293482132910701521L;
     private static List<String> columnNames      = new ArrayList<>(3);
