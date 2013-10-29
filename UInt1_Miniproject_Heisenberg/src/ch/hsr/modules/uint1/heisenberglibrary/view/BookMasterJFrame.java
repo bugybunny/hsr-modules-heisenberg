@@ -164,10 +164,10 @@ public class BookMasterJFrame extends JFrame implements Observer {
         topPane.add(inventoryPanel);
         inventoryPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-        searchTextField = new GhostHintJTextField("Search");
+        searchTextField = new GhostHintJTextField(
+                UiComponentStrings
+                        .getString("BookMasterJFrame.textfield.search.defaulttext")); //$NON-NLS-1$
         inventoryPanel.add(searchTextField);
-        searchTextField.setText(UiComponentStrings
-                .getString("BookMasterJFrame.textfield.search.defaulttext")); //$NON-NLS-1$
         searchTextField.setColumns(10);
 
         onlyAvailableCheckboxMasterList = new JCheckBox(
@@ -323,14 +323,14 @@ public class BookMasterJFrame extends JFrame implements Observer {
                     return copiesAvailable > 0;
                 }
             };
+            // combiningRowFilterList.add(RowFilter.numberFilter(
+            // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0));
             combiningRowFilterList.add(onlyAvailableFilter);
         }
-        long start = System.currentTimeMillis();
         tableSorter.setRowFilter(RowFilter.andFilter(combiningRowFilterList));
         // TODO Stolze fragen wieso zur Hölle ich das noch machen
         // muss?!?!<?!?!?!?! DAS HAT MICH FUCKING MEHRERE STUNDEN GEKOSTET
         bookTable.setRowSorter(tableSorter);
-        System.out.println(System.currentTimeMillis() - start);
     }
 
     @Override
@@ -399,9 +399,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
         }
 
         private void filter() {
-            if (!searchField.isShowingHint()) {
-                filterTable(searchField.getText());
-            }
+            filterTable(searchField.getText());
         }
 
         @Override
