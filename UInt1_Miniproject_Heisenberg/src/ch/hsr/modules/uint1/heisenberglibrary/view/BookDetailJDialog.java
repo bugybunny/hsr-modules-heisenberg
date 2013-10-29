@@ -33,6 +33,7 @@ import javax.swing.KeyStroke;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
 /**
  * This dialog holds all opened details views for all books. Each tab represents
@@ -102,7 +103,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
      * @param aBookToOpen
      *            the book domain object to open in a tab
      */
-    public void openBookTab(BookDO aBookToOpen) {
+    public void openBookTab(BookDO aBookToOpen, Library library) {
         BookDetailJPanel detailBookPanel = null;
         // check if a tab with the given tab is already open
         for (BookDetailJPanel tempBookDetailView : openBookTabList) {
@@ -113,7 +114,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
 
         // if not open yet, create it and all listeners and actions
         if (detailBookPanel == null) {
-            detailBookPanel = new BookDetailJPanel(aBookToOpen);
+            detailBookPanel = new BookDetailJPanel(aBookToOpen, library);
             String tabTitle = (aBookToOpen.toString().length() >= 15) ? aBookToOpen
                     .toString().substring(0, 15) : toString();
 

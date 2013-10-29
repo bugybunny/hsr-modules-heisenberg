@@ -34,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -47,6 +48,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -68,6 +71,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * pattern.
      */
     private BookDO                    displayedBookDO;
+    
+    private Library                   detailLibrary;
 
     /**
      * Flag to indicate if there are unsaved changes in this panel.
@@ -85,13 +90,17 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private Component                 rigidArea;
     private JTable                    bookExemplarTable;
 
+
     /**
      * Creates a new instance of this class and sets model.
      * 
      * @param aBookDo
      */
-    public BookDetailJPanel(BookDO aBookDo) {
+    public BookDetailJPanel(BookDO aBookDo, Library library) {
+        detailLibrary = library;
+        displayedBookDO = aBookDo;
         initEverything(aBookDo);
+
     }
 
     /**
@@ -257,13 +266,27 @@ public class BookDetailJPanel extends JPanel implements Observer {
         buttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         JPanel southBookList = new JPanel();
-        southPanel.add(southBookList);
+ 
 
         
         bookExemplarTable = new JTable();
         southBookList.add(bookExemplarTable);
-        //bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO));
-    }
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, detailLibrary));
+        bookExemplarTable.setCellSelectionEnabled(true);
+        bookExemplarTable.setFillsViewportHeight(true);
+        bookExemplarTable.setColumnSelectionAllowed(false);
+
+        
+        JScrollPane jsp = new JScrollPane(bookExemplarTable);
+        southPanel.add(jsp);
+        
+        
+        JScrollPane scrollPane = new JScrollPane();
+        southBookList.add(scrollPane);
+        for(Component comp : southBookList.getComponents()){
+            System.out.println(comp.getClass().getSimpleName());
+        }
+        }
 
     /**
      * Initializes the handlers in this panel.

@@ -41,7 +41,7 @@ public class LibraryApp {
             // do nothing and just use the default look and feel for the os
         }
 
-        BookMasterJFrame frame = new BookMasterJFrame(library.getBooks());
+        BookMasterJFrame frame = new BookMasterJFrame(library);
         frame.setVisible(true);
     }
 

@@ -79,14 +79,17 @@ public class BookMasterJFrame extends JFrame implements Observer {
     // nicht global sein
     private int                            numberOfBooks    = 0;
     private List<BookDO>                   bookList;
+    private Library                        bookMasterlibrary;
 
     /**
      * Creates the frame.
      * 
      * @param aBooks
      */
-    public BookMasterJFrame(List<BookDO> someBooks) {
-        bookList = someBooks;
+    public BookMasterJFrame(Library library) {
+        bookList = library.getBooks();
+        bookMasterlibrary = library;
+        
         initComponents();
         initHandlers();
     }
@@ -367,7 +370,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
             for (int tempBook : bookTable.getSelectedRows()) {
                 BookDO selectedBook = bookList.get(bookTable
                         .convertRowIndexToModel(tempBook));
-                bookDetailDialog.openBookTab(selectedBook);
+                bookDetailDialog.openBookTab(selectedBook, bookMasterlibrary);
             }
         }
     }
