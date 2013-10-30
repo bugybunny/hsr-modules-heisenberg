@@ -141,7 +141,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     private void initComponents() {
         setBorder(new EmptyBorder(5, 5, 5, 5));
-        setLayout(new BorderLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel northPanel = new JPanel();
         northPanel.setBorder(new TitledBorder(UIManager
@@ -149,7 +149,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 UiComponentStrings
                         .getString("BookDetailJDialog.border.title.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(northPanel, BorderLayout.CENTER);
+        add(northPanel);
         GridBagLayout gblPanel = new GridBagLayout();
         gblPanel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
         gblPanel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0 };
@@ -237,7 +237,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         southPanel.setBorder(new TitledBorder(null, UiComponentStrings
                 .getString("BookDetailJDialog.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(southPanel, BorderLayout.SOUTH);
+        add(southPanel);
         southPanel.setLayout(new BorderLayout(0, 0));
 
         JPanel southInformationPanel = new JPanel();
@@ -269,7 +269,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
-         bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, detailLibrary));
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, detailLibrary));
         bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 
