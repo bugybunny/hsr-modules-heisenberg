@@ -326,6 +326,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
                     return copiesAvailable > 0;
                 }
             };
+            // TODO folgendes verwenden, habe aber noch Probleme mit Generics
             // combiningRowFilterList.add(RowFilter.numberFilter(
             // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0));
             combiningRowFilterList.add(onlyAvailableFilter);
