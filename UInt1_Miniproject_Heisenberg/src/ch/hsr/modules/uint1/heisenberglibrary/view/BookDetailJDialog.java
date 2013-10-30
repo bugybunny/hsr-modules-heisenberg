@@ -134,6 +134,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
                     .addModelStateChangeListener(new BookDetailModelChangeListener(
                             detailBookPanel));
             openBookTabList.add(detailBookPanel);
+            pack();
         }
         // if already opened, just bring this tab to the front
         else {

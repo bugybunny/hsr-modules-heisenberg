@@ -71,7 +71,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * pattern.
      */
     private BookDO                    displayedBookDO;
-    
+
     private Library                   detailLibrary;
 
     /**
@@ -89,7 +89,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private Component                 glue;
     private Component                 rigidArea;
     private JTable                    bookExemplarTable;
-
 
     /**
      * Creates a new instance of this class and sets model.
@@ -239,10 +238,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 .getString("BookDetailJDialog.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(southPanel, BorderLayout.SOUTH);
-        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
+        southPanel.setLayout(new BorderLayout(0, 0));
 
         JPanel southInformationPanel = new JPanel();
-        southPanel.add(southInformationPanel);
+        southPanel.add(southInformationPanel, BorderLayout.NORTH);
         southInformationPanel.setLayout(new BoxLayout(southInformationPanel,
                 BoxLayout.X_AXIS));
 
@@ -266,27 +265,25 @@ public class BookDetailJPanel extends JPanel implements Observer {
         buttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         JPanel southBookList = new JPanel();
- 
 
-        
         bookExemplarTable = new JTable();
-        southBookList.add(bookExemplarTable);
-        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, detailLibrary));
-        bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setFillsViewportHeight(true);
+        southBookList.add(bookExemplarTable);
+         bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, detailLibrary));
+        bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 
-        
         JScrollPane jsp = new JScrollPane(bookExemplarTable);
-        southPanel.add(jsp);
-        
-        
+        southPanel.add(jsp, BorderLayout.CENTER);
+
         JScrollPane scrollPane = new JScrollPane();
         southBookList.add(scrollPane);
-        for(Component comp : southBookList.getComponents()){
+        for (Component comp : southBookList.getComponents()) {
             System.out.println(comp.getClass().getSimpleName());
         }
-        }
+        
+     
+    }
 
     /**
      * Initializes the handlers in this panel.
@@ -317,6 +314,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
         publisherTextfield.getDocument().addDocumentListener(
                 new ChangeToDirtyDocumentListener(publisherTextfield,
                         displayedBookDO.getPublisher()));
+        
+        
     }
 
     /**
@@ -493,7 +492,5 @@ public class BookDetailJPanel extends JPanel implements Observer {
             checkIfModified();
         }
     }
-    
-    
 
 }

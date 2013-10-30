@@ -1,6 +1,9 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -10,6 +13,7 @@ import javax.swing.table.AbstractTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -26,7 +30,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         columnNames.add(UiComponentStrings
                 .getString("Exemplar ID")); 
         columnNames.add(UiComponentStrings
-                .getString("Availability fdddf")); 
+                .getString("Availability")); 
         columnNames.add(UiComponentStrings
                 .getString("Borrowed until"));  
     }
@@ -70,6 +74,33 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
         Copy copyOfSpecificBook = exemplarLibrary.getCopiesOfBook(specificBook).get(aRowIndex);
         
+        List<Loan> loanedBooks = exemplarLibrary.getLentCopiesOfBook(specificBook);
+        
+    
+        
+       // Copy exemplarOfLoanedBook;
+        //boolean loaned = false;
+        
+        String availability = "available";
+        Object borrowedUntil = "-";
+
+        for (int i = 0; i<loanedBooks.size(); i++) {
+            if (loanedBooks.get(i).getCopy().getInventoryNumber() == copyOfSpecificBook.getInventoryNumber()) {
+               // exemplarOfLoanedBook = loanedBooks.get(i).getCopy();
+                //loaned = true;
+                availability = "unavailable";
+                
+                GregorianCalendar dueDate = (GregorianCalendar) loanedBooks.get(i).getPickupDate();
+                dueDate.add(GregorianCalendar.DAY_OF_YEAR, loanedBooks.get(i).getDaysOfLoanDuration());
+                
+                
+                DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+                
+                borrowedUntil = df.format(dueDate.getTime());
+            }
+        }
+        
+ 
         Object ret = null;
 
         switch (aColumnIndex) {
@@ -77,13 +108,13 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
                 ret = copyOfSpecificBook.getInventoryNumber();
                 break;
             case 1:
-                ret = "availability";
+                ret = availability;
                 break;
             case 2:
-                ret = "borrowed until";
+                ret = borrowedUntil;
                 break;
             default:
-                ret = "blubb error";
+                ret = "";
         }
         return ret;
     }
