@@ -144,7 +144,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
 
     @Override
     protected boolean save() {
-        // TODO probably something to do later, if not delete it
         return false;
     }
 

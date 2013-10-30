@@ -71,9 +71,6 @@ public class BookMasterJFrame extends JFrame implements Observer {
     private JLabel                         lblNewLabel;
     private JPanel                         bookInventoryPanel;
     private JPanel                         outerStatisticsPanel;
-    // TODO überlegen ob wir mehrere DetailDialog erlauben wollen, damit man
-    // nicht ein Fenster mit 20 Tabs hat und es so übersichtlicher zu machen,
-    // würde aber den ganzen Code viel komplexer machen
     private BookDetailJDialog              bookDetailDialog;
     // TODO wahrscheinlich rauslöschen, oder wieso wird das gebraucht? muss
     // nicht global sein
@@ -89,7 +86,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
     public BookMasterJFrame(Library library) {
         bookList = library.getBooks();
         bookMasterlibrary = library;
-        
+
         initComponents();
         initHandlers();
     }

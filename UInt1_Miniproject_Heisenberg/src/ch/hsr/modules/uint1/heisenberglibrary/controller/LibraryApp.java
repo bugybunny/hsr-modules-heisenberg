@@ -72,12 +72,6 @@ public class LibraryApp {
                 + "%");
         System.out.println("Copies currently overdue: "
                 + library.getOverdueLoans().size());
-
-        for (Loan l : library.getOverdueLoans()) {
-            // TODO remove
-            // System.out.println(l.getDaysOverdue());
-        }
-
     }
 
     private static void createBooksAndLoans(Library library)
