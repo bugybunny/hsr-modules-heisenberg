@@ -18,48 +18,46 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
  * The tableModel for the jTable in BookDetailJPanel.
- *
+ * 
  * @author twinter
  */
-
 public class BookExemplarModel extends AbstractTableModel implements Observer {
-    private static final long serialVersionUID = -1293482132910701521L;
+    private static final long   serialVersionUID = -1293482132910701521L;
     private static List<String> columnNames      = new ArrayList<>(3);
 
     static {
-        columnNames.add(UiComponentStrings
-                .getString("Exemplar ID")); 
-        columnNames.add(UiComponentStrings
-                .getString("Availability")); 
-        columnNames.add(UiComponentStrings
-                .getString("Borrowed until"));  
+        columnNames.add(UiComponentStrings.getString("BookExemplarModel.exemplarTableColumn.id")); //$NON-NLS-1$
+        columnNames.add(UiComponentStrings.getString("BookExemplarModel.exemplarTableColumn.availability")); //$NON-NLS-1$
+        columnNames.add(UiComponentStrings.getString("BookExemplarModel.exemplarTableColumn.borrowedUntil")); //$NON-NLS-1$
     }
-    
+
     private Library             exemplarLibrary;
     private BookDO              specificBook;
 
-    
     /**
      * Creates a new instance of this class.
      * 
      * @param aDisplayedBookDO
      *            the specific book from the DetailPanel
      */
-    public BookExemplarModel(BookDO aDisplayedBookDO, Library library) {
+    public BookExemplarModel(BookDO aDisplayedBookDO, Library aLibrary) {
         specificBook = aDisplayedBookDO;
-        exemplarLibrary = library;
-    }    
- 
-    
-    /* (non-Javadoc)
+        exemplarLibrary = aLibrary;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.swing.table.TableModel#getRowCount()
      */
     @Override
     public int getRowCount() {
-       return exemplarLibrary.getCopiesOfBook(specificBook).size();
+        return exemplarLibrary.getCopiesOfBook(specificBook).size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.swing.table.TableModel#getColumnCount()
      */
     @Override
@@ -67,45 +65,47 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         return columnNames.size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
-        Copy copyOfSpecificBook = exemplarLibrary.getCopiesOfBook(specificBook).get(aRowIndex);
-        
-        List<Loan> loanedBooks = exemplarLibrary.getLentCopiesOfBook(specificBook);
-        
-    
-        
-       // Copy exemplarOfLoanedBook;
-        //boolean loaned = false;
-        
-        String availability = "available";
-        Object borrowedUntil = "-";
+        Copy copyOfSpecificBook = exemplarLibrary.getCopiesOfBook(specificBook)
+                .get(aRowIndex);
 
-        for (int i = 0; i<loanedBooks.size(); i++) {
-            if (loanedBooks.get(i).getCopy().getInventoryNumber() == copyOfSpecificBook.getInventoryNumber()) {
-               // exemplarOfLoanedBook = loanedBooks.get(i).getCopy();
-                //loaned = true;
-                availability = "unavailable";
-                
-                GregorianCalendar dueDate = (GregorianCalendar) loanedBooks.get(i).getPickupDate();
-                dueDate.add(GregorianCalendar.DAY_OF_YEAR, loanedBooks.get(i).getDaysOfLoanDuration());
-                
-                
-                DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-                
+        List<Loan> loanedBooks = exemplarLibrary
+                .getLentCopiesOfBook(specificBook);
+
+        // Copy exemplarOfLoanedBook;
+        // boolean loaned = false;
+
+        String availability = UiComponentStrings.getString("BookExemplarModel.copy.isAvailable"); //$NON-NLS-1$
+        Object borrowedUntil = UiComponentStrings.getString("BookExemplarModel.copy.date.isAvailable"); //$NON-NLS-1$
+
+        for (int i = 0; i < loanedBooks.size(); i++) {
+            if (loanedBooks.get(i).getCopy().getInventoryNumber() == copyOfSpecificBook
+                    .getInventoryNumber()) {
+                // exemplarOfLoanedBook = loanedBooks.get(i).getCopy();
+                // loaned = true;
+                availability = UiComponentStrings.getString("BookExemplarModel.copy.notAvailable"); //$NON-NLS-1$
+
+                GregorianCalendar dueDate = loanedBooks.get(i).getPickupDate();
+                dueDate.add(GregorianCalendar.DAY_OF_YEAR, loanedBooks.get(i)
+                        .getDaysOfLoanDuration());
+
+                DateFormat df = new SimpleDateFormat(UiComponentStrings.getString("BookExemplarModel.dateformat")); //$NON-NLS-1$
+
                 borrowedUntil = df.format(dueDate.getTime());
             }
         }
-        
- 
+
         Object ret = null;
 
         switch (aColumnIndex) {
             case 0:
-                ret = copyOfSpecificBook.getInventoryNumber();
+                ret = Long.valueOf(copyOfSpecificBook.getInventoryNumber());
                 break;
             case 1:
                 ret = availability;
@@ -114,28 +114,30 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
                 ret = borrowedUntil;
                 break;
             default:
-                ret = "";
+                ret = UiComponentStrings.getString("empty"); //$NON-NLS-1$ 
         }
         return ret;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     @Override
-    public void update(Observable aO, Object aArg) {
+    public void update(Observable anObservable, Object anArgument) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see javax.swing.table.AbstractTableModel#getColumnName(int)
      */
     @Override
-    public String getColumnName(int aColumn) {
-        return columnNames.get(aColumn);
+    public String getColumnName(int aColumnIndex) {
+        return columnNames.get(aColumnIndex);
     }
 
 }

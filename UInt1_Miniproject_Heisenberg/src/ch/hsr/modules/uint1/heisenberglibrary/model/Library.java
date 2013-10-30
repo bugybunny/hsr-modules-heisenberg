@@ -3,7 +3,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Library extends AbstractObservableDO{
+public class Library extends AbstractObservableDO {
 
     private List<Copy>     copies;
     private List<Customer> customers;
@@ -11,10 +11,10 @@ public class Library extends AbstractObservableDO{
     private List<BookDO>   bookDOs;
 
     public Library() {
-        copies = new ArrayList<Copy>();
-        customers = new ArrayList<Customer>();
-        loans = new ArrayList<Loan>();
-        bookDOs = new ArrayList<BookDO>();
+        copies = new ArrayList<>();
+        customers = new ArrayList<>();
+        loans = new ArrayList<>();
+        bookDOs = new ArrayList<>();
     }
 
     public Loan createAndAddLoan(Customer customer, Copy copy) {
@@ -23,9 +23,8 @@ public class Library extends AbstractObservableDO{
             loans.add(l);
             doNotify();
             return l;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Customer createAndAddCustomer(String name, String surname) {
@@ -68,7 +67,7 @@ public class Library extends AbstractObservableDO{
     }
 
     public List<Copy> getCopiesOfBook(BookDO bookDO) {
-        List<Copy> res = new ArrayList<Copy>();
+        List<Copy> res = new ArrayList<>();
         for (Copy c : copies) {
             if (c.getTitle().equals(bookDO)) {
                 res.add(c);
@@ -79,7 +78,7 @@ public class Library extends AbstractObservableDO{
     }
 
     public List<Loan> getLentCopiesOfBook(BookDO bookDO) {
-        List<Loan> lentCopies = new ArrayList<Loan>();
+        List<Loan> lentCopies = new ArrayList<>();
         for (Loan l : loans) {
             if (l.getCopy().getTitle().equals(bookDO) && l.isLent()) {
                 lentCopies.add(l);
@@ -89,7 +88,7 @@ public class Library extends AbstractObservableDO{
     }
 
     public List<Loan> getCustomerLoans(Customer customer) {
-        List<Loan> lentCopies = new ArrayList<Loan>();
+        List<Loan> lentCopies = new ArrayList<>();
         for (Loan l : loans) {
             if (l.getCustomer().equals(customer)) {
                 lentCopies.add(l);
@@ -99,7 +98,7 @@ public class Library extends AbstractObservableDO{
     }
 
     public List<Loan> getOverdueLoans() {
-        List<Loan> overdueLoans = new ArrayList<Loan>();
+        List<Loan> overdueLoans = new ArrayList<>();
         for (Loan l : getLoans()) {
             if (l.isOverdue()) {
                 overdueLoans.add(l);
@@ -117,7 +116,7 @@ public class Library extends AbstractObservableDO{
     }
 
     private List<Copy> getCopies(boolean isLent) {
-        List<Copy> retCopies = new ArrayList<Copy>();
+        List<Copy> retCopies = new ArrayList<>();
         for (Copy c : copies) {
             if (isLent == isCopyLent(c)) {
                 retCopies.add(c);

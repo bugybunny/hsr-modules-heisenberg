@@ -11,9 +11,9 @@ public class Loan {
     private GregorianCalendar pickupDate, returnDate;
     private final static int  DAYS_TO_RETURN_BOOK = 30;
 
-    public Loan(Customer customer, Copy copy) {
-        this.copy = copy;
-        this.customer = customer;
+    public Loan(Customer aCustomer, Copy aCopy) {
+        copy = aCopy;
+        customer = aCustomer;
         pickupDate = new GregorianCalendar();
     }
 
@@ -31,21 +31,21 @@ public class Loan {
         return true;
     }
 
-    public void returnCopy(GregorianCalendar returnDate)
+    public void returnCopy(GregorianCalendar aReturnDate)
             throws IllegalLoanOperationException {
-        if (returnDate.before(pickupDate)) {
+        if (aReturnDate.before(pickupDate)) {
             throw new IllegalLoanOperationException(
                     "Return Date is before pickupDate");
         }
-        this.returnDate = returnDate;
+        this.returnDate = aReturnDate;
     }
 
-    public void setPickupDate(GregorianCalendar pickupDate)
+    public void setPickupDate(GregorianCalendar aPickupDate)
             throws IllegalLoanOperationException {
         if (!isLent()) {
             throw new IllegalLoanOperationException("Loan is already retuned");
         }
-        this.pickupDate = pickupDate;
+        this.pickupDate = aPickupDate;
     }
 
     public GregorianCalendar getPickupDate() {
@@ -73,10 +73,10 @@ public class Loan {
                 + getDaysOfLoanDuration();
     }
 
-    private String getFormattedDate(GregorianCalendar date) {
-        if (date != null) {
+    private static String getFormattedDate(GregorianCalendar aDate) {
+        if (aDate != null) {
             DateFormat f = SimpleDateFormat.getDateInstance();
-            return f.format(date.getTime());
+            return f.format(aDate.getTime());
         }
         return "00.00.00";
     }

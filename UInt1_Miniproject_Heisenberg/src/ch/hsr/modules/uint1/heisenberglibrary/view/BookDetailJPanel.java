@@ -97,9 +97,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     public BookDetailJPanel(BookDO aBookDo, Library library) {
         detailLibrary = library;
-        displayedBookDO = aBookDo;
         initEverything(aBookDo);
-
     }
 
     /**
@@ -133,6 +131,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private void initEverything(BookDO aBookDo) {
         initComponents();
         setBookDO(aBookDo);
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+                detailLibrary));
         initHandlers();
     }
 
@@ -269,7 +269,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
-        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO, detailLibrary));
         bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 
@@ -278,11 +277,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
         JScrollPane scrollPane = new JScrollPane();
         southBookList.add(scrollPane);
-        for (Component comp : southBookList.getComponents()) {
-            System.out.println(comp.getClass().getSimpleName());
-        }
-        
-     
     }
 
     /**
@@ -314,8 +308,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         publisherTextfield.getDocument().addDocumentListener(
                 new ChangeToDirtyDocumentListener(publisherTextfield,
                         displayedBookDO.getPublisher()));
-        
-        
+
     }
 
     /**
