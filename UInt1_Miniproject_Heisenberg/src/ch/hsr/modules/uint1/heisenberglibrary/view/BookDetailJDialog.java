@@ -120,7 +120,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
 
             tabbedPane.addTab(tabTitle, null, detailBookPanel,
                     aBookToOpen.toString());
-
             Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
             actionMapForBookTab.put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -269,4 +268,5 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
             }
         }
     }
+
 }

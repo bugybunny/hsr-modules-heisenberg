@@ -72,9 +72,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
     private JPanel                         bookInventoryPanel;
     private JPanel                         outerStatisticsPanel;
     private BookDetailJDialog              bookDetailDialog;
-    // TODO wahrscheinlich rauslöschen, oder wieso wird das gebraucht? muss
-    // nicht global sein
-    private int                            numberOfBooks    = 0;
+
     private List<BookDO>                   bookList;
     private Library                        bookMasterlibrary;
 
@@ -127,16 +125,15 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         String numberOfBooksText = MessageFormat.format(UiComponentStrings
                 .getString("BookMasterJFrame.label.numberofbooks.text"), //$NON-NLS-1$
-                Integer.valueOf(numberOfBooks));
+                Integer.valueOf(bookMasterlibrary.getBooks().size()));
         numberOfBooksLabel = new JLabel(numberOfBooksText);
         inventoryStatisticsPanel.add(numberOfBooksLabel);
 
         inventoryStatisticsPanel.add(Box.createHorizontalStrut(50));
 
-        // TODO numberof exemplars auslesen aus library
         String numberOfExamblesText = MessageFormat.format(UiComponentStrings
                 .getString("BookMasterJFrame.label.exemplarnumber.text"), //$NON-NLS-1$
-                Integer.valueOf(0));
+                Integer.valueOf(bookMasterlibrary.getCopies().size()));
         numberOfExemplarsLabel = new JLabel(numberOfExamblesText);
         inventoryStatisticsPanel.add(numberOfExemplarsLabel);
 
@@ -225,10 +222,6 @@ public class BookMasterJFrame extends JFrame implements Observer {
                 .addTab(UiComponentStrings
                         .getString("BookMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$
 
-        // TODO: Wahrscheinlich schlecht, wegen update schauen.
-        System.out.println("BLUBB" + numberOfBooks); //$NON-NLS-1$
-
-        // numberOfBooksJLable.setText(UiComponentStrings.getString("BookMasterJFrame.numberOfBooksJLable.text")+numberOfBooks);
     }
 
     private void initHandlers() {

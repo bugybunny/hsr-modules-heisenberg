@@ -269,6 +269,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+                detailLibrary));
         bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 
@@ -277,6 +279,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
         JScrollPane scrollPane = new JScrollPane();
         southBookList.add(scrollPane);
+
     }
 
     /**
