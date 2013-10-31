@@ -22,7 +22,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.IllegalLoanOperationExceptio
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
-import ch.hsr.modules.uint1.heisenberglibrary.view.BookMasterJFrame;
+import ch.hsr.modules.uint1.heisenberglibrary.view.LibraryMasterJFrame;
 
 public class LibraryApp {
     public static void main(String[] args) throws Exception {
@@ -41,8 +41,7 @@ public class LibraryApp {
             // do nothing and just use the default look and feel for the os
         }
 
-        BookMasterJFrame frame = new BookMasterJFrame(library);
-        frame.setVisible(true);
+        new LibraryMasterJFrame(library);
     }
 
     private static void initLibrary(Library library)

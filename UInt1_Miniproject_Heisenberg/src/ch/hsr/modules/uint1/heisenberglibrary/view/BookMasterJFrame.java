@@ -18,14 +18,11 @@ import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
@@ -44,7 +41,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
-public class BookMasterJFrame extends JFrame implements Observer {
+public class BookMasterJFrame extends JPanel implements Observer {
     private static final long              serialVersionUID = 8186612854405487707L;
 
     /**
@@ -53,22 +50,17 @@ public class BookMasterJFrame extends JFrame implements Observer {
      */
     private JTable                         bookTable;
     private TableRowSorter<BookTableModel> tableSorter;
-    private JPanel                         contentPanel;
     private JPanel                         centerPanel;
     private JButton                        viewSelectedButton;
     private JButton                        addBookButton;
     private JPanel                         inventoryStatisticsPanel;
     private JPanel                         inventoryPanel;
-    private JTabbedPane                    tabbedPane;
-    private JPanel                         booksPanel;
     private JLabel                         numberOfBooksLabel;
     private JLabel                         numberOfExemplarsLabel;
     private GhostHintJTextField            searchTextField;
     private JCheckBox                      onlyAvailableCheckboxMasterList;
     private Component                      horizontalStrut;
-    private JPanel                         lendingPanel;
     private JPanel                         panel;
-    private JLabel                         lblNewLabel;
     private JPanel                         bookInventoryPanel;
     private JPanel                         outerStatisticsPanel;
     private BookDetailJDialog              bookDetailDialog;
@@ -90,32 +82,16 @@ public class BookMasterJFrame extends JFrame implements Observer {
     }
 
     private void initComponents() {
-        ImageIcon frameIcon = new ImageIcon(
-                BookMasterJFrame.class.getResource("/images/library.png"));
-        setIconImage(frameIcon.getImage());
-        setTitle(UiComponentStrings.getString("BookMasterJFrame.title")); //$NON-NLS-1$
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1200, 441);
-        contentPanel = new JPanel();
-        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPanel);
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
-
-        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        contentPanel.add(tabbedPane);
-
-        booksPanel = new JPanel();
-        tabbedPane
-                .addTab(UiComponentStrings
-                        .getString("BookMasterJFrame.tab.books.text"), null, booksPanel, null); //$NON-NLS-1$
-        booksPanel.setLayout(new BoxLayout(booksPanel, BoxLayout.Y_AXIS));
+        setBorder(new EmptyBorder(5, 5, 5, 5));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         outerStatisticsPanel = new JPanel();
         outerStatisticsPanel.setBorder(new TitledBorder(new EtchedBorder(
                 EtchedBorder.LOWERED, null, null), UiComponentStrings
                 .getString("BookMasterJFrame.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        booksPanel.add(outerStatisticsPanel);
+        add(outerStatisticsPanel);
         outerStatisticsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
         inventoryStatisticsPanel = new JPanel();
@@ -141,7 +117,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
         bookInventoryPanel.setBorder(new TitledBorder(null, UiComponentStrings
                 .getString("BookMasterJFrame.border.bookinventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        booksPanel.add(bookInventoryPanel);
+        add(bookInventoryPanel);
         bookInventoryPanel.setLayout(new BorderLayout(0, 0));
 
         JPanel topPane = new JPanel();
@@ -151,11 +127,6 @@ public class BookMasterJFrame extends JFrame implements Observer {
         panel = new JPanel();
         ((FlowLayout) panel.getLayout()).setAlignment(FlowLayout.LEFT);
         topPane.add(panel);
-
-        lblNewLabel = new JLabel(
-                UiComponentStrings
-                        .getString("BookMasterJFrame.lblNewLabel.text")); //$NON-NLS-1$
-        panel.add(lblNewLabel);
 
         inventoryPanel = new JPanel();
         topPane.add(inventoryPanel);
@@ -216,12 +187,6 @@ public class BookMasterJFrame extends JFrame implements Observer {
 
         JScrollPane jsp = new JScrollPane(bookTable);
         centerPanel.add(jsp);
-
-        lendingPanel = new JPanel();
-        tabbedPane
-                .addTab(UiComponentStrings
-                        .getString("BookMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$
-
     }
 
     private void initHandlers() {
@@ -322,8 +287,6 @@ public class BookMasterJFrame extends JFrame implements Observer {
             combiningRowFilterList.add(onlyAvailableFilter);
         }
         tableSorter.setRowFilter(RowFilter.andFilter(combiningRowFilterList));
-        // TODO Stolze fragen wieso zur Hölle ich das noch machen
-        // muss?!?!<?!?!?!?! DAS HAT MICH FUCKING MEHRERE STUNDEN GEKOSTET
         bookTable.setRowSorter(tableSorter);
     }
 
@@ -353,7 +316,7 @@ public class BookMasterJFrame extends JFrame implements Observer {
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (bookDetailDialog == null) {
-                bookDetailDialog = new BookDetailJDialog(BookMasterJFrame.this);
+                bookDetailDialog = new BookDetailJDialog(null);
             }
             bookDetailDialog.setVisible(true);
             bookDetailDialog.toFront();
