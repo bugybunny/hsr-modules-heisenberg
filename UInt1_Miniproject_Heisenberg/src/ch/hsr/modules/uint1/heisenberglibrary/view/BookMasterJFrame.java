@@ -191,6 +191,8 @@ public class BookMasterJFrame extends JPanel implements Observer {
 
     private void initHandlers() {
         viewSelectedButton.addActionListener(new ViewSelectedButtonListener());
+        addBookButton.addActionListener(new AddBookButtonListener());
+
         bookTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
@@ -326,6 +328,22 @@ public class BookMasterJFrame extends JPanel implements Observer {
                         .convertRowIndexToModel(tempBook));
                 bookDetailDialog.openBookTab(selectedBook, bookMasterlibrary);
             }
+        }
+    }
+
+    private class AddBookButtonListener implements ActionListener {
+        /**
+         * Opens an empty detail view with the ability to save a new book.
+         */
+        @Override
+        public void actionPerformed(ActionEvent anActionEvent) {
+            // TODO Opens a new window, should open a new tab instead
+            bookDetailDialog = new BookDetailJDialog(BookMasterJFrame.this);
+            bookDetailDialog.setVisible(true);
+            bookDetailDialog.toFront();
+
+            bookDetailDialog.openBookTab(null, bookMasterlibrary);
+
         }
     }
 

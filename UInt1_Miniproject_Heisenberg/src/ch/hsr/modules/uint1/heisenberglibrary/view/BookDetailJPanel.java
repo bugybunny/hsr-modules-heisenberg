@@ -49,7 +49,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListene
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -131,8 +130,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private void initEverything(BookDO aBookDo) {
         initComponents();
         setBookDO(aBookDo);
-        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
-                detailLibrary));
+        /*
+         * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+         * detailLibrary));
+         */
         initHandlers();
     }
 
@@ -152,10 +153,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
         add(northPanel);
         GridBagLayout gblPanel = new GridBagLayout();
         gblPanel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
-        gblPanel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0 };
+        gblPanel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0, 0 };
         gblPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0,
                 Double.MIN_VALUE };
-        gblPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        gblPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 Double.MIN_VALUE };
         northPanel.setLayout(gblPanel);
 
@@ -163,6 +164,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.title.text")); //$NON-NLS-1$
         GridBagConstraints gbcTitleLabel = new GridBagConstraints();
+        gbcTitleLabel.anchor = GridBagConstraints.EAST;
         gbcTitleLabel.insets = new Insets(0, 0, 5, 5);
         gbcTitleLabel.gridx = 1;
         gbcTitleLabel.gridy = 1;
@@ -181,7 +183,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.author.text")); //$NON-NLS-1$
         GridBagConstraints gbcAuthorLabel = new GridBagConstraints();
-        gbcAuthorLabel.anchor = GridBagConstraints.NORTH;
+        gbcAuthorLabel.anchor = GridBagConstraints.EAST;
         gbcAuthorLabel.insets = new Insets(0, 0, 5, 5);
         gbcAuthorLabel.gridx = 1;
         gbcAuthorLabel.gridy = 2;
@@ -200,6 +202,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.publisher.text")); //$NON-NLS-1$
         GridBagConstraints gbcPublisherLabel = new GridBagConstraints();
+        gbcPublisherLabel.anchor = GridBagConstraints.EAST;
         gbcPublisherLabel.insets = new Insets(0, 0, 5, 5);
         gbcPublisherLabel.gridx = 1;
         gbcPublisherLabel.gridy = 3;
@@ -218,7 +221,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.condition.text")); //$NON-NLS-1$
         GridBagConstraints gbcConditionLabel = new GridBagConstraints();
-        gbcConditionLabel.insets = new Insets(0, 0, 0, 5);
+        gbcConditionLabel.anchor = GridBagConstraints.EAST;
+        gbcConditionLabel.insets = new Insets(0, 0, 5, 5);
         gbcConditionLabel.gridx = 1;
         gbcConditionLabel.gridy = 4;
         northPanel.add(tempconditionLabel, gbcConditionLabel);
@@ -228,10 +232,20 @@ public class BookDetailJPanel extends JPanel implements Observer {
             comboBox.addItem(tempBookCondition);
         }
         GridBagConstraints gbcComboBox = new GridBagConstraints();
+        gbcComboBox.insets = new Insets(0, 0, 5, 0);
         gbcComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbcComboBox.gridx = 3;
         gbcComboBox.gridy = 4;
         northPanel.add(comboBox, gbcComboBox);
+
+        JButton btnAddABook = new JButton(
+                UiComponentStrings
+                        .getString("BookDetailJPanel.btnAddABook.text")); //$NON-NLS-1$
+        GridBagConstraints gbc_btnAddABook = new GridBagConstraints();
+        gbc_btnAddABook.anchor = GridBagConstraints.EAST;
+        gbc_btnAddABook.gridx = 3;
+        gbc_btnAddABook.gridy = 6;
+        northPanel.add(btnAddABook, gbc_btnAddABook);
 
         JPanel southPanel = new JPanel();
         southPanel.setBorder(new TitledBorder(null, UiComponentStrings
@@ -258,6 +272,11 @@ public class BookDetailJPanel extends JPanel implements Observer {
         glue = Box.createGlue();
         southInformationPanel.add(glue);
 
+        JButton btnRemoveSelected = new JButton(
+                UiComponentStrings
+                        .getString("BookDetailJPanel.btnRemoveSelected.text")); //$NON-NLS-1$
+        southInformationPanel.add(btnRemoveSelected);
+
         buttonAddCopy = new JButton(
                 UiComponentStrings
                         .getString("BookDetailJDialog.button.addcopy.text")); //$NON-NLS-1$
@@ -269,8 +288,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
-        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
-                detailLibrary));
+        /*
+         * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+         * detailLibrary));
+         */
         bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 
@@ -292,6 +313,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * @see ChangeToDirtyDocumentListener
      */
     protected void initHandlers() {
+
         // set focus to titlefield after tab has been switched
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -299,19 +321,20 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 titleTextfield.requestFocusInWindow();
             }
         });
+        if (displayedBookDO != null) {
 
-        titleTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(titleTextfield,
-                        displayedBookDO.getTitle()));
+            titleTextfield.getDocument().addDocumentListener(
+                    new ChangeToDirtyDocumentListener(titleTextfield,
+                            displayedBookDO.getTitle()));
 
-        authorTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(authorTextfield,
-                        displayedBookDO.getAuthor()));
+            authorTextfield.getDocument().addDocumentListener(
+                    new ChangeToDirtyDocumentListener(authorTextfield,
+                            displayedBookDO.getAuthor()));
 
-        publisherTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(publisherTextfield,
-                        displayedBookDO.getPublisher()));
-
+            publisherTextfield.getDocument().addDocumentListener(
+                    new ChangeToDirtyDocumentListener(publisherTextfield,
+                            displayedBookDO.getPublisher()));
+        }
     }
 
     /**

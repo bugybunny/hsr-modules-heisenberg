@@ -105,6 +105,9 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
      */
     public void openBookTab(BookDO aBookToOpen, Library library) {
         BookDetailJPanel detailBookPanel = null;
+
+        // TODO: test
+
         // check if a tab with the given tab is already open
         for (BookDetailJPanel tempBookDetailView : openBookTabList) {
             if (tempBookDetailView.getDisplayedBookDO() == aBookToOpen) {
@@ -115,11 +118,18 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         // if not open yet, create it and all listeners and actions
         if (detailBookPanel == null) {
             detailBookPanel = new BookDetailJPanel(aBookToOpen, library);
-            String tabTitle = (aBookToOpen.toString().length() >= 15) ? aBookToOpen
-                    .toString().substring(0, 15) : toString();
 
-            tabbedPane.addTab(tabTitle, null, detailBookPanel,
-                    aBookToOpen.toString());
+            String tabTitle = "a new book";
+            if (aBookToOpen != null) {
+                tabTitle = (aBookToOpen.toString().length() >= 15) ? aBookToOpen
+                        .toString().substring(0, 15) : toString();
+
+                tabbedPane.addTab(tabTitle, null, detailBookPanel,
+                        aBookToOpen.toString());
+            } else {
+                tabbedPane
+                        .addTab(tabTitle, null, detailBookPanel, "a new book");
+            }
             Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
             actionMapForBookTab.put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
