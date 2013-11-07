@@ -106,12 +106,12 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
     public void openBookTab(BookDO aBookToOpen, Library library) {
         BookDetailJPanel detailBookPanel = null;
 
-        // TODO: test
-
         // check if a tab with the given tab is already open
-        for (BookDetailJPanel tempBookDetailView : openBookTabList) {
-            if (tempBookDetailView.getDisplayedBookDO() == aBookToOpen) {
-                detailBookPanel = tempBookDetailView;
+        if (aBookToOpen != null) {
+            for (BookDetailJPanel tempBookDetailView : openBookTabList) {
+                if (tempBookDetailView.getDisplayedBookDO() == aBookToOpen) {
+                    detailBookPanel = tempBookDetailView;
+                }
             }
         }
 

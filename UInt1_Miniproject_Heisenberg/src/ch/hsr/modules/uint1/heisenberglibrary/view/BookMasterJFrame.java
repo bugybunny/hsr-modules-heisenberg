@@ -338,7 +338,12 @@ public class BookMasterJFrame extends JPanel implements Observer {
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
             // TODO Opens a new window, should open a new tab instead
-            bookDetailDialog = new BookDetailJDialog(BookMasterJFrame.this);
+
+            // check first if the detaildialog is already opened, if so bring it
+            // to the front
+            if (bookDetailDialog == null) {
+                bookDetailDialog = new BookDetailJDialog(null);
+            }
             bookDetailDialog.setVisible(true);
             bookDetailDialog.toFront();
 

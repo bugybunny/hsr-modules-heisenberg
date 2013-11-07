@@ -88,6 +88,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private Component                 glue;
     private Component                 rigidArea;
     private JTable                    bookExemplarTable;
+    private JButton                   btnAddABook;
 
     /**
      * Creates a new instance of this class and sets model.
@@ -130,6 +131,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private void initEverything(BookDO aBookDo) {
         initComponents();
         setBookDO(aBookDo);
+        // TODO: REACTIVATE
         /*
          * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
          * detailLibrary));
@@ -238,9 +240,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
         gbcComboBox.gridy = 4;
         northPanel.add(comboBox, gbcComboBox);
 
-        JButton btnAddABook = new JButton(
-                UiComponentStrings
-                        .getString("BookDetailJPanel.btnAddABook.text")); //$NON-NLS-1$
+        // TODO: dd
+        btnAddABook = new JButton(UiComponentStrings.getString("Add book"));
+
         GridBagConstraints gbc_btnAddABook = new GridBagConstraints();
         gbc_btnAddABook.anchor = GridBagConstraints.EAST;
         gbc_btnAddABook.gridx = 3;
@@ -288,6 +290,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
+        // TODO: REACTIVATE
         /*
          * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
          * detailLibrary));
@@ -321,8 +324,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 titleTextfield.requestFocusInWindow();
             }
         });
-        if (displayedBookDO != null) {
 
+        if (displayedBookDO != null) {
+            btnAddABook.setText("Save changes");
             titleTextfield.getDocument().addDocumentListener(
                     new ChangeToDirtyDocumentListener(titleTextfield,
                             displayedBookDO.getTitle()));
