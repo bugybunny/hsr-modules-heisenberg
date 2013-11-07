@@ -244,6 +244,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
         northPanel.add(comboBox, gbcComboBox);
 
         btnAddABook = new JButton(UiComponentStrings.getString("Add book"));
+        btnAddABook.addActionListener(new SaveBookButtonListener());
+        btnAddABook.setEnabled(false);
 
         GridBagConstraints gbc_btnAddABook = new GridBagConstraints();
         gbc_btnAddABook.anchor = GridBagConstraints.EAST;
@@ -318,6 +320,18 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * @see ChangeToDirtyDocumentListener
      */
     protected void initHandlers() {
+
+        addModelStateChangeListener(new ModelStateChangeListener() {
+
+            @Override
+            public void stateChanged(ModelStateChangeEvent aModelStateChange) {
+                if (isDirty()) {
+                    btnAddABook.setEnabled(true);
+                } else {
+                    btnAddABook.setEnabled(false);
+                }
+            }
+        });
 
         // set focus to titlefield after tab has been switched
         addComponentListener(new ComponentAdapter() {
@@ -526,8 +540,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // displayedBookDO.set(titleTextfield.getText(),
-            // authorTextfield.getText(), publisherTextfield.getText(),);
+            save();
         }
     }
 
