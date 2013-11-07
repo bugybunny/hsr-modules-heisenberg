@@ -41,7 +41,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
-public class BookMasterJFrame extends JPanel implements Observer {
+public class BookMainJPanel extends JPanel implements Observer {
     private static final long              serialVersionUID = 8186612854405487707L;
 
     /**
@@ -73,7 +73,7 @@ public class BookMasterJFrame extends JPanel implements Observer {
      * 
      * @param aBooks
      */
-    public BookMasterJFrame(Library library) {
+    public BookMainJPanel(Library library) {
         bookList = library.getBooks();
         bookMasterlibrary = library;
 
@@ -89,7 +89,7 @@ public class BookMasterJFrame extends JPanel implements Observer {
         outerStatisticsPanel = new JPanel();
         outerStatisticsPanel.setBorder(new TitledBorder(new EtchedBorder(
                 EtchedBorder.LOWERED, null, null), UiComponentStrings
-                .getString("BookMasterJFrame.border.inventory.text"), //$NON-NLS-1$
+                .getString("BookMainJPanel.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(outerStatisticsPanel);
         outerStatisticsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
@@ -100,7 +100,7 @@ public class BookMasterJFrame extends JPanel implements Observer {
                 .setAlignment(FlowLayout.LEFT);
 
         String numberOfBooksText = MessageFormat.format(UiComponentStrings
-                .getString("BookMasterJFrame.label.numberofbooks.text"), //$NON-NLS-1$
+                .getString("BookMainJPanel.label.numberofbooks.text"), //$NON-NLS-1$
                 Integer.valueOf(bookMasterlibrary.getBooks().size()));
         numberOfBooksLabel = new JLabel(numberOfBooksText);
         inventoryStatisticsPanel.add(numberOfBooksLabel);
@@ -108,14 +108,14 @@ public class BookMasterJFrame extends JPanel implements Observer {
         inventoryStatisticsPanel.add(Box.createHorizontalStrut(50));
 
         String numberOfExamblesText = MessageFormat.format(UiComponentStrings
-                .getString("BookMasterJFrame.label.exemplarnumber.text"), //$NON-NLS-1$
+                .getString("BookMainJPanel.label.exemplarnumber.text"), //$NON-NLS-1$
                 Integer.valueOf(bookMasterlibrary.getCopies().size()));
         numberOfExemplarsLabel = new JLabel(numberOfExamblesText);
         inventoryStatisticsPanel.add(numberOfExemplarsLabel);
 
         bookInventoryPanel = new JPanel();
         bookInventoryPanel.setBorder(new TitledBorder(null, UiComponentStrings
-                .getString("BookMasterJFrame.border.bookinventory.text"), //$NON-NLS-1$
+                .getString("BookMainJPanel.border.bookinventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(bookInventoryPanel);
         bookInventoryPanel.setLayout(new BorderLayout(0, 0));
@@ -134,13 +134,13 @@ public class BookMasterJFrame extends JPanel implements Observer {
 
         searchTextField = new GhostHintJTextField(
                 UiComponentStrings
-                        .getString("BookMasterJFrame.textfield.search.defaulttext")); //$NON-NLS-1$
+                        .getString("BookMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
         inventoryPanel.add(searchTextField);
         searchTextField.setColumns(10);
 
         onlyAvailableCheckboxMasterList = new JCheckBox(
                 UiComponentStrings
-                        .getString("BookMasterJFrame.checkbox.onlyavailable.text")); //$NON-NLS-1$
+                        .getString("BookMainJPanel.checkbox.onlyavailable.text")); //$NON-NLS-1$
         inventoryPanel.add(onlyAvailableCheckboxMasterList);
 
         horizontalStrut = Box.createHorizontalStrut(50);
@@ -148,16 +148,16 @@ public class BookMasterJFrame extends JPanel implements Observer {
 
         addBookButton = new JButton(
                 UiComponentStrings
-                        .getString("BookMasterJFrame.button.addbook.text")); //$NON-NLS-1$
+                        .getString("BookMainJPanel.button.addbook.text")); //$NON-NLS-1$
         inventoryPanel.add(addBookButton);
 
         viewSelectedButton = new JButton(
                 UiComponentStrings
-                        .getString("BookMasterJFrame.button.viewselected.text")); //$NON-NLS-1$
+                        .getString("BookMainJPanel.button.viewselected.text")); //$NON-NLS-1$
         inventoryPanel.add(viewSelectedButton);
         viewSelectedButton
                 .setToolTipText(UiComponentStrings
-                        .getString("BookMasterJFrame.button.viewselected.disabled.tooltip")); //$NON-NLS-1$
+                        .getString("BookMainJPanel.button.viewselected.disabled.tooltip")); //$NON-NLS-1$
         viewSelectedButton.setEnabled(false);
         viewSelectedButton.setMnemonic('v');
 
@@ -362,11 +362,11 @@ public class BookMasterJFrame extends JPanel implements Observer {
             if (bookTable.getSelectedRows().length > 0) {
                 viewSelectedButton.setEnabled(true);
                 UiComponentStrings
-                        .getString("BookMasterJFrame.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
+                        .getString("BookMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
             } else {
                 viewSelectedButton.setEnabled(false);
                 UiComponentStrings
-                        .getString("BookMasterJFrame.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
+                        .getString("BookMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
             }
         }
     }

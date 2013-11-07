@@ -52,7 +52,7 @@ public class LibraryMasterJFrame extends JFrame {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         contentPanel.add(tabbedPane);
 
-        booksPanel = new BookMasterJFrame(bookMasterlibrary);
+        booksPanel = new BookMainJPanel(bookMasterlibrary);
         tabbedPane
                 .addTab(UiComponentStrings
                         .getString("LibraryMasterJFrame.tab.books.text"), null, booksPanel, null); //$NON-NLS-1$
