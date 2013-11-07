@@ -57,7 +57,7 @@ public class LibraryMasterJFrame extends JFrame {
                 .addTab(UiComponentStrings
                         .getString("LibraryMasterJFrame.tab.books.text"), null, booksPanel, null); //$NON-NLS-1$
         booksPanel.setLayout(new BoxLayout(booksPanel, BoxLayout.Y_AXIS));
-        lendingPanel = new JPanel();
+        lendingPanel = new LendingMainJPanel(bookMasterlibrary);
         tabbedPane
                 .addTab(UiComponentStrings
                         .getString("LibraryMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$

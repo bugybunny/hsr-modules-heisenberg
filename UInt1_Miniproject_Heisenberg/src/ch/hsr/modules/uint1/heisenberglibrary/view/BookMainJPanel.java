@@ -58,7 +58,7 @@ public class BookMainJPanel extends JPanel implements Observer {
     private JLabel                         numberOfBooksLabel;
     private JLabel                         numberOfExemplarsLabel;
     private GhostHintJTextField            searchTextField;
-    private JCheckBox                      onlyAvailableCheckboxMasterList;
+    private JCheckBox                      onlyAvailableCheckbox;
     private Component                      horizontalStrut;
     private JPanel                         panel;
     private JPanel                         bookInventoryPanel;
@@ -107,10 +107,10 @@ public class BookMainJPanel extends JPanel implements Observer {
 
         inventoryStatisticsPanel.add(Box.createHorizontalStrut(50));
 
-        String numberOfExamblesText = MessageFormat.format(UiComponentStrings
+        String numberOfExamplesText = MessageFormat.format(UiComponentStrings
                 .getString("BookMainJPanel.label.exemplarnumber.text"), //$NON-NLS-1$
                 Integer.valueOf(bookMasterlibrary.getCopies().size()));
-        numberOfExemplarsLabel = new JLabel(numberOfExamblesText);
+        numberOfExemplarsLabel = new JLabel(numberOfExamplesText);
         inventoryStatisticsPanel.add(numberOfExemplarsLabel);
 
         bookInventoryPanel = new JPanel();
@@ -138,10 +138,10 @@ public class BookMainJPanel extends JPanel implements Observer {
         inventoryPanel.add(searchTextField);
         searchTextField.setColumns(10);
 
-        onlyAvailableCheckboxMasterList = new JCheckBox(
+        onlyAvailableCheckbox = new JCheckBox(
                 UiComponentStrings
                         .getString("BookMainJPanel.checkbox.onlyavailable.text")); //$NON-NLS-1$
-        inventoryPanel.add(onlyAvailableCheckboxMasterList);
+        inventoryPanel.add(onlyAvailableCheckbox);
 
         horizontalStrut = Box.createHorizontalStrut(50);
         inventoryPanel.add(horizontalStrut);
@@ -172,15 +172,10 @@ public class BookMainJPanel extends JPanel implements Observer {
         tableSorter = new TableRowSorter<>(
                 (BookTableModel) bookTable.getModel());
         bookTable.getTableHeader().setReorderingAllowed(false);
-        // bookTable.setAutoCreateRowSorter(true);
+        bookTable.setAutoCreateRowSorter(true);
         bookTable.setCellSelectionEnabled(true);
         bookTable.setFillsViewportHeight(true);
         bookTable.setColumnSelectionAllowed(false);
-
-        //
-        // TableRowSorter<BookTableModel> rowSorter = new TableRowSorter<>(
-        // (BookTableModel) bookTable.getModel());
-        // bookTable.setRowSorter(rowSorter);
 
         bookTable.getSelectionModel().setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -213,7 +208,7 @@ public class BookMainJPanel extends JPanel implements Observer {
 
         searchTextField.getDocument().addDocumentListener(
                 new SearchFieldDocumentListener(searchTextField));
-        onlyAvailableCheckboxMasterList.addItemListener(new ItemListener() {
+        onlyAvailableCheckbox.addItemListener(new ItemListener() {
 
             @Override
             public void itemStateChanged(ItemEvent anItemChangeEvent) {
@@ -269,7 +264,7 @@ public class BookMainJPanel extends JPanel implements Observer {
         combiningRowFilterList
                 .add(new TextBookTableFilter<BookTableModel, Object>(
                         aSearchText));
-        if (onlyAvailableCheckboxMasterList.isSelected()) {
+        if (onlyAvailableCheckbox.isSelected()) {
             RowFilter<BookTableModel, Object> onlyAvailableFilter = new RowFilter<BookTableModel, Object>() {
                 @Override
                 public boolean include(
