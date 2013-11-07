@@ -20,6 +20,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Map;
@@ -513,6 +515,16 @@ public class BookDetailJPanel extends JPanel implements Observer {
         @Override
         public void changedUpdate(DocumentEvent aDocumentChangedEvent) {
             checkIfModified();
+        }
+    }
+
+    private class SaveBookButtonListener implements ActionListener {
+        /**
+         * Opens an empty detail view with the ability to save a new book.
+         */
+        @Override
+        public void actionPerformed(ActionEvent anActionEvent) {
+            // book
         }
     }
 
