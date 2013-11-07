@@ -49,8 +49,8 @@ import javax.swing.event.DocumentListener;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -65,32 +65,32 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
  * @author msyfrig
  */
 public class BookDetailJPanel extends JPanel implements Observer {
-    private static final long         serialVersionUID = 3353323227207467624L;
+    private static final long serialVersionUID = 3353323227207467624L;
 
     /**
      * The displayed book that can be edited and is observed via observer
      * pattern.
      */
-    private BookDO                    displayedBookDO;
+    private BookDO            displayedBookDO;
 
-    private Library                   detailLibrary;
+    private Library           detailLibrary;
 
     /**
      * Flag to indicate if there are unsaved changes in this panel.
      */
-    private boolean                   dirty;
+    private boolean           dirty;
 
     // components
-    private JTextField                titleTextfield;
+    private JTextField        titleTextfield;
 
-    private JTextField                authorTextfield;
-    private JTextField                publisherTextfield;
-    private JButton                   buttonAddCopy;
-    private JComboBox<Copy.Condition> comboBox;
-    private Component                 glue;
-    private Component                 rigidArea;
-    private JTable                    bookExemplarTable;
-    private JButton                   btnAddABook;
+    private JTextField        authorTextfield;
+    private JTextField        publisherTextfield;
+    private JButton           buttonAddCopy;
+    private JComboBox<Shelf>  comboBox;
+    private Component         glue;
+    private Component         rigidArea;
+    private JTable            bookExemplarTable;
+    private JButton           btnAddABook;
 
     /**
      * Creates a new instance of this class and sets model.
@@ -221,19 +221,20 @@ public class BookDetailJPanel extends JPanel implements Observer {
         northPanel.add(publisherTextfield, gbcPublisherTextfield);
         publisherTextfield.setColumns(10);
 
-        JLabel tempconditionLabel = new JLabel(
+        JLabel shelfLable = new JLabel(
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.condition.text")); //$NON-NLS-1$
-        GridBagConstraints gbcConditionLabel = new GridBagConstraints();
-        gbcConditionLabel.anchor = GridBagConstraints.EAST;
-        gbcConditionLabel.insets = new Insets(0, 0, 5, 5);
-        gbcConditionLabel.gridx = 1;
-        gbcConditionLabel.gridy = 4;
-        northPanel.add(tempconditionLabel, gbcConditionLabel);
+        GridBagConstraints gbc_shelfLable = new GridBagConstraints();
+        gbc_shelfLable.anchor = GridBagConstraints.EAST;
+        gbc_shelfLable.insets = new Insets(0, 0, 5, 5);
+        gbc_shelfLable.gridx = 1;
+        gbc_shelfLable.gridy = 4;
+        northPanel.add(shelfLable, gbc_shelfLable);
 
         comboBox = new JComboBox<>();
-        for (Copy.Condition tempBookCondition : Copy.Condition.values()) {
+        for (Shelf tempBookCondition : Shelf.values()) {
             comboBox.addItem(tempBookCondition);
+
         }
         GridBagConstraints gbcComboBox = new GridBagConstraints();
         gbcComboBox.insets = new Insets(0, 0, 5, 0);
@@ -242,7 +243,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         gbcComboBox.gridy = 4;
         northPanel.add(comboBox, gbcComboBox);
 
-        // TODO: dd
         btnAddABook = new JButton(UiComponentStrings.getString("Add book"));
 
         GridBagConstraints gbc_btnAddABook = new GridBagConstraints();
@@ -329,6 +329,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
         if (displayedBookDO != null) {
             btnAddABook.setText("Save changes");
+            comboBox.setSelectedItem(displayedBookDO.getShelf());
+            System.out.println(displayedBookDO.getShelf());
             titleTextfield.getDocument().addDocumentListener(
                     new ChangeToDirtyDocumentListener(titleTextfield,
                             displayedBookDO.getTitle()));
@@ -524,7 +526,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // book
+            // displayedBookDO.set(titleTextfield.getText(),
+            // authorTextfield.getText(), publisherTextfield.getText(),);
         }
     }
 

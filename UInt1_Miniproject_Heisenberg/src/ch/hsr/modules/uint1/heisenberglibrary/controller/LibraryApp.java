@@ -121,7 +121,8 @@ public class LibraryApp {
                     .createAndAddBook(getTextContentOf(title, "name"));
             b.setAuthor(getTextContentOf(title, "author"));
             b.setPublisher(getTextContentOf(title, "publisher"));
-            b.setShelf(Shelf.A1);
+            Shelf shelf = Shelf.values()[(int) (Math.random() * Shelf.values().length)];
+            b.setShelf(shelf);
         }
     }
 
