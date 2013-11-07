@@ -38,6 +38,8 @@ public class LibraryMasterJFrame extends JFrame {
     private void initComponents() {
         ImageIcon frameIcon = new ImageIcon(
                 LibraryMasterJFrame.class.getResource("/images/library.png"));
+        System.out.println(LibraryMasterJFrame.class
+                .getResource("/images/library.png"));
         setIconImage(frameIcon.getImage());
         setTitle(UiComponentStrings.getString("LibraryMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

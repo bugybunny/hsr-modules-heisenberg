@@ -14,25 +14,33 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.util.regex.Matcher;
+
 import javax.swing.RowFilter;
 
 /**
  * Filters a table based on a given string. This string can be in any row and is
  * case insensitive.
  * 
- * 
- * TODO schreiben wieso nicht einfach RowFilter.regexFilter verwendet wird
+ * <br> An own implementation for string comparision is used because
+ * {@link String#contains(CharSequence)} is faster than
+ * {@link RowFilter#regexFilter(String, int...)} and even if an own
+ * {@link Matcher} with a precomiled pattern would be used,
+ * {@code String.contains()} is still faster.t
  * 
  * @author msyfrig
  */
 public class TextBookTableFilter<M, I> extends RowFilter<M, I> {
     private final String searchText;
 
-    // private final Pattern matchingPattern;
-
+    /**
+     * Creates a new filter with the given filterstring. This filter uses
+     * contains, so it can be in any column.
+     * 
+     * @param aSearchText
+     */
     public TextBookTableFilter(String aSearchText) {
         searchText = aSearchText;
-        // matchingPattern = Pattern.compile("(?i).*" + searchText + ".*");
     }
 
     /**
@@ -48,18 +56,17 @@ public class TextBookTableFilter<M, I> extends RowFilter<M, I> {
             javax.swing.RowFilter.Entry<? extends M, ? extends I> anEntry) {
         // show all rows if searchstring is empty, no need to go through all
         // cells and check, should be 75% faster
-        if (searchText.isEmpty()) {
+        if (searchText == null || searchText.isEmpty()) {
             return true;
         }
         boolean ret = false;
         for (int i = 0; i < anEntry.getValueCount(); i++) {
-            // Matcher matcher = matchingPattern
-            // .matcher(anEntry.getStringValue(i));
-            // if (matcher.find()) {
-            if (anEntry.getStringValue(i).toLowerCase()
-                    .contains(searchText.toLowerCase())) {
-                ret = true;
-                break;
+            if (anEntry.getStringValue(i) != null) {
+                if (anEntry.getStringValue(i).toLowerCase()
+                        .contains(searchText.toLowerCase())) {
+                    ret = true;
+                    break;
+                }
             }
         }
         return ret;
