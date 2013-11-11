@@ -1,7 +1,6 @@
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
-
-public class Copy {
+public class Copy extends AbstractObservableDO {
 
     public enum Condition {
         NEW, GOOD, DAMAGED, WASTE, LOST

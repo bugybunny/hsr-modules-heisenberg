@@ -1,6 +1,6 @@
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
-public class Customer {
+public class Customer extends AbstractObservableDO {
 
     private String name, surname, street, city;
     private int    zip;

@@ -12,14 +12,14 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
- * Lists all books in a JTable with columns: Available, Title, Author and
- * Publisher.
+ * Lists all loans in a JTable with columns: Status, Exemplar #, booktitle, lent
+ * until, lent datum.
  * 
- * @author twinter
+ * @author msyfrig
  */
 public class BookTableModel extends AbstractTableModel implements Observer {
     private static final long   serialVersionUID = 4449419618706874102L;
-    private static List<String> columnNames      = new ArrayList<>(4);
+    private static List<String> columnNames      = new ArrayList<>(5);
 
     static {
         columnNames.add(UiComponentStrings
@@ -31,9 +31,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         columnNames.add(UiComponentStrings
                 .getString("BookTableModel.bookTableColumn.publisher"));  //$NON-NLS-1$
     }
-    // TODO auf Set ändern und jedes mal wenn etwas hinzugefügt werden will
-    // prüfen ob es nicht hinzugefügt wird/eine exception gibt, falls ja ist ein
-    // duplikat
     private List<BookDO>        data;
 
     /**

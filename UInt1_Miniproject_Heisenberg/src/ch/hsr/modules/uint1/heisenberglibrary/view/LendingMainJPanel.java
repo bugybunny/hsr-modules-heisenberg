@@ -39,7 +39,7 @@ import javax.swing.table.TableRowSorter;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
 
 public class LendingMainJPanel extends JPanel implements Observer {
     private static final long              serialVersionUID = 8186612854405487707L;
@@ -49,7 +49,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
      * actual copies.
      */
     private JTable                         lendingTable;
-    private TableRowSorter<BookTableModel> tableSorter;
+    private TableRowSorter<LoanTableModel> tableSorter;
     private JPanel                         centerPanel;
     private JButton                        viewSelectedButton;
     private JButton                        addLoanButton;
@@ -182,9 +182,9 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         lendingTable = new JTable();
         lendingTable.setRowSorter(tableSorter);
-        lendingTable.setModel(new BookTableModel(bookList));
+        lendingTable.setModel(new LoanTableModel(bookMasterlibrary.getLoans()));
         tableSorter = new TableRowSorter<>(
-                (BookTableModel) lendingTable.getModel());
+                (LoanTableModel) lendingTable.getModel());
         lendingTable.getTableHeader().setReorderingAllowed(false);
         lendingTable.setAutoCreateRowSorter(true);
         lendingTable.setCellSelectionEnabled(true);
@@ -205,7 +205,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
         lendingTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
-        ((BookTableModel) lendingTable.getModel())
+        ((LoanTableModel) lendingTable.getModel())
                 .addTableModelChangeListener(new TableModelChangeListener() {
                     private Collection<BookDO> previouslySelectedBooks;
 
@@ -273,16 +273,16 @@ public class LendingMainJPanel extends JPanel implements Observer {
      * Filters the booktable based on some rules. The search field
      */
     private void filterTable(final String aSearchText) {
-        List<RowFilter<BookTableModel, Object>> combiningRowFilterList = new ArrayList<>(
+        List<RowFilter<LoanTableModel, Object>> combiningRowFilterList = new ArrayList<>(
                 2);
         combiningRowFilterList
-                .add(new TextBookTableFilter<BookTableModel, Object>(
+                .add(new TextBookTableFilter<LoanTableModel, Object>(
                         aSearchText));
         if (onlyOverdueCheckbox.isSelected()) {
-            RowFilter<BookTableModel, Object> onlyAvailableFilter = new RowFilter<BookTableModel, Object>() {
+            RowFilter<LoanTableModel, Object> onlyAvailableFilter = new RowFilter<LoanTableModel, Object>() {
                 @Override
                 public boolean include(
-                        javax.swing.RowFilter.Entry<? extends BookTableModel, ? extends Object> anEntry) {
+                        javax.swing.RowFilter.Entry<? extends LoanTableModel, ? extends Object> anEntry) {
                     int copiesAvailable = ((Integer) anEntry
                             .getModel()
                             .getValueAt(

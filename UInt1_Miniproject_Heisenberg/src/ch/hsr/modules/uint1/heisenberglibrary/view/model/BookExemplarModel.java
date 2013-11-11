@@ -15,6 +15,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
+import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateFormatterUtil;
 
 /**
  * The tableModel for the jTable in BookDetailJPanel.
@@ -26,9 +27,14 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
     private static List<String> columnNames      = new ArrayList<>(3);
 
     static {
-        columnNames.add(UiComponentStrings.getString("BookExemplarModel.exemplarTableColumn.id")); //$NON-NLS-1$
-        columnNames.add(UiComponentStrings.getString("BookExemplarModel.exemplarTableColumn.availability")); //$NON-NLS-1$
-        columnNames.add(UiComponentStrings.getString("BookExemplarModel.exemplarTableColumn.borrowedUntil")); //$NON-NLS-1$
+        columnNames.add(UiComponentStrings
+                .getString("BookExemplarModel.exemplarTableColumn.id")); //$NON-NLS-1$
+        columnNames
+                .add(UiComponentStrings
+                        .getString("BookExemplarModel.exemplarTableColumn.availability")); //$NON-NLS-1$
+        columnNames
+                .add(UiComponentStrings
+                        .getString("BookExemplarModel.exemplarTableColumn.borrowedUntil")); //$NON-NLS-1$
     }
 
     private Library             exemplarLibrary;
@@ -81,23 +87,28 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         // Copy exemplarOfLoanedBook;
         // boolean loaned = false;
 
-        String availability = UiComponentStrings.getString("BookExemplarModel.copy.isAvailable"); //$NON-NLS-1$
-        Object borrowedUntil = UiComponentStrings.getString("BookExemplarModel.copy.date.isAvailable"); //$NON-NLS-1$
+        String availability = UiComponentStrings
+                .getString("BookExemplarModel.copy.isAvailable"); //$NON-NLS-1$
+        Object borrowedUntil = UiComponentStrings
+                .getString("BookExemplarModel.copy.date.isAvailable"); //$NON-NLS-1$
 
         for (int i = 0; i < loanedBooks.size(); i++) {
             if (loanedBooks.get(i).getCopy().getInventoryNumber() == copyOfSpecificBook
                     .getInventoryNumber()) {
                 // exemplarOfLoanedBook = loanedBooks.get(i).getCopy();
                 // loaned = true;
-                availability = UiComponentStrings.getString("BookExemplarModel.copy.notAvailable"); //$NON-NLS-1$
+                availability = UiComponentStrings
+                        .getString("BookExemplarModel.copy.notAvailable"); //$NON-NLS-1$
 
                 GregorianCalendar dueDate = loanedBooks.get(i).getPickupDate();
                 dueDate.add(GregorianCalendar.DAY_OF_YEAR, loanedBooks.get(i)
                         .getDaysOfLoanDuration());
 
-                DateFormat df = new SimpleDateFormat(UiComponentStrings.getString("BookExemplarModel.dateformat")); //$NON-NLS-1$
+                DateFormat df = new SimpleDateFormat(
+                        UiComponentStrings
+                                .getString("BookExemplarModel.dateformat")); //$NON-NLS-1$
 
-                borrowedUntil = df.format(dueDate.getTime());
+                borrowedUntil = DateFormatterUtil.getFormattedDate(dueDate);
             }
         }
 
