@@ -86,7 +86,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private JTextField        authorTextfield;
     private JTextField        publisherTextfield;
     private JButton           buttonAddCopy;
-    private JComboBox<Shelf>  comboBox;
+    private JComboBox<Shelf>  comboShelf;
     private Component         glue;
     private Component         rigidArea;
     private JTable            bookExemplarTable;
@@ -109,6 +109,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * @param book
      */
     private void setBookDO(BookDO aNewBookDo) {
+
         // do nothing if same book is set
         if (aNewBookDo != displayedBookDO) {
             // delete observers for this old, not anymore displayed book
@@ -231,17 +232,26 @@ public class BookDetailJPanel extends JPanel implements Observer {
         gbc_shelfLable.gridy = 4;
         northPanel.add(shelfLable, gbc_shelfLable);
 
-        comboBox = new JComboBox<>();
-        for (Shelf tempBookCondition : Shelf.values()) {
-            comboBox.addItem(tempBookCondition);
-
+        comboShelf = new JComboBox<>();
+        for (Shelf tempShelfValues : Shelf.values()) {
+            comboShelf.addItem(tempShelfValues);
         }
-        GridBagConstraints gbcComboBox = new GridBagConstraints();
-        gbcComboBox.insets = new Insets(0, 0, 5, 0);
-        gbcComboBox.fill = GridBagConstraints.HORIZONTAL;
-        gbcComboBox.gridx = 3;
-        gbcComboBox.gridy = 4;
-        northPanel.add(comboBox, gbcComboBox);
+        comboShelf.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO: TEST
+                if (displayedBookDO != null) {
+                    displayedBookDO.setShelf((Shelf) comboShelf
+                            .getSelectedItem());
+                }
+            }
+        });
+        GridBagConstraints gbc_comboShelf = new GridBagConstraints();
+        gbc_comboShelf.insets = new Insets(0, 0, 5, 0);
+        gbc_comboShelf.fill = GridBagConstraints.HORIZONTAL;
+        gbc_comboShelf.gridx = 3;
+        gbc_comboShelf.gridy = 4;
+        northPanel.add(comboShelf, gbc_comboShelf);
 
         btnAddABook = new JButton(UiComponentStrings.getString("Add book"));
         btnAddABook.addActionListener(new SaveBookButtonListener());
@@ -282,6 +292,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 UiComponentStrings
                         .getString("BookDetailJPanel.btnRemoveSelected.text")); //$NON-NLS-1$
         southInformationPanel.add(btnRemoveSelected);
+        btnRemoveSelected.addActionListener(new RemoveExemplarListener());
 
         buttonAddCopy = new JButton(
                 UiComponentStrings
@@ -343,8 +354,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
         if (displayedBookDO != null) {
             btnAddABook.setText("Save changes");
-            comboBox.setSelectedItem(displayedBookDO.getShelf());
-            System.out.println(displayedBookDO.getShelf());
+            comboShelf.setSelectedItem(displayedBookDO.getShelf());
             titleTextfield.getDocument().addDocumentListener(
                     new ChangeToDirtyDocumentListener(titleTextfield,
                             displayedBookDO.getTitle()));
@@ -356,6 +366,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
             publisherTextfield.getDocument().addDocumentListener(
                     new ChangeToDirtyDocumentListener(publisherTextfield,
                             displayedBookDO.getPublisher()));
+        }
+
+        if (displayedBookDO == null) {
+            btnAddABook.setEnabled(true);
         }
     }
 
@@ -385,6 +399,18 @@ public class BookDetailJPanel extends JPanel implements Observer {
      *         {@code dirty==false}
      */
     protected boolean save() {
+        if (displayedBookDO == null) {
+            System.out.println("test");
+            displayedBookDO = detailLibrary.createAndAddBook(titleTextfield
+                    .getText());
+            displayedBookDO.set(titleTextfield.getText(),
+                    authorTextfield.getText(), publisherTextfield.getText(),
+                    (Shelf) comboShelf.getSelectedItem());
+            btnAddABook.setEnabled(false);
+            setBookDO(displayedBookDO);
+            initHandlers();
+        }
+
         if (isDirty()) {
             displayedBookDO.set(titleTextfield.getText(),
                     authorTextfield.getText(), publisherTextfield.getText(),
@@ -541,6 +567,17 @@ public class BookDetailJPanel extends JPanel implements Observer {
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
             save();
+        }
+    }
+
+    private class RemoveExemplarListener implements ActionListener {
+        /**
+         * Opens an empty detail view with the ability to save a new book.
+         */
+        @Override
+        public void actionPerformed(ActionEvent anActionEvent) {
+            // TODO: DELETE EXEMPLAR O_O
+
         }
     }
 
