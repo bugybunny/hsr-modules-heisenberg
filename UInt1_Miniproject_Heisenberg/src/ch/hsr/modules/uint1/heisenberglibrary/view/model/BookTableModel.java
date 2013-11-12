@@ -54,6 +54,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
      */
     @Override
     public int getRowCount() {
+        // System.out.println(data.size());
         return data.size();
     }
 
@@ -122,7 +123,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
                 // do nothing
         }
         notifyListenersBeforeUpdate();
-        fireTableCellUpdated(aRowIndex, aColumnIndex);
+        fireTableDataChanged();
     }
 
     /*
