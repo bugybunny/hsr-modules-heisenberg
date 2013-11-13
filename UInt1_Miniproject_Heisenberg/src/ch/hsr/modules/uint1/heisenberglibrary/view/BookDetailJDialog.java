@@ -75,7 +75,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setBounds(100, 100, 900, 400);
         getContentPane().setLayout(new BorderLayout());
-
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
     }
@@ -103,6 +102,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
      * @param aBookToOpen
      *            the book domain object to open in a tab
      */
+
     public void openBookTab(BookDO aBookToOpen, Library library) {
         BookDetailJPanel detailBookPanel = null;
 
@@ -278,5 +278,4 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
             }
         }
     }
-
 }

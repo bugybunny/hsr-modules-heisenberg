@@ -51,6 +51,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListene
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -85,7 +86,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
     private JTextField        authorTextfield;
     private JTextField        publisherTextfield;
-    private JButton           buttonAddCopy;
     private JComboBox<Shelf>  comboShelf;
     private Component         glue;
     private Component         rigidArea;
@@ -134,11 +134,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private void initEverything(BookDO aBookDo) {
         initComponents();
         setBookDO(aBookDo);
-        // TODO: REACTIVATE
-        /*
-         * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
-         * detailLibrary));
-         */
+        // TODO: PROBLEM BLUBB PROBLEM NOOOoooooooooooooooooooooooooooooooooo!
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+                detailLibrary));
         initHandlers();
     }
 
@@ -222,6 +220,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         northPanel.add(publisherTextfield, gbcPublisherTextfield);
         publisherTextfield.setColumns(10);
 
+        
         JLabel shelfLable = new JLabel(
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.condition.text")); //$NON-NLS-1$
@@ -294,22 +293,22 @@ public class BookDetailJPanel extends JPanel implements Observer {
         southInformationPanel.add(btnRemoveSelected);
         btnRemoveSelected.addActionListener(new RemoveExemplarListener());
 
-        buttonAddCopy = new JButton(
+        JButton tempbuttonAddCopy = new JButton(
                 UiComponentStrings
                         .getString("BookDetailJDialog.button.addcopy.text")); //$NON-NLS-1$
-        southInformationPanel.add(buttonAddCopy);
-        buttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        southInformationPanel.add(tempbuttonAddCopy);
+        tempbuttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         JPanel southBookList = new JPanel();
 
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
-        // TODO: REACTIVATE
-        /*
-         * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
-         * detailLibrary));
-         */
+
+        // TODO: PROBLEM AERA
+        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+                detailLibrary));
+
         bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 

@@ -1,7 +1,5 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -103,10 +101,6 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
                 GregorianCalendar dueDate = loanedBooks.get(i).getPickupDate();
                 dueDate.add(GregorianCalendar.DAY_OF_YEAR, loanedBooks.get(i)
                         .getDaysOfLoanDuration());
-
-                DateFormat df = new SimpleDateFormat(
-                        UiComponentStrings
-                                .getString("BookExemplarModel.dateformat")); //$NON-NLS-1$
 
                 borrowedUntil = DateFormatterUtil.getFormattedDate(dueDate);
             }
