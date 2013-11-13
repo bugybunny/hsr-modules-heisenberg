@@ -6,15 +6,24 @@ import java.util.GregorianCalendar;
 
 public class Loan extends AbstractObservableDO {
 
-    private Copy              copy;
-    private Customer          customer;
-    private GregorianCalendar pickupDate, returnDate;
+    private Copy     copy;
+    private Customer customer;
+    private GregorianCalendar pickupDate, returnDate, dueDate;
     private final static int  DAYS_TO_RETURN_BOOK = 30;
 
     public Loan(Customer aCustomer, Copy aCopy) {
         copy = aCopy;
         customer = aCustomer;
         pickupDate = new GregorianCalendar();
+        calculateDueDate();
+    }
+
+    private void calculateDueDate() {
+        dueDate = (GregorianCalendar) pickupDate.clone();
+        dueDate.add(GregorianCalendar.DAY_OF_YEAR, DAYS_TO_RETURN_BOOK);
+        dueDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
+        dueDate.add(GregorianCalendar.MINUTE, 59);
+        dueDate.add(GregorianCalendar.SECOND, 59);
     }
 
     public boolean isLent() {
@@ -45,7 +54,8 @@ public class Loan extends AbstractObservableDO {
         if (!isLent()) {
             throw new IllegalLoanOperationException("Loan is already retuned");
         }
-        this.pickupDate = aPickupDate;
+        pickupDate = aPickupDate;
+        calculateDueDate();
     }
 
     public GregorianCalendar getPickupDate() {
@@ -54,6 +64,13 @@ public class Loan extends AbstractObservableDO {
 
     public GregorianCalendar getReturnDate() {
         return returnDate;
+    }
+
+    /**
+     * @return the dueDate
+     */
+    public GregorianCalendar getDueDate() {
+        return dueDate;
     }
 
     public Copy getCopy() {
@@ -105,13 +122,6 @@ public class Loan extends AbstractObservableDO {
         if (!isLent()) {
             return false;
         }
-
-        GregorianCalendar dueDate = (GregorianCalendar) pickupDate.clone();
-        dueDate.add(GregorianCalendar.DAY_OF_YEAR, DAYS_TO_RETURN_BOOK);
-        dueDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
-        dueDate.add(GregorianCalendar.MINUTE, 59);
-        dueDate.add(GregorianCalendar.SECOND, 59);
-
         return (new GregorianCalendar().after(dueDate));
     }
 }
