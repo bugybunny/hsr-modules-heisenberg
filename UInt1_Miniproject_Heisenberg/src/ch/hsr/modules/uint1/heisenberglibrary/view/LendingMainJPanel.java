@@ -1,3 +1,17 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
@@ -5,10 +19,11 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -16,66 +31,64 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 
+import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
-import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
+import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
 
 public class LendingMainJPanel extends JPanel implements Observer {
-    private static final long              serialVersionUID = 8186612854405487707L;
+    private static final long                         serialVersionUID = 8186612854405487707L;
+
+    private JTable                                    lendingTable;
+    private TableFilter<LoanTableModel>               tableFilter;
+    private OnlyOverdueFilter<LoanTableModel, Object> onlyOverdueFilter;
+    private JPanel                                    centerPanel;
+    private JButton                                   viewSelectedButton;
+    private JButton                                   addLoanButton;
+    private JPanel                                    inventoryStatisticsPanel;
+    private JPanel                                    inventoryPanel;
+    private JLabel                                    numberOfLoansLabel;
+    private JLabel                                    numberOfCurrentyLoanedCopiesLabel;
+    private JLabel                                    overdueLabel;
+    private GhostHintJTextField                       searchTextField;
+    private JCheckBox                                 onlyOverdueCheckbox;
+    private Component                                 horizontalStrut;
+    private JPanel                                    panel;
+    private JPanel                                    loanInventoryPanel;
+    private JPanel                                    outerStatisticsPanel;
+    private BookDetailJDialog                         loanDetailDialog;
+
+    private List<Loan>                                loanList;
+    private Library                                   bookMasterlibrary;
 
     /**
-     * The table that displays all different booktypes in the library, not the
-     * actual copies.
-     */
-    private JTable                         lendingTable;
-    private TableRowSorter<LoanTableModel> tableSorter;
-    private JPanel                         centerPanel;
-    private JButton                        viewSelectedButton;
-    private JButton                        addLoanButton;
-    private JPanel                         inventoryStatisticsPanel;
-    private JPanel                         inventoryPanel;
-    private JLabel                         numberOfLoansLabel;
-    private JLabel                         numberOfCurrentyLoanedCopiesLabel;
-    private JLabel                         overdueLabel;
-    private GhostHintJTextField            searchTextField;
-    private JCheckBox                      onlyOverdueCheckbox;
-    private Component                      horizontalStrut;
-    private JPanel                         panel;
-    private JPanel                         loanInventoryPanel;
-    private JPanel                         outerStatisticsPanel;
-    private BookDetailJDialog              loanDetailDialog;
-
-    private List<BookDO>                   bookList;
-    private Library                        bookMasterlibrary;
-
-    /**
-     * Creates the frame.
-     * 
-     * @param aBooks
+     * Creates the panel.
      */
     public LendingMainJPanel(Library library) {
-        bookList = library.getBooks();
+        loanList = library.getLoans();
         bookMasterlibrary = library;
 
         initComponents();
@@ -181,18 +194,14 @@ public class LendingMainJPanel extends JPanel implements Observer {
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         lendingTable = new JTable();
-        lendingTable.setRowSorter(tableSorter);
         lendingTable.setModel(new LoanTableModel(bookMasterlibrary.getLoans()));
-        tableSorter = new TableRowSorter<>(
-                (LoanTableModel) lendingTable.getModel());
+        tableFilter = new TableFilter<>(lendingTable, searchTextField);
         lendingTable.getTableHeader().setReorderingAllowed(false);
         lendingTable.setAutoCreateRowSorter(true);
         lendingTable.setCellSelectionEnabled(true);
         lendingTable.setFillsViewportHeight(true);
         lendingTable.setColumnSelectionAllowed(false);
-
-        lendingTable.getSelectionModel().setSelectionMode(
-                ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        lendingTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane jsp = new JScrollPane(lendingTable);
         centerPanel.add(jsp);
@@ -205,9 +214,25 @@ public class LendingMainJPanel extends JPanel implements Observer {
         lendingTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
+        // ctrl+f: switch focus to searchfield for table
+        Action searchAction = new AbstractAction("search") {
+            private static final long serialVersionUID = -6626318103198277780L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                searchTextField.requestFocus();
+            }
+        };
+
+        KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+                InputEvent.CTRL_DOWN_MASK);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ctrlF,
+                searchAction.getValue(Action.NAME));
+        getActionMap().put(searchAction.getValue(Action.NAME), searchAction);
+
         ((LoanTableModel) lendingTable.getModel())
                 .addTableModelChangeListener(new TableModelChangeListener() {
-                    private Collection<BookDO> previouslySelectedBooks;
+                    private Collection<Loan> previouslySelectedBooks;
 
                     @Override
                     public void tableIsAboutToUpdate() {
@@ -219,47 +244,50 @@ public class LendingMainJPanel extends JPanel implements Observer {
                         restoreSelectedRows(previouslySelectedBooks);
                     }
                 });
-
-        searchTextField.getDocument().addDocumentListener(
-                new SearchFieldDocumentListener(searchTextField));
+        onlyOverdueFilter = new OnlyOverdueFilter<>();
         onlyOverdueCheckbox.addItemListener(new ItemListener() {
 
             @Override
-            public void itemStateChanged(ItemEvent anItemChangeEvent) {
-                filterTable(searchTextField.getText());
+            public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
+                if (anItemStateChangedEvent.getStateChange() == ItemEvent.SELECTED) {
+                    tableFilter.addFilter(onlyOverdueFilter);
+                } else {
+                    tableFilter.removeFilter(onlyOverdueFilter);
+                }
+                tableFilter.filterTable();
             }
         });
     }
 
     /**
-     * Saves the selected books in the table. The actual book instances are
-     * saved since books can be added or removed so only saving the row index is
+     * Saves the selected loans in the table. The actual loan instances are
+     * saved since loans can be added or removed so only saving the row index is
      * not enough.
      * 
-     * @return set of currently selected books
+     * @return set of currently selected loans
      */
-    private Set<BookDO> saveSelectedRows() {
-        Set<BookDO> selectedBooks = new HashSet<>(
+    private Set<Loan> saveSelectedRows() {
+        Set<Loan> selectedLoans = new HashSet<>(
                 lendingTable.getSelectedRowCount());
         for (int selectionIndex : lendingTable.getSelectedRows()) {
-            BookDO singleSelectedBook = bookList.get(lendingTable
+            Loan singleSelectedBook = loanList.get(lendingTable
                     .convertRowIndexToModel(selectionIndex));
-            selectedBooks.add(singleSelectedBook);
+            selectedLoans.add(singleSelectedBook);
         }
-        return selectedBooks;
+        return selectedLoans;
     }
 
     /**
-     * Reselect the given books in the table if they still exist.
+     * Reselect the given loans in the table if they still exist.
      * 
-     * @param someBooksToSelect
-     *            the books to select
+     * @param someLoansToSelect
+     *            the loans to select
      */
-    private void restoreSelectedRows(Collection<BookDO> someBooksToSelect) {
-        for (BookDO tempBookToSelect : someBooksToSelect) {
+    private void restoreSelectedRows(Collection<Loan> someLoansToSelect) {
+        for (Loan tempLoanToSelect : someLoansToSelect) {
 
-            int indexInList = bookList.indexOf(tempBookToSelect);
-            // do nothing if not found and books has been removed
+            int indexInList = loanList.indexOf(tempLoanToSelect);
+            // do nothing if not found and loan has been removed
             if (indexInList > -1) {
                 int indexToSelectInView = lendingTable
                         .convertRowIndexToView(indexInList);
@@ -267,38 +295,6 @@ public class LendingMainJPanel extends JPanel implements Observer {
                         indexToSelectInView, indexToSelectInView);
             }
         }
-    }
-
-    /**
-     * Filters the booktable based on some rules. The search field
-     */
-    private void filterTable(final String aSearchText) {
-        List<RowFilter<LoanTableModel, Object>> combiningRowFilterList = new ArrayList<>(
-                2);
-        combiningRowFilterList
-                .add(new TextBookTableFilter<LoanTableModel, Object>(
-                        aSearchText));
-        if (onlyOverdueCheckbox.isSelected()) {
-            RowFilter<LoanTableModel, Object> onlyAvailableFilter = new RowFilter<LoanTableModel, Object>() {
-                @Override
-                public boolean include(
-                        javax.swing.RowFilter.Entry<? extends LoanTableModel, ? extends Object> anEntry) {
-                    int copiesAvailable = ((Integer) anEntry
-                            .getModel()
-                            .getValueAt(
-                                    ((Integer) anEntry.getIdentifier())
-                                            .intValue(),
-                                    0)).intValue();
-                    return copiesAvailable > 0;
-                }
-            };
-            // TODO folgendes verwenden, habe aber noch Probleme mit Generics
-            // combiningRowFilterList.add(RowFilter.numberFilter(
-            // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0));
-            combiningRowFilterList.add(onlyAvailableFilter);
-        }
-        tableSorter.setRowFilter(RowFilter.andFilter(combiningRowFilterList));
-        lendingTable.setRowSorter(tableSorter);
     }
 
     @Override
@@ -333,9 +329,11 @@ public class LendingMainJPanel extends JPanel implements Observer {
             loanDetailDialog.toFront();
 
             for (int tempBook : lendingTable.getSelectedRows()) {
-                BookDO selectedBook = bookList.get(lendingTable
+                Loan selectedBook = loanList.get(lendingTable
                         .convertRowIndexToModel(tempBook));
-                loanDetailDialog.openBookTab(selectedBook, bookMasterlibrary);
+                // TODO openloan detail
+                // loanDetailDialog.openBookTab(selectedBook,
+                // bookMasterlibrary);
             }
         }
     }
@@ -380,30 +378,14 @@ public class LendingMainJPanel extends JPanel implements Observer {
         }
     }
 
-    private class SearchFieldDocumentListener implements DocumentListener {
-        private GhostHintJTextField searchField;
-
-        public SearchFieldDocumentListener(GhostHintJTextField aSearchField) {
-            searchField = aSearchField;
-        }
-
-        private void filter() {
-            filterTable(searchField.getText());
-        }
-
+    private class OnlyOverdueFilter<M extends LoanTableModel, I extends Object>
+            extends RowFilter<M, I> {
         @Override
-        public void insertUpdate(DocumentEvent anInsertUpdateEvent) {
-            filter();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent aRemoveUpdateEvent) {
-            filter();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent aChangedUpdateEvent) {
-            filter();
+        public boolean include(
+                javax.swing.RowFilter.Entry<? extends M, ? extends I> anEntry) {
+            LoanStatus loanStatus = (LoanStatus) anEntry.getModel().getValueAt(
+                    ((Integer) anEntry.getIdentifier()).intValue(), 0);
+            return loanStatus == LoanStatus.DUE;
         }
     }
 }
