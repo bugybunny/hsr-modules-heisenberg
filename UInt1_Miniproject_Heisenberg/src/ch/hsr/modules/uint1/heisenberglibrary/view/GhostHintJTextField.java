@@ -56,12 +56,26 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
     private static final long serialVersionUID = 2764559471513955654L;
     private final String      hint;
     private boolean           showingHint;
+    public static final Color POSITIVE_COLOR   = new Color(130, 240, 130);
+    public static final Color NEGATIVE_COLOR   = new Color(240, 130, 130);
 
     /**
      * @return whether the hint is shown now
      */
     public boolean isShowingHint() {
         return showingHint;
+    }
+
+    public void setPositiveBackground() {
+        if (!showingHint) {
+            setBackground(POSITIVE_COLOR);
+        }
+    }
+
+    public void setNegativeBackground() {
+        if (!showingHint) {
+            setBackground(NEGATIVE_COLOR);
+        }
     }
 
     /**
@@ -118,6 +132,7 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
     @Override
     public void focusLost(FocusEvent aFocusLostEvent) {
         if (getText().isEmpty()) {
+            setBackground(null);
             setForeground(Color.LIGHT_GRAY);
             showingHint = true;
         }
