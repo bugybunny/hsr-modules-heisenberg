@@ -76,9 +76,9 @@ public class BookMainJPanel extends JPanel implements Observer {
     public BookMainJPanel(Library library) {
         bookList = library.getBooks();
         bookMasterlibrary = library;
-
         initComponents();
         initHandlers();
+        bookMasterlibrary.addObserver(this);
     }
 
     private void initComponents() {
@@ -290,10 +290,12 @@ public class BookMainJPanel extends JPanel implements Observer {
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anObservable instanceof Library) {
-            System.out.println("number of books" + anArgument); //$NON-NLS-1$
+            ((AbstractTableModel) bookTable.getModel()).fireTableDataChanged();
+            numberOfBooksLabel.setText(MessageFormat.format(UiComponentStrings
+                    .getString("BookMainJPanel.label.numberofbooks.text"), //$NON-NLS-1$
+                    Integer.valueOf(bookMasterlibrary.getBooks().size())));
         }
-        ((AbstractTableModel) bookTable.getModel()).fireTableDataChanged();
-        // numberOfBooks =
+
     }
 
     /**

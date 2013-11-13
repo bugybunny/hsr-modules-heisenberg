@@ -134,7 +134,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private void initEverything(BookDO aBookDo) {
         initComponents();
         setBookDO(aBookDo);
-        // TODO: PROBLEM BLUBB PROBLEM NOOOoooooooooooooooooooooooooooooooooo!
         bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
                 detailLibrary));
         initHandlers();
@@ -220,7 +219,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         northPanel.add(publisherTextfield, gbcPublisherTextfield);
         publisherTextfield.setColumns(10);
 
-        
         JLabel shelfLable = new JLabel(
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.condition.text")); //$NON-NLS-1$
@@ -238,7 +236,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         comboShelf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: TEST
                 if (displayedBookDO != null) {
                     displayedBookDO.setShelf((Shelf) comboShelf
                             .getSelectedItem());
@@ -293,11 +290,12 @@ public class BookDetailJPanel extends JPanel implements Observer {
         southInformationPanel.add(btnRemoveSelected);
         btnRemoveSelected.addActionListener(new RemoveExemplarListener());
 
-        JButton tempbuttonAddCopy = new JButton(
+        JButton btnAddCopy = new JButton(
                 UiComponentStrings
                         .getString("BookDetailJDialog.button.addcopy.text")); //$NON-NLS-1$
-        southInformationPanel.add(tempbuttonAddCopy);
-        tempbuttonAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        southInformationPanel.add(btnAddCopy);
+        btnAddCopy.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnAddCopy.addActionListener(new AddCopyListener());
 
         JPanel southBookList = new JPanel();
 
@@ -305,7 +303,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
 
-        // TODO: PROBLEM AERA
         bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
                 detailLibrary));
 
@@ -399,7 +396,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     protected boolean save() {
         if (displayedBookDO == null) {
-            System.out.println("test");
             displayedBookDO = detailLibrary.createAndAddBook(titleTextfield
                     .getText());
             displayedBookDO.set(titleTextfield.getText(),
@@ -575,9 +571,24 @@ public class BookDetailJPanel extends JPanel implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // TODO: DELETE EXEMPLAR O_O
-
+            // TODO: temp temp
+            System.out.println("remove selected pressed");
+            /*
+             * detailLibrary.getCopiesOfBook(displayedBookDO).remove(
+             * bookExemplarTable.getSelectedRow());
+             */
         }
     }
 
+    private class AddCopyListener implements ActionListener {
+        /**
+         * Opens an empty detail view with the ability to save a new book.
+         */
+        @Override
+        public void actionPerformed(ActionEvent anActionEvent) {
+            // TODO: temp
+            // detailLibrary.getCopiesOfBook(displayedBookDO).add("blub");
+            // System.out.println("add new exemplar pressed");
+        }
+    }
 }

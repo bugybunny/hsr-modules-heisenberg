@@ -1,5 +1,8 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -9,7 +12,7 @@ import javax.swing.border.EmptyBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
-public class LibraryMasterJFrame extends JFrame {
+public class LibraryMasterJFrame extends JFrame implements Observer {
     private static final long serialVersionUID = 8186612854405487707L;
 
     /**
@@ -61,5 +64,15 @@ public class LibraryMasterJFrame extends JFrame {
         tabbedPane
                 .addTab(UiComponentStrings
                         .getString("LibraryMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(Observable aO, Object aArg) {
+
     }
 }
