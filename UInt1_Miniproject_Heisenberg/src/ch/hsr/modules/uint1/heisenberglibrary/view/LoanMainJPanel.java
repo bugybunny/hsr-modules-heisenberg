@@ -59,10 +59,10 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
 
-public class LendingMainJPanel extends JPanel implements Observer {
+public class LoanMainJPanel extends JPanel implements Observer {
     private static final long                         serialVersionUID = 8186612854405487707L;
 
-    private JTable                                    lendingTable;
+    private JTable                                    loanTable;
     private TableFilter<LoanTableModel>               tableFilter;
     private OnlyOverdueFilter<LoanTableModel, Object> onlyOverdueFilter;
     private JPanel                                    centerPanel;
@@ -87,7 +87,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
     /**
      * Creates the panel.
      */
-    public LendingMainJPanel(Library library) {
+    public LoanMainJPanel(Library library) {
         loanList = library.getLoans();
         bookMasterlibrary = library;
 
@@ -103,7 +103,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
         outerStatisticsPanel = new JPanel();
         outerStatisticsPanel.setBorder(new TitledBorder(new EtchedBorder(
                 EtchedBorder.LOWERED, null, null), UiComponentStrings
-                .getString("LendingMainJPanel.border.inventory.text"), //$NON-NLS-1$
+                .getString("LoanMainJPanel.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(outerStatisticsPanel);
         outerStatisticsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
@@ -114,7 +114,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
                 .setAlignment(FlowLayout.LEFT);
 
         String numberOfLoansText = MessageFormat.format(UiComponentStrings
-                .getString("LendingMainJPanel.label.loannumber.text"), //$NON-NLS-1$
+                .getString("LoanMainJPanel.label.loannumber.text"), //$NON-NLS-1$
                 Integer.valueOf(bookMasterlibrary.getLoans().size()));
         numberOfLoansLabel = new JLabel(numberOfLoansText);
         inventoryStatisticsPanel.add(numberOfLoansLabel);
@@ -123,7 +123,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         String numberOfCurrentlyLoanedCopiesText = MessageFormat
                 .format(UiComponentStrings
-                        .getString("LendingMainJPanel.label.currentlyloaned.text"), //$NON-NLS-1$
+                        .getString("LoanMainJPanel.label.currentlyloaned.text"), //$NON-NLS-1$
                         Integer.valueOf(bookMasterlibrary.getLentOutBooks()
                                 .size()));
         numberOfCurrentyLoanedCopiesLabel = new JLabel(
@@ -134,7 +134,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         String numberOfOverdueLoansText = MessageFormat
                 .format(UiComponentStrings
-                        .getString("LendingMainJPanel.label.overdueloans.text"), //$NON-NLS-1$
+                        .getString("LoanMainJPanel.label.overdueloans.text"), //$NON-NLS-1$
                         Integer.valueOf(bookMasterlibrary.getOverdueLoans()
                                 .size()));
         overdueLabel = new JLabel(numberOfOverdueLoansText);
@@ -142,7 +142,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         loanInventoryPanel = new JPanel();
         loanInventoryPanel.setBorder(new TitledBorder(null, UiComponentStrings
-                .getString("LendingMainJPanel.border.loaninventory.text"), //$NON-NLS-1$
+                .getString("LoanMainJPanel.border.loaninventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(loanInventoryPanel);
         loanInventoryPanel.setLayout(new BorderLayout(0, 0));
@@ -161,13 +161,13 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         searchTextField = new GhostHintJTextField(
                 UiComponentStrings
-                        .getString("LendingMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
         inventoryPanel.add(searchTextField);
         searchTextField.setColumns(10);
 
         onlyOverdueCheckbox = new JCheckBox(
                 UiComponentStrings
-                        .getString("LendingMainJPanel.checkbox.onlyoverdue.text")); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.checkbox.onlyoverdue.text")); //$NON-NLS-1$
         inventoryPanel.add(onlyOverdueCheckbox);
 
         horizontalStrut = Box.createHorizontalStrut(50);
@@ -175,16 +175,16 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         addLoanButton = new JButton(
                 UiComponentStrings
-                        .getString("LendingMainJPanel.button.addloan.text")); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.button.addloan.text")); //$NON-NLS-1$
         inventoryPanel.add(addLoanButton);
 
         viewSelectedButton = new JButton(
                 UiComponentStrings
-                        .getString("LendingMainJPanel.button.viewselected.text")); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.button.viewselected.text")); //$NON-NLS-1$
         inventoryPanel.add(viewSelectedButton);
         viewSelectedButton
                 .setToolTipText(UiComponentStrings
-                        .getString("LendingMainJPanel.button.viewselected.disabled.tooltip")); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.button.viewselected.disabled.tooltip")); //$NON-NLS-1$
         viewSelectedButton.setEnabled(false);
         viewSelectedButton.setMnemonic('v');
 
@@ -193,17 +193,17 @@ public class LendingMainJPanel extends JPanel implements Observer {
 
         centerPanel.setLayout(new BorderLayout(0, 0));
 
-        lendingTable = new JTable();
-        lendingTable.setModel(new LoanTableModel(bookMasterlibrary.getLoans()));
-        tableFilter = new TableFilter<>(lendingTable, searchTextField);
-        lendingTable.getTableHeader().setReorderingAllowed(false);
-        lendingTable.setAutoCreateRowSorter(true);
-        lendingTable.setCellSelectionEnabled(true);
-        lendingTable.setFillsViewportHeight(true);
-        lendingTable.setColumnSelectionAllowed(false);
-        lendingTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        loanTable = new JTable();
+        loanTable.setModel(new LoanTableModel(bookMasterlibrary.getLoans()));
+        tableFilter = new TableFilter<>(loanTable, searchTextField);
+        loanTable.getTableHeader().setReorderingAllowed(false);
+        loanTable.setAutoCreateRowSorter(true);
+        loanTable.setCellSelectionEnabled(true);
+        loanTable.setFillsViewportHeight(true);
+        loanTable.setColumnSelectionAllowed(false);
+        loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JScrollPane jsp = new JScrollPane(lendingTable);
+        JScrollPane jsp = new JScrollPane(loanTable);
         centerPanel.add(jsp);
     }
 
@@ -211,7 +211,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
         viewSelectedButton.addActionListener(new ViewSelectedButtonListener());
         addLoanButton.addActionListener(new AddBookButtonListener());
 
-        lendingTable.getSelectionModel().addListSelectionListener(
+        loanTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
         // ctrl+f: switch focus to searchfield for table
@@ -230,7 +230,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
                 searchAction.getValue(Action.NAME));
         getActionMap().put(searchAction.getValue(Action.NAME), searchAction);
 
-        ((LoanTableModel) lendingTable.getModel())
+        ((LoanTableModel) loanTable.getModel())
                 .addTableModelChangeListener(new TableModelChangeListener() {
                     private Collection<Loan> previouslySelectedBooks;
 
@@ -268,9 +268,9 @@ public class LendingMainJPanel extends JPanel implements Observer {
      */
     private Set<Loan> saveSelectedRows() {
         Set<Loan> selectedLoans = new HashSet<>(
-                lendingTable.getSelectedRowCount());
-        for (int selectionIndex : lendingTable.getSelectedRows()) {
-            Loan singleSelectedBook = loanList.get(lendingTable
+                loanTable.getSelectedRowCount());
+        for (int selectionIndex : loanTable.getSelectedRows()) {
+            Loan singleSelectedBook = loanList.get(loanTable
                     .convertRowIndexToModel(selectionIndex));
             selectedLoans.add(singleSelectedBook);
         }
@@ -289,9 +289,9 @@ public class LendingMainJPanel extends JPanel implements Observer {
             int indexInList = loanList.indexOf(tempLoanToSelect);
             // do nothing if not found and loan has been removed
             if (indexInList > -1) {
-                int indexToSelectInView = lendingTable
+                int indexToSelectInView = loanTable
                         .convertRowIndexToView(indexInList);
-                lendingTable.getSelectionModel().addSelectionInterval(
+                loanTable.getSelectionModel().addSelectionInterval(
                         indexToSelectInView, indexToSelectInView);
             }
         }
@@ -302,12 +302,12 @@ public class LendingMainJPanel extends JPanel implements Observer {
         if (anObservable instanceof Library) {
             System.out.println("number of books" + anArgument); //$NON-NLS-1$
         }
-        ((AbstractTableModel) lendingTable.getModel()).fireTableDataChanged();
+        ((AbstractTableModel) loanTable.getModel()).fireTableDataChanged();
         // numberOfBooks =
     }
 
     /**
-     * Listener to open the selected book rows in {@code lendingTable} in a
+     * Listener to open the selected book rows in {@code loanTable} in a
      * {@link BookDetailJPanel} detail tab.
      * 
      * @author msyfrig
@@ -328,8 +328,8 @@ public class LendingMainJPanel extends JPanel implements Observer {
             loanDetailDialog.setVisible(true);
             loanDetailDialog.toFront();
 
-            for (int tempBook : lendingTable.getSelectedRows()) {
-                Loan selectedBook = loanList.get(lendingTable
+            for (int tempBook : loanTable.getSelectedRows()) {
+                Loan selectedBook = loanList.get(loanTable
                         .convertRowIndexToModel(tempBook));
                 // TODO openloan detail
                 // loanDetailDialog.openBookTab(selectedBook,
@@ -366,14 +366,14 @@ public class LendingMainJPanel extends JPanel implements Observer {
          */
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
-            if (lendingTable.getSelectedRows().length > 0) {
+            if (loanTable.getSelectedRows().length > 0) {
                 viewSelectedButton.setEnabled(true);
                 UiComponentStrings
-                        .getString("LendingMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
             } else {
                 viewSelectedButton.setEnabled(false);
                 UiComponentStrings
-                        .getString("LendingMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
+                        .getString("LoanMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
             }
         }
     }
