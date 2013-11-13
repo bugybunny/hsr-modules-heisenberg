@@ -14,8 +14,10 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view.util;
 
+import java.text.ChoiceFormat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -24,12 +26,21 @@ import java.util.GregorianCalendar;
  * @author msyfrig
  */
 public class DateFormatterUtil {
-    private static DateFormat df = SimpleDateFormat.getDateInstance();
+    private static DateFormat df   = SimpleDateFormat.getDateInstance();
+    private static double[]   days = { 0, 1, ChoiceFormat.nextDouble(1) };
 
     public static String getFormattedDate(GregorianCalendar aDate) {
         if (aDate != null) {
             return df.format(aDate.getTime());
         }
         return "00.00.00";
+    }
+
+    public static long daysDiff(Date from, Date to) {
+        return daysDiff(from.getTime(), to.getTime());
+    }
+
+    public static long daysDiff(long from, long to) {
+        return Math.round((to - from) / 86400000D);
     }
 }

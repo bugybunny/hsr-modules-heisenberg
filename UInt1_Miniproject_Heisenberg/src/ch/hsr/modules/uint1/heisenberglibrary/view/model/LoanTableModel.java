@@ -1,6 +1,11 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
+import java.text.ChoiceFormat;
+import java.text.Format;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -22,9 +27,36 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateFormatterUtil;
  * @author msyfrig
  */
 public class LoanTableModel extends AbstractTableModel implements Observer {
-    private static final long   serialVersionUID = 4449419618706874102L;
-    private static List<String> columnNames      = new ArrayList<>(4);
 
+
+    private static final long         serialVersionUID               = 4449419618706874102L;
+    private static List<String>       columnNames                    = new ArrayList<>(
+                                                                             4);
+
+    //@formatter:off
+    // things to format the days until duedate string
+    private static final double[] DAY_RULES = { ChoiceFormat.previousDouble(-1), -1, 0, 1, ChoiceFormat.nextDouble(1) };
+
+    private static final String ONE_DAY_LEFT_PATTERN = UiComponentStrings
+            .getString("LoanTableModel.column.lentuntil.content.choice.oneDayLeft");  //$NON-NLS-1$
+    private static final String ZERO_OR_MORE_DAYS_LEFT_PATTERN = UiComponentStrings
+            .getString("LoanTableModel.column.lentuntil.content.choice.moreDaysLeft"); //$NON-NLS-1$
+    private static final String ONE_DAY_LATE_PATTERN = UiComponentStrings
+            .getString("LoanTableModel.column.lentuntil.content.choice.oneDayLate");  //$NON-NLS-1$
+    private static final String MORE_DAYS_LATE_PATTERN = UiComponentStrings
+            .getString("LoanTableModel.column.lentuntil.content.choice.moreDaysLate"); //$NON-NLS-1$
+
+    private static final String[] DAY_STRINGS = {MORE_DAYS_LATE_PATTERN, ONE_DAY_LATE_PATTERN,
+            ZERO_OR_MORE_DAYS_LEFT_PATTERN, ONE_DAY_LEFT_PATTERN,
+            ZERO_OR_MORE_DAYS_LEFT_PATTERN};
+
+    private static final ChoiceFormat DAY_FORMATTER_CHOICE = new ChoiceFormat(DAY_RULES, DAY_STRINGS);
+    private static final Format[] DAYS_UNTIL_FORMATS = { null, DAY_FORMATTER_CHOICE, NumberFormat.getInstance() };
+    private static final MessageFormat DAYS_UNTIL_FORMATTER = new MessageFormat(UiComponentStrings.
+            getString("LoanTableModel.column.lentuntil.content")); //$NON-NLS-1$
+    
+
+    //@formatter:on
     static {
         columnNames.add(UiComponentStrings
                 .getString("LoanTableModel.loanTableColumn.status")); //$NON-NLS-1$
@@ -36,8 +68,10 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
                 .getString("LoanTableModel.loanTableColumn.lentuntil")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
                 .getString("LoanTableModel.loanTableColumn.lentto")); //$NON-NLS-1$
+
+        DAYS_UNTIL_FORMATTER.setFormats(DAYS_UNTIL_FORMATS);
     }
-    private List<Loan>          data;
+    private List<Loan>                 data;
 
     public LoanTableModel(List<Loan> someLoans) {
         data = someLoans;
@@ -95,10 +129,14 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
                 ret = currentLoan.getCopy().getTitle().getTitle();
                 break;
             case 3:
-                // TODO resttage auch ausgeben, anderes format für de_CH und
-                // en_US
-                ret = DateFormatterUtil.getFormattedDate(currentLoan
-                        .getReturnDate());
+                long daysFromTodayToDueDate = DateFormatterUtil.daysDiff(
+                        new Date(), currentLoan.getDueDate().getTime());
+                Object[] messageArguments = {
+                        DateFormatterUtil.getFormattedDate(currentLoan
+                                .getDueDate()),
+                        Long.valueOf(daysFromTodayToDueDate),
+                        Long.valueOf(Math.abs(daysFromTodayToDueDate)) };
+                ret = DAYS_UNTIL_FORMATTER.format(messageArguments);
                 break;
             case 4:
                 ret = currentLoan.getCustomer().getSurname() + " "

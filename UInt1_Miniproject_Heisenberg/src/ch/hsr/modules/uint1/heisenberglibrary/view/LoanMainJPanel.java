@@ -132,11 +132,10 @@ public class LoanMainJPanel extends JPanel implements Observer {
 
         inventoryStatisticsPanel.add(Box.createHorizontalStrut(50));
 
-        String numberOfOverdueLoansText = MessageFormat
-                .format(UiComponentStrings
+        String numberOfOverdueLoansText = MessageFormat.format(
+                UiComponentStrings
                         .getString("LoanMainJPanel.label.overdueloans.text"), //$NON-NLS-1$
-                        Integer.valueOf(bookMasterlibrary.getOverdueLoans()
-                                .size()));
+                Integer.valueOf(bookMasterlibrary.getOverdueLoans().size()));
         overdueLabel = new JLabel(numberOfOverdueLoansText);
         inventoryStatisticsPanel.add(overdueLabel);
 
@@ -257,6 +256,7 @@ public class LoanMainJPanel extends JPanel implements Observer {
                 tableFilter.filterTable();
             }
         });
+        ColumnsAutoSizer.sizeColumnsToFit(loanTable, 10);
     }
 
     /**
@@ -267,8 +267,7 @@ public class LoanMainJPanel extends JPanel implements Observer {
      * @return set of currently selected loans
      */
     private Set<Loan> saveSelectedRows() {
-        Set<Loan> selectedLoans = new HashSet<>(
-                loanTable.getSelectedRowCount());
+        Set<Loan> selectedLoans = new HashSet<>(loanTable.getSelectedRowCount());
         for (int selectionIndex : loanTable.getSelectedRows()) {
             Loan singleSelectedBook = loanList.get(loanTable
                     .convertRowIndexToModel(selectionIndex));
