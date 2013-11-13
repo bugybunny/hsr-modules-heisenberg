@@ -215,7 +215,7 @@ public class LendingMainJPanel extends JPanel implements Observer {
                 new BookTableSelectionListener());
 
         // ctrl+f: switch focus to searchfield for table
-        Action searchAction = new AbstractAction("search") {
+        Action searchAction = new AbstractAction("search") { //$NON-NLS-1$
             private static final long serialVersionUID = -6626318103198277780L;
 
             @Override
