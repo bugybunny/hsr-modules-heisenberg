@@ -1,13 +1,24 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.awt.AWTKeyStroke;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -35,14 +46,13 @@ public class LibraryMasterJFrame extends JFrame implements Observer {
         bookMasterlibrary = library;
 
         initComponents();
+        initHandlers();
         setVisible(true);
     }
 
     private void initComponents() {
         ImageIcon frameIcon = new ImageIcon(
                 LibraryMasterJFrame.class.getResource("/images/library.png"));
-        System.out.println(LibraryMasterJFrame.class
-                .getResource("/images/library.png"));
         setIconImage(frameIcon.getImage());
         setTitle(UiComponentStrings.getString("LibraryMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,6 +74,73 @@ public class LibraryMasterJFrame extends JFrame implements Observer {
         tabbedPane
                 .addTab(UiComponentStrings
                         .getString("LibraryMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$
+    }
+
+    private void initHandlers() {
+        KeyStroke ctrlTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+                InputEvent.CTRL_DOWN_MASK);
+        KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
+
+        // Remove ctrl-tab from normal focus traversal
+        Set<AWTKeyStroke> forwardKeys = new HashSet<>(
+                tabbedPane
+                        .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        forwardKeys.remove(ctrlTab);
+        tabbedPane.setFocusTraversalKeys(
+                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+
+        // Remove ctrl-shift-tab from normal focus traversal
+        Set<AWTKeyStroke> backwardKeys = new HashSet<>(
+                tabbedPane
+                        .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        backwardKeys.remove(ctrlShiftTab);
+        tabbedPane.setFocusTraversalKeys(
+                KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
+
+        // ctrl+tab: switch to next tab
+        Action navigateToNextTabAction = new AbstractAction("navigateToNextTab") { //$NON-NLS-1$
+            private static final long serialVersionUID = -6626318103198277780L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                int newSelectedTabIndex = tabbedPane.getSelectedIndex() + 1;
+                if (newSelectedTabIndex > tabbedPane.getTabCount() - 1) {
+                    newSelectedTabIndex = 0;
+                }
+                tabbedPane.setSelectedIndex(newSelectedTabIndex);
+            }
+        };
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlShiftTab,
+                        navigateToNextTabAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                navigateToNextTabAction.getValue(Action.NAME),
+                navigateToNextTabAction);
+
+        // ctrl+shift+tab: switch to previous tab
+        Action navigateToPreviousTabAction = new AbstractAction(
+                "navigateToPreviousTab") { //$NON-NLS-1$
+            private static final long serialVersionUID = -6626318103198277780L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                int newSelectedTabIndex = tabbedPane.getSelectedIndex() - 1;
+                if (newSelectedTabIndex < 0) {
+                    newSelectedTabIndex = tabbedPane.getTabCount() - 1;
+                }
+                tabbedPane.setSelectedIndex(newSelectedTabIndex);
+            }
+        };
+
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlShiftTab,
+                        navigateToPreviousTabAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                navigateToPreviousTabAction.getValue(Action.NAME),
+                navigateToPreviousTabAction);
     }
 
     /*
