@@ -10,7 +10,9 @@ import javax.swing.table.AbstractTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
+import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateFormatterUtil;
 
 /**
  * The tableModel for the jTable in BookDetailJPanel.
@@ -85,11 +87,11 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         Object borrowedUntil = UiComponentStrings
                 .getString("BookExemplarModel.copy.date.isAvailable");
 
-        // TODO: BLUBB
-        /*
-         * borrowedUntil = DateFormatterUtil.getFormattedDate(copyList
-         * .get(aRowIndex).g);
-         */
+        Loan tempLoan = library.getActiveLoanForCopy(copyOfSpecificBook);
+        if (tempLoan != null) {
+            borrowedUntil = DateFormatterUtil.getFormattedDate(tempLoan
+                    .getDueDate());
+        }
 
         Object ret = null;
 
