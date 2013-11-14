@@ -125,6 +125,17 @@ public class Library extends AbstractObservableDO {
         return retCopies;
     }
 
+    public List<Loan> getActiveLoans() {
+        List<Loan> activeLoans = new ArrayList<>();
+        for (Loan tempLoan : getLoans()) {
+            if (tempLoan.isLent()) {
+                activeLoans.add(tempLoan);
+            }
+        }
+        return activeLoans;
+
+    }
+
     public List<Copy> getCopies() {
         return copies;
     }

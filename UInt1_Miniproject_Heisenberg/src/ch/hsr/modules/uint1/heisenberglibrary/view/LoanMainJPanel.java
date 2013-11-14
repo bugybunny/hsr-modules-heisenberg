@@ -16,6 +16,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,14 +82,14 @@ public class LoanMainJPanel extends JPanel implements Observer {
     private JPanel                                    outerStatisticsPanel;
     private BookDetailJDialog                         loanDetailDialog;
 
-    private List<Loan>                                loanList;
+    private List<Loan>                                activeLoanList;
     private Library                                   bookMasterlibrary;
 
     /**
      * Creates the panel.
      */
     public LoanMainJPanel(Library library) {
-        loanList = library.getLoans();
+        activeLoanList = library.getActiveLoans();
         bookMasterlibrary = library;
 
         initComponents();
@@ -193,7 +194,8 @@ public class LoanMainJPanel extends JPanel implements Observer {
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         loanTable = new JTable();
-        loanTable.setModel(new LoanTableModel(bookMasterlibrary.getLoans()));
+        loanTable.setMinimumSize(new Dimension(200, 100));
+        loanTable.setModel(new LoanTableModel(activeLoanList));
         tableFilter = new TableFilter<>(loanTable, searchTextField);
         loanTable.getTableHeader().setReorderingAllowed(false);
         loanTable.setAutoCreateRowSorter(true);
@@ -269,7 +271,7 @@ public class LoanMainJPanel extends JPanel implements Observer {
     private Set<Loan> saveSelectedRows() {
         Set<Loan> selectedLoans = new HashSet<>(loanTable.getSelectedRowCount());
         for (int selectionIndex : loanTable.getSelectedRows()) {
-            Loan singleSelectedBook = loanList.get(loanTable
+            Loan singleSelectedBook = activeLoanList.get(loanTable
                     .convertRowIndexToModel(selectionIndex));
             selectedLoans.add(singleSelectedBook);
         }
@@ -285,7 +287,7 @@ public class LoanMainJPanel extends JPanel implements Observer {
     private void restoreSelectedRows(Collection<Loan> someLoansToSelect) {
         for (Loan tempLoanToSelect : someLoansToSelect) {
 
-            int indexInList = loanList.indexOf(tempLoanToSelect);
+            int indexInList = activeLoanList.indexOf(tempLoanToSelect);
             // do nothing if not found and loan has been removed
             if (indexInList > -1) {
                 int indexToSelectInView = loanTable
@@ -328,7 +330,7 @@ public class LoanMainJPanel extends JPanel implements Observer {
             loanDetailDialog.toFront();
 
             for (int tempBook : loanTable.getSelectedRows()) {
-                Loan selectedBook = loanList.get(loanTable
+                Loan selectedBook = activeLoanList.get(loanTable
                         .convertRowIndexToModel(tempBook));
                 // TODO openloan detail
                 // loanDetailDialog.openBookTab(selectedBook,
