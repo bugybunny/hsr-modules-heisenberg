@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
@@ -40,7 +39,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.TextBookTableFilter;
  * {@link #addFilter(RowFilter)} and {@link #removeFilter(RowFilter)} when
  * events happen outside of the table that should trigger the filter.
  * 
- * <br>To add additonal filters when for example a {@link JCheckBox} should be
+ * <br>To add additonal filters when for example a {@link javax.swing.JCheckBox} should be
  * considerer when filtering and should trigger the filter, add or remove the
  * filter when the checkbox is selected or deselected and <b>call
  * {@link #filterTable()} after adding or removing the filter</b>. Make sure to

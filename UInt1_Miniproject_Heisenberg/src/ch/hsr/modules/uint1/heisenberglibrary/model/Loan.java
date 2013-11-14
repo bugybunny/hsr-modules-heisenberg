@@ -2,7 +2,10 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
+
+import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
 
 public class Loan extends AbstractObservable {
 
@@ -106,16 +109,12 @@ public class Loan extends AbstractObservable {
         return -1;
     }
 
-    public int getDaysOverdue() {
+    public long getDaysOverdue() {
         if (!isOverdue()) {
             return 0;
         }
 
-        GregorianCalendar dueDate = (GregorianCalendar) pickupDate.clone();
-        dueDate.add(GregorianCalendar.DAY_OF_YEAR, DAYS_TO_RETURN_BOOK);
-
-        return (int) (new GregorianCalendar().getTimeInMillis() - dueDate
-                .getTimeInMillis()) / 1000 / 60 / 60 / 24;
+        return DateUtil.daysDiff(new Date(), dueDate.getTime());
     }
 
     public boolean isOverdue() {

@@ -14,8 +14,6 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
-import java.util.regex.Matcher;
-
 import javax.swing.RowFilter;
 
 /**
@@ -25,7 +23,7 @@ import javax.swing.RowFilter;
  * <br> An own implementation for string comparision is used because
  * {@link String#contains(CharSequence)} is faster than
  * {@link RowFilter#regexFilter(String, int...)} and even if an own
- * {@link Matcher} with a precomiled pattern would be used,
+ * {@link java.util.regex.Matcher} with a precomiled pattern would be used,
  * {@code String.contains()} is still faster.t
  * 
  * @author msyfrig

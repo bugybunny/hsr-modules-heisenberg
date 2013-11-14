@@ -61,6 +61,7 @@ public class DateUtil {
      *         {@code to - from} in days, can be negative
      */
     public static long daysDiff(long from, long to) {
-        return Math.round((to - from) / 86400000d);
+        return Math.round((to - from) / 1000 / 60 / 60 / 24);
+
     }
 }

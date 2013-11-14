@@ -230,12 +230,12 @@ public class BookDetailJPanel extends JPanel implements Observer {
         JLabel shelfLable = new JLabel(
                 UiComponentStrings
                         .getString("BookDetailJDialog.label.condition.text")); //$NON-NLS-1$
-        GridBagConstraints gbc_shelfLable = new GridBagConstraints();
-        gbc_shelfLable.anchor = GridBagConstraints.EAST;
-        gbc_shelfLable.insets = new Insets(0, 0, 5, 5);
-        gbc_shelfLable.gridx = 1;
-        gbc_shelfLable.gridy = 4;
-        northPanel.add(shelfLable, gbc_shelfLable);
+        GridBagConstraints gbcShelfLable = new GridBagConstraints();
+        gbcShelfLable.anchor = GridBagConstraints.EAST;
+        gbcShelfLable.insets = new Insets(0, 0, 5, 5);
+        gbcShelfLable.gridx = 1;
+        gbcShelfLable.gridy = 4;
+        northPanel.add(shelfLable, gbcShelfLable);
 
         comboShelf = new JComboBox<>();
         for (Shelf tempShelfValues : Shelf.values()) {
@@ -250,22 +250,22 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 }
             }
         });
-        GridBagConstraints gbc_comboShelf = new GridBagConstraints();
-        gbc_comboShelf.insets = new Insets(0, 0, 5, 0);
-        gbc_comboShelf.fill = GridBagConstraints.HORIZONTAL;
-        gbc_comboShelf.gridx = 3;
-        gbc_comboShelf.gridy = 4;
-        northPanel.add(comboShelf, gbc_comboShelf);
+        GridBagConstraints gbcComboShelf = new GridBagConstraints();
+        gbcComboShelf.insets = new Insets(0, 0, 5, 0);
+        gbcComboShelf.fill = GridBagConstraints.HORIZONTAL;
+        gbcComboShelf.gridx = 3;
+        gbcComboShelf.gridy = 4;
+        northPanel.add(comboShelf, gbcComboShelf);
 
         btnAddABook = new JButton(UiComponentStrings.getString("Add book"));
         btnAddABook.addActionListener(new SaveBookButtonListener());
         btnAddABook.setEnabled(false);
 
-        GridBagConstraints gbc_btnAddABook = new GridBagConstraints();
-        gbc_btnAddABook.anchor = GridBagConstraints.EAST;
-        gbc_btnAddABook.gridx = 3;
-        gbc_btnAddABook.gridy = 6;
-        northPanel.add(btnAddABook, gbc_btnAddABook);
+        GridBagConstraints gbcBtnAddABook = new GridBagConstraints();
+        gbcBtnAddABook.anchor = GridBagConstraints.EAST;
+        gbcBtnAddABook.gridx = 3;
+        gbcBtnAddABook.gridy = 6;
+        northPanel.add(btnAddABook, gbcBtnAddABook);
 
         JPanel southPanel = new JPanel();
         southPanel.setBorder(new TitledBorder(null, UiComponentStrings
