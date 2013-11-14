@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -23,7 +21,7 @@ import javax.swing.border.EmptyBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
-public class LibraryMasterJFrame extends JFrame implements Observer {
+public class LibraryMasterJFrame extends JFrame {
     private static final long serialVersionUID = 8186612854405487707L;
 
     /**
@@ -141,15 +139,5 @@ public class LibraryMasterJFrame extends JFrame implements Observer {
         getRootPane().getActionMap().put(
                 navigateToPreviousTabAction.getValue(Action.NAME),
                 navigateToPreviousTabAction);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-     */
-    @Override
-    public void update(Observable aO, Object aArg) {
-
     }
 }

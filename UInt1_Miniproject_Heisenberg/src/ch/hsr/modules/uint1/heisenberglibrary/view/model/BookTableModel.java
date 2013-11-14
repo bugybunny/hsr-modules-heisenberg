@@ -47,22 +47,11 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getRowCount()
-     */
     @Override
     public int getRowCount() {
-        // System.out.println(data.size());
         return data.size();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getColumnCount()
-     */
     @Override
     public int getColumnCount() {
         return columnNames.size();
@@ -76,11 +65,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         return aColumnIndex != 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getValueAt(int, int)
-     */
     // TODO: specific books with availability
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
@@ -126,21 +110,11 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         fireTableDataChanged();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
-     */
     @Override
     public String getColumnName(int aColumn) {
         return columnNames.get(aColumn);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
-     */
     @Override
     public Class<?> getColumnClass(int aColumnIndex) {
         Class<?> ret = String.class;

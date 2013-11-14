@@ -47,8 +47,6 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
 
 
 
-
-
     private static final long         serialVersionUID               = 4449419618706874102L;
     private static List<String>       columnNames                    = new ArrayList<>(
                                                                              4);
@@ -101,21 +99,11 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getRowCount()
-     */
     @Override
     public int getRowCount() {
         return data.size();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getColumnCount()
-     */
     @Override
     public int getColumnCount() {
         return columnNames.size();
@@ -127,11 +115,6 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getValueAt(int, int)
-     */
     // TODO: specific books with availability
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
@@ -149,11 +132,10 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
                 ret = currentLoan.getCopy().getTitle().getTitle();
                 break;
             case 3:
-                long daysFromTodayToDueDate = DateUtil.daysDiff(
-                        new Date(), currentLoan.getDueDate().getTime());
+                long daysFromTodayToDueDate = DateUtil.daysDiff(new Date(),
+                        currentLoan.getDueDate().getTime());
                 Object[] messageArguments = {
-                        DateUtil.getFormattedDate(currentLoan
-                                .getDueDate()),
+                        DateUtil.getFormattedDate(currentLoan.getDueDate()),
                         Long.valueOf(daysFromTodayToDueDate),
                         Long.valueOf(Math.abs(daysFromTodayToDueDate)) };
                 ret = DAYS_UNTIL_FORMATTER.format(messageArguments);
@@ -168,21 +150,11 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
-     */
     @Override
     public String getColumnName(int aColumn) {
         return columnNames.get(aColumn);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
-     */
     @Override
     public Class<?> getColumnClass(int aColumnIndex) {
         Class<?> ret = String.class;

@@ -489,11 +489,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         listenerList.remove(ModelStateChangeListener.class, aListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-     */
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {

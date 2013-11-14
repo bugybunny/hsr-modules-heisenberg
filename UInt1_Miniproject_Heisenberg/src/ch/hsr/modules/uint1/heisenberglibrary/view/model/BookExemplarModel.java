@@ -50,31 +50,16 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         copyList = library.getCopiesOfBook(aDisplayedBookDO);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getRowCount()
-     */
     @Override
     public int getRowCount() {
         return copyList.size();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getColumnCount()
-     */
     @Override
     public int getColumnCount() {
         return columnNames.size();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getValueAt(int, int)
-     */
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
         Copy copyOfSpecificBook = copyList.get(aRowIndex);
@@ -89,8 +74,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
 
         Loan tempLoan = library.getActiveLoanForCopy(copyOfSpecificBook);
         if (tempLoan != null) {
-            borrowedUntil = DateUtil.getFormattedDate(tempLoan
-                    .getDueDate());
+            borrowedUntil = DateUtil.getFormattedDate(tempLoan.getDueDate());
         }
 
         Object ret = null;
@@ -111,32 +95,17 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-     */
     @Override
     public void update(Observable anObservable, Object anArgument) {
         // TODO Auto-generated method stub
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
-     */
     @Override
     public String getColumnName(int aColumnIndex) {
         return columnNames.get(aColumnIndex);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.AbstractTableModel#fireTableDataChanged()
-     */
     @Override
     public void fireTableDataChanged() {
         // TODO Auto-generated method stub
