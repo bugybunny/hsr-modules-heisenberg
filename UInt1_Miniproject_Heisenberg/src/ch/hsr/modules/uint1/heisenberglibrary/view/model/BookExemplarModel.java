@@ -1,7 +1,6 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -11,9 +10,7 @@ import javax.swing.table.AbstractTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
-import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateFormatterUtil;
 
 /**
  * The tableModel for the jTable in BookDetailJPanel.
@@ -35,7 +32,8 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
                         .getString("BookExemplarModel.exemplarTableColumn.borrowedUntil")); //$NON-NLS-1$
     }
 
-    private Library             exemplarLibrary;
+    private List<Copy>          copyList;
+    private Library             library;
     private BookDO              specificBook;
 
     /**
@@ -45,8 +43,9 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      *            the specific book from the DetailPanel
      */
     public BookExemplarModel(BookDO aDisplayedBookDO, Library aLibrary) {
+        library = aLibrary;
         specificBook = aDisplayedBookDO;
-        exemplarLibrary = aLibrary;
+        copyList = library.getCopiesOfBook(aDisplayedBookDO);
     }
 
     /*
@@ -56,7 +55,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      */
     @Override
     public int getRowCount() {
-        return exemplarLibrary.getCopiesOfBook(specificBook).size();
+        return copyList.size();
     }
 
     /*
@@ -76,35 +75,21 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      */
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
-        Copy copyOfSpecificBook = exemplarLibrary.getCopiesOfBook(specificBook)
-                .get(aRowIndex);
+        Copy copyOfSpecificBook = copyList.get(aRowIndex);
 
-        List<Loan> loanedBooks = exemplarLibrary
-                .getLentCopiesOfBook(specificBook);
-
-        // Copy exemplarOfLoanedBook;
-        // boolean loaned = false;
-
-        String availability = UiComponentStrings
-                .getString("BookExemplarModel.copy.isAvailable"); //$NON-NLS-1$
-        Object borrowedUntil = UiComponentStrings
-                .getString("BookExemplarModel.copy.date.isAvailable"); //$NON-NLS-1$
-
-        for (int i = 0; i < loanedBooks.size(); i++) {
-            if (loanedBooks.get(i).getCopy().getInventoryNumber() == copyOfSpecificBook
-                    .getInventoryNumber()) {
-                // exemplarOfLoanedBook = loanedBooks.get(i).getCopy();
-                // loaned = true;
-                availability = UiComponentStrings
-                        .getString("BookExemplarModel.copy.notAvailable"); //$NON-NLS-1$
-
-                GregorianCalendar dueDate = loanedBooks.get(i).getPickupDate();
-                dueDate.add(GregorianCalendar.DAY_OF_YEAR, loanedBooks.get(i)
-                        .getDaysOfLoanDuration());
-
-                borrowedUntil = DateFormatterUtil.getFormattedDate(dueDate);
-            }
+        String availability = "available";
+        if (library.isCopyLent(copyOfSpecificBook)) {
+            availability = "unavailable";
         }
+
+        Object borrowedUntil = UiComponentStrings
+                .getString("BookExemplarModel.copy.date.isAvailable");
+
+        // TODO: BLUBB
+        /*
+         * borrowedUntil = DateFormatterUtil.getFormattedDate(copyList
+         * .get(aRowIndex).g);
+         */
 
         Object ret = null;
 

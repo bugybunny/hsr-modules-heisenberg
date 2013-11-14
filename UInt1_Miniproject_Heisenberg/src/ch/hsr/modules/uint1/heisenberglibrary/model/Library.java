@@ -48,8 +48,8 @@ public class Library extends AbstractObservableDO {
         return c;
     }
 
-    public void removeCopy(BookDO title) {
-        copies.remove(new Copy(title));
+    public void removeCopy(Copy removeCopy) {
+        copies.remove(removeCopy);
         doNotify(Integer.valueOf(getCopies().size()));
     }
 

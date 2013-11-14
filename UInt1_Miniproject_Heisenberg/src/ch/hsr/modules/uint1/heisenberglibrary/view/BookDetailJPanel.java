@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -121,7 +122,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
             // add observers for new book object
             if (displayedBookDO != null) {
                 displayedBookDO.addObserver(this);
+
             }
+
             updateDisplay();
         }
     }
@@ -137,6 +140,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         setBookDO(aBookDo);
         bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
                 detailLibrary));
+
         initHandlers();
     }
 
@@ -303,10 +307,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookExemplarTable = new JTable();
         bookExemplarTable.setFillsViewportHeight(true);
         southBookList.add(bookExemplarTable);
-
-        bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
-                detailLibrary));
-
+        /*
+         * bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
+         * loanList));
+         */
         bookExemplarTable.setCellSelectionEnabled(true);
         bookExemplarTable.setColumnSelectionAllowed(false);
 
@@ -572,23 +576,15 @@ public class BookDetailJPanel extends JPanel implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            System.out.println("remove selected pressed");
-            /*
-             * for (int tempBook : bookTable.getSelectedRows()) { BookDO
-             * selectedBook = bookList.get(bookTable
-             * .convertRowIndexToModel(tempBook));
-             * bookDetailDialog.openBookTab(selectedBook, bookMasterlibrary); }
-             */
-            int[] selectedCopies = bookExemplarTable.getSelectedRows();
 
-            for (int i = 0; i < selectedCopies.length; i++) {
-                Copy selectedCopy = detailLibrary.getCopiesOfBook(
-                        displayedBookDO).get(
-                        bookExemplarTable
-                                .convertRowIndexToModel(selectedCopies[i]));
-                detailLibrary.removeCopy(selectedCopy.getTitle());
+            List<Copy> copyList = detailLibrary
+                    .getCopiesOfBook(displayedBookDO);
+
+            for (int tempCopy : bookExemplarTable.getSelectedRows()) {
+                Copy selectedCopy = copyList.get(bookExemplarTable
+                        .convertRowIndexToModel(tempCopy));
+                detailLibrary.removeCopy(selectedCopy);
             }
-
         }
     }
 
