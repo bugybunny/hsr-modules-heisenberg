@@ -15,5 +15,5 @@
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 public enum ModelChangeType {
-    NUMBER_OF_BOOKS, NUMBER_OF_EXEMPLARS, NUMBER_OF_LOANS;
+    NUMBER_OF_BOOKS, NUMBER_OF_EXEMPLARS, NUMBER_OF_LOANS, COPY_REMOVED, COPY_ADDED, BOOK_ADDED;
 }

@@ -49,8 +49,12 @@ public class Library extends AbstractObservableDO {
     }
 
     public void removeCopy(Copy removeCopy) {
+        int oldSize = copies.size();
         copies.remove(removeCopy);
-        doNotify(Integer.valueOf(getCopies().size()));
+        int newSize = copies.size();
+
+        doNotify(new ObservableModelChange(ModelChangeType.COPY_REMOVED,
+                Integer.valueOf(oldSize), Integer.valueOf(newSize)));
     }
 
     public BookDO findByBookTitle(String title) {
