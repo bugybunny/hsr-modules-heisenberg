@@ -21,13 +21,13 @@ import java.util.Observable;
  * 
  * @author msyfrig
  */
-public abstract class AbstractObservableDO extends Observable {
+public abstract class AbstractObservable extends Observable {
 
     /**
      * Creates a new instance of this class.
      * 
      */
-    public AbstractObservableDO() {
+    public AbstractObservable() {
     }
 
     /**
@@ -37,7 +37,7 @@ public abstract class AbstractObservableDO extends Observable {
      * For future use if we wanna change something globally for all observable
      * objects.
      * 
-     * @see AbstractObservableDO#doNotify()
+     * @see AbstractObservable#doNotify()
      */
     public void set() {
         doNotify();

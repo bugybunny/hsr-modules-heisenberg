@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
-public class Loan extends AbstractObservableDO {
+public class Loan extends AbstractObservable {
 
     private Copy     copy;
     private Customer customer;

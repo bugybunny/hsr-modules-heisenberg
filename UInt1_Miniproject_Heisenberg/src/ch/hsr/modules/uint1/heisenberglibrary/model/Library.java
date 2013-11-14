@@ -3,7 +3,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Library extends AbstractObservableDO {
+public class Library extends AbstractObservable {
 
     private List<Copy>     copies;
     private List<Customer> customers;
