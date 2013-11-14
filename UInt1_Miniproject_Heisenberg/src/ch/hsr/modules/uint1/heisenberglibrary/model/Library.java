@@ -8,20 +8,33 @@ public class Library extends AbstractObservable {
     private List<Copy>     copies;
     private List<Customer> customers;
     private List<Loan>     loans;
-    private List<BookDO>   bookDOs;
+    private List<BookDO>   books;
+    // TODO daran denken, dass activeLoans-- gemacht wird, wenn ein Buch
+    // zurückgegeben wird!!!!!
+    private int            activeLoanCount;
 
     public Library() {
         copies = new ArrayList<>();
         customers = new ArrayList<>();
         loans = new ArrayList<>();
-        bookDOs = new ArrayList<>();
+        books = new ArrayList<>();
+        activeLoanCount = getActiveLoans().size();
     }
 
     public Loan createAndAddLoan(Customer customer, Copy copy) {
         if (!isCopyLent(copy)) {
             Loan l = new Loan(customer, copy);
             loans.add(l);
-            doNotify();
+            doNotify(new ObservableModelChangeEvent(
+                    ModelChangeTypeEnums.Loan.ADDED, null, l));
+            doNotify(new ObservableModelChangeEvent(
+                    ModelChangeTypeEnums.Loan.NUMBER, Integer.valueOf(loans
+                            .size() - 1), Integer.valueOf(loans.size())));
+            activeLoanCount++;
+            doNotify(new ObservableModelChangeEvent(
+                    ModelChangeTypeEnums.Loan.ACTIVE_NUMBER,
+                    Integer.valueOf(activeLoanCount - 1),
+                    Integer.valueOf(activeLoanCount)));
             return l;
         }
         return null;
@@ -30,35 +43,55 @@ public class Library extends AbstractObservable {
     public Customer createAndAddCustomer(String name, String surname) {
         Customer c = new Customer(name, surname);
         customers.add(c);
-        doNotify();
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Customer.ADDED, null, c));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Customer.NUMBER, Integer.valueOf(customers
+                        .size() - 1), Integer.valueOf(customers.size())));
         return c;
     }
 
     public BookDO createAndAddBook(String name) {
         BookDO b = new BookDO(name);
-        bookDOs.add(b);
-        doNotify(Integer.valueOf(getBooks().size()));
+        books.add(b);
+        doNotify(new ObservableModelChangeEvent(ModelChangeTypeEnums.Book.ADDED,
+                null, b));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.NUMBER,
+                Integer.valueOf(books.size() - 1),
+                Integer.valueOf(books.size())));
+
         return b;
     }
 
     public Copy createAndAddCopy(BookDO title) {
         Copy c = new Copy(title);
         copies.add(c);
-        doNotify(Integer.valueOf(getCopies().size()));
+
+        doNotify(new ObservableModelChangeEvent(ModelChangeTypeEnums.Copy.ADDED,
+                null, c));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Copy.NUMBER,
+                Integer.valueOf(copies.size() - 1), Integer.valueOf(copies
+                        .size())));
+
         return c;
     }
 
     public void removeCopy(Copy removeCopy) {
-        int oldSize = copies.size();
         copies.remove(removeCopy);
-        int newSize = copies.size();
 
-        doNotify(new ObservableModelChange(ModelChangeType.COPY_REMOVED,
-                Integer.valueOf(oldSize), Integer.valueOf(newSize)));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Copy.REMOVED, removeCopy, null));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Copy.NUMBER,
+                Integer.valueOf(copies.size() - 1), Integer.valueOf(copies
+                        .size())));
+
     }
 
     public BookDO findByBookTitle(String title) {
-        for (BookDO b : bookDOs) {
+        for (BookDO b : books) {
             if (b.getTitle().equals(title)) {
                 return b;
             }
@@ -165,7 +198,7 @@ public class Library extends AbstractObservable {
     }
 
     public List<BookDO> getBooks() {
-        return bookDOs;
+        return books;
     }
 
     public List<Customer> getCustomers() {

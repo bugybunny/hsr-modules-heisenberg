@@ -1,18 +1,34 @@
-package ch.hsr.modules.uint1.heisenberglibrary.model;
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 /**
  * Represents a book object.
  * 
+ * @author mstolze
  * @author msyfrig
  */
 public class BookDO extends AbstractObservable {
 
-    private String title, author, publisher;
+    private String title;
+    private String author;
+    private String publisher;
     private Shelf  shelf;
 
-    public BookDO(String name) {
-        this.title = name;
+    public BookDO(String aTitle) {
+        title = aTitle;
     }
 
     public void set(String aTitle, String aAuthor, String aPublisher,
@@ -21,71 +37,53 @@ public class BookDO extends AbstractObservable {
         author = aAuthor;
         publisher = aPublisher;
         shelf = aShelf;
-        super.set();
+        // TODO buch clonen falls möglich und als oldvalue übergeben
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.EVERYTHING_CHANGED, null, this));
     }
 
-    /**
-     * @return the title
-     */
     public String getTitle() {
         return title;
     }
 
-    /**
-     * @param aTitle
-     *            the title to set
-     */
     public void setTitle(String aTitle) {
+        String oldValue = title;
         title = aTitle;
-        doNotify();
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.TITLE, oldValue, title));
     }
 
-    /**
-     * @return the author
-     */
     public String getAuthor() {
         return author;
     }
 
-    /**
-     * @param aAuthor
-     *            the author to set
-     */
-    public void setAuthor(String aAuthor) {
-        author = aAuthor;
-        doNotify();
+    public void setAuthor(String anAuthor) {
+        String oldValue = author;
+        author = anAuthor;
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.AUTHOR, oldValue, author));
     }
 
-    /**
-     * @return the publisher
-     */
     public String getPublisher() {
         return publisher;
     }
 
-    /**
-     * @param aPublisher
-     *            the publisher to set
-     */
     public void setPublisher(String aPublisher) {
+        String oldValue = publisher;
         publisher = aPublisher;
-        doNotify();
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.PUBLISHER, oldValue, publisher));
     }
 
-    /**
-     * @return the shelf
-     */
     public Shelf getShelf() {
         return shelf;
     }
 
-    /**
-     * @param aShelf
-     *            the shelf to set
-     */
     public void setShelf(Shelf aShelf) {
+        Shelf oldValue = shelf;
         shelf = aShelf;
-        doNotify();
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.SHELF, oldValue, shelf));
     }
 
     @Override
@@ -93,11 +91,6 @@ public class BookDO extends AbstractObservable {
         return title + ", " + author + ", " + publisher;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -110,11 +103,6 @@ public class BookDO extends AbstractObservable {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

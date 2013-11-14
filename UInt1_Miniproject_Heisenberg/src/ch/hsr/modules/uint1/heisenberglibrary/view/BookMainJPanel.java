@@ -53,8 +53,15 @@ import javax.swing.table.TableRowSorter;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
 
+/**
+ * 
+ * @author msyfrig
+ */
 public class BookMainJPanel extends JPanel implements Observer {
     private static final long              serialVersionUID = 8186612854405487707L;
 
@@ -70,7 +77,7 @@ public class BookMainJPanel extends JPanel implements Observer {
     private JPanel                         inventoryStatisticsPanel;
     private JPanel                         inventoryPanel;
     private JLabel                         numberOfBooksLabel;
-    private JLabel                         numberOfExemplarsLabel;
+    private JLabel                         numberOfCopiesLabel;
     private GhostHintJTextField            searchTextField;
     private JCheckBox                      onlyAvailableCheckbox;
     private Component                      horizontalStrut;
@@ -82,11 +89,6 @@ public class BookMainJPanel extends JPanel implements Observer {
     private List<BookDO>                   bookList;
     private Library                        bookMasterlibrary;
 
-    /**
-     * Creates the frame.
-     * 
-     * @param aBooks
-     */
     public BookMainJPanel(Library library) {
         bookList = library.getBooks();
         bookMasterlibrary = library;
@@ -121,11 +123,11 @@ public class BookMainJPanel extends JPanel implements Observer {
 
         inventoryStatisticsPanel.add(Box.createHorizontalStrut(50));
 
-        String numberOfExamplesText = MessageFormat.format(UiComponentStrings
-                .getString("BookMainJPanel.label.exemplarnumber.text"), //$NON-NLS-1$
+        String numberOfCopiesText = MessageFormat.format(UiComponentStrings
+                .getString("BookMainJPanel.label.copiesnumber.text"), //$NON-NLS-1$
                 Integer.valueOf(bookMasterlibrary.getCopies().size()));
-        numberOfExemplarsLabel = new JLabel(numberOfExamplesText);
-        inventoryStatisticsPanel.add(numberOfExemplarsLabel);
+        numberOfCopiesLabel = new JLabel(numberOfCopiesText);
+        inventoryStatisticsPanel.add(numberOfCopiesLabel);
 
         bookInventoryPanel = new JPanel();
         bookInventoryPanel.setBorder(new TitledBorder(null, UiComponentStrings
@@ -303,11 +305,26 @@ public class BookMainJPanel extends JPanel implements Observer {
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        if (anObservable instanceof Library) {
-            ((AbstractTableModel) bookTable.getModel()).fireTableDataChanged();
-            numberOfBooksLabel.setText(MessageFormat.format(UiComponentStrings
-                    .getString("BookMainJPanel.label.numberofbooks.text"), //$NON-NLS-1$
-                    Integer.valueOf(bookMasterlibrary.getBooks().size())));
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            ModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Book.ADDED
+                    || type == ModelChangeTypeEnums.Book.REMOVED) {
+                ((AbstractTableModel) bookTable.getModel())
+                        .fireTableDataChanged();
+            } else if (type == ModelChangeTypeEnums.Book.NUMBER) {
+                numberOfBooksLabel
+                        .setText(MessageFormat.format(
+                                UiComponentStrings
+                                        .getString("BookMainJPanel.label.numberofbooks.text"), //$NON-NLS-1$
+                                modelChange.getNewValue()));
+            } else if (type == ModelChangeTypeEnums.Copy.NUMBER) {
+                numberOfCopiesLabel
+                        .setText(MessageFormat.format(
+                                UiComponentStrings
+                                        .getString("BookMainJPanel.label.copiesnumber.text"), //$NON-NLS-1$
+                                modelChange.getNewValue()));
+            }
         }
 
     }

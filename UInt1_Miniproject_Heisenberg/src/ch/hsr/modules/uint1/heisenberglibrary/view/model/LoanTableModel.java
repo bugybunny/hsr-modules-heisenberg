@@ -1,3 +1,17 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
 import java.text.ChoiceFormat;
@@ -27,6 +41,12 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateFormatterUtil;
  * @author msyfrig
  */
 public class LoanTableModel extends AbstractTableModel implements Observer {
+
+
+
+
+
+
 
 
     private static final long         serialVersionUID               = 4449419618706874102L;
@@ -148,11 +168,6 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
         return ret;
     }
 
-    @Override
-    public void setValueAt(Object value, int aRowIndex, int aColumnIndex) {
-        // do nothing since not editable
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -205,7 +220,7 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
     }
 
     /**
-     * Updates the whole table if a value for a book has changed.
+     * Updates the whole table if a value for a loan or copy has changed.
      */
     @Override
     public void update(Observable anObservable, Object anArgument) {

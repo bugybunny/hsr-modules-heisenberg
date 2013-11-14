@@ -14,6 +14,27 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
-public enum ModelChangeType {
-    NUMBER_OF_BOOKS, NUMBER_OF_EXEMPLARS, NUMBER_OF_LOANS, COPY_REMOVED, COPY_ADDED, BOOK_ADDED;
+public class ObservableModelChangeEvent {
+    private ModelChangeType changeType;
+    private Object          oldValue;
+    private Object          newValue;
+
+    public ObservableModelChangeEvent(ModelChangeType aChangeType, Object anOldValue,
+            Object aNewValue) {
+        changeType = aChangeType;
+        oldValue = anOldValue;
+        newValue = aNewValue;
+    }
+
+    public ModelChangeType getChangeType() {
+        return changeType;
+    }
+
+    public Object getOldValue() {
+        return oldValue;
+    }
+
+    public Object getNewValue() {
+        return newValue;
+    }
 }

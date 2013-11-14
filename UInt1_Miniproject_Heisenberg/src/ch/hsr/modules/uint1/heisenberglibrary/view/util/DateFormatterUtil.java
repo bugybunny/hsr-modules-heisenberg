@@ -24,6 +24,7 @@ import java.util.GregorianCalendar;
  * 
  * @author msyfrig
  */
+// TODO umbenennen in DateUtil oder so
 public class DateFormatterUtil {
     private static DateFormat df = SimpleDateFormat.getDateInstance();
 

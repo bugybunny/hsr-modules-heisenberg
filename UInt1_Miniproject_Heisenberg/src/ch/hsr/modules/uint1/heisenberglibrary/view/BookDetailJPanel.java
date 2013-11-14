@@ -53,7 +53,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
-import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChange;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
@@ -417,7 +418,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
             displayedBookDO.set(titleTextfield.getText(),
                     authorTextfield.getText(), publisherTextfield.getText(),
                     displayedBookDO.getShelf());
-            // TODO getShelf anpassen sobald implementiert im GUI
             setDirty(false);
             return true;
         }
@@ -496,15 +496,21 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        if (anArgument instanceof ObservableModelChange) {
-            ObservableModelChange modelChange = (ObservableModelChange) anArgument;
-            if (modelChange.getChangeType() == ModelChangeType.COPY_REMOVED) {
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            ModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Copy.REMOVED
+                    || type == ModelChangeTypeEnums.Copy.ADDED) {
                 ((BookExemplarModel) bookExemplarTable.getModel())
                         .fireTableDataChanged();
-
+            } else if (type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED
+                    || type == ModelChangeTypeEnums.Book.AUTHOR
+                    || type == ModelChangeTypeEnums.Book.PUBLISHER
+                    || type == ModelChangeTypeEnums.Book.SHELF
+                    || type == ModelChangeTypeEnums.Book.TITLE) {
+                // just update everything, no need for premature optimization
+                updateDisplay();
             }
-        } else if (anArgument instanceof BookDO) {
-            updateDisplay();
         }
     }
 
@@ -527,6 +533,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
             authorTextfield.setEnabled(true);
             publisherTextfield.setText(displayedBookDO.getPublisher());
             publisherTextfield.setEnabled(true);
+            comboShelf.setSelectedItem(displayedBookDO.getShelf());
+            comboShelf.setEnabled(true);
         }
     }
 

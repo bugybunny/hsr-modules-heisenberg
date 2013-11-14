@@ -21,7 +21,8 @@ import java.util.Observable;
  * 
  * @author msyfrig
  */
-public abstract class AbstractObservable extends Observable {
+public abstract class AbstractObservable extends Observable implements
+        Cloneable {
 
     /**
      * Creates a new instance of this class.
@@ -40,15 +41,7 @@ public abstract class AbstractObservable extends Observable {
      * @see AbstractObservable#doNotify()
      */
     public void set() {
-        doNotify();
-    }
-
-    /**
-     * Sets the state to changed and notifies all registered observers.
-     */
-    protected void doNotify() {
-        setChanged();
-        notifyObservers();
+        // TODO allenfalls entfernen
     }
 
     /**

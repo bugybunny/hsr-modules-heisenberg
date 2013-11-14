@@ -58,8 +58,15 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListene
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
 
+/**
+ * 
+ * @author msyfrig
+ */
 public class LoanMainJPanel extends JPanel implements Observer {
     private static final long                         serialVersionUID = 8186612854405487707L;
 
@@ -91,9 +98,9 @@ public class LoanMainJPanel extends JPanel implements Observer {
     public LoanMainJPanel(Library library) {
         activeLoanList = library.getActiveLoans();
         bookMasterlibrary = library;
-
         initComponents();
         initHandlers();
+        library.addObserver(this);
     }
 
     private void initComponents() {
@@ -300,11 +307,34 @@ public class LoanMainJPanel extends JPanel implements Observer {
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        if (anObservable instanceof Library) {
-            System.out.println("number of books" + anArgument); //$NON-NLS-1$
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            ModelChangeType type = modelChange.getChangeType();
+
+            if (type == ModelChangeTypeEnums.Loan.NUMBER) {
+                numberOfLoansLabel
+                        .setText(MessageFormat.format(
+                                UiComponentStrings
+                                        .getString("LoanMainJPanel.label.loannumber.text"), //$NON-NLS-1$
+                                modelChange.getNewValue()));
+            } else if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
+                numberOfCurrentyLoanedCopiesLabel
+                        .setText(MessageFormat.format(
+                                UiComponentStrings
+                                        .getString("LoanMainJPanel.label.currentlyloaned.text"), //$NON-NLS-1$
+                                modelChange.getNewValue()));
+            } else if (type == ModelChangeTypeEnums.Loan.ADDED
+                    || type == ModelChangeTypeEnums.Loan.REMOVED) {
+                ((AbstractTableModel) loanTable.getModel())
+                        .fireTableDataChanged();
+            }
+            // TODO event für overdue loan Anzahl Verniedrigung, sobald ein eine
+            // overdue Ausleihe zurückgegeben wurde
+            // TODO events für remove und update und added von loans mit
+            // aktualisierung in tablemodel. achtung: getactiveloans und so muss
+            // wahrscheinlich neu aufgerufen und alle observer neu hinzugefügt
+            // werden
         }
-        ((AbstractTableModel) loanTable.getModel()).fireTableDataChanged();
-        // numberOfBooks =
     }
 
     /**
