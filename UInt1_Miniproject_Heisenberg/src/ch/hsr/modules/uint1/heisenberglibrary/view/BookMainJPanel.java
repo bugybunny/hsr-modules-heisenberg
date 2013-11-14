@@ -19,10 +19,11 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -30,26 +31,28 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 
+import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -63,31 +66,32 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
  * @author msyfrig
  */
 public class BookMainJPanel extends JPanel implements Observer {
-    private static final long              serialVersionUID = 8186612854405487707L;
+    private static final long                           serialVersionUID = 8186612854405487707L;
 
     /**
      * The table that displays all different booktypes in the library, not the
      * actual copies.
      */
-    private JTable                         bookTable;
-    private TableRowSorter<BookTableModel> tableSorter;
-    private JPanel                         centerPanel;
-    private JButton                        viewSelectedButton;
-    private JButton                        addBookButton;
-    private JPanel                         inventoryStatisticsPanel;
-    private JPanel                         inventoryPanel;
-    private JLabel                         numberOfBooksLabel;
-    private JLabel                         numberOfCopiesLabel;
-    private GhostHintJTextField            searchTextField;
-    private JCheckBox                      onlyAvailableCheckbox;
-    private Component                      horizontalStrut;
-    private JPanel                         panel;
-    private JPanel                         bookInventoryPanel;
-    private JPanel                         outerStatisticsPanel;
-    private BookDetailJDialog              bookDetailDialog;
+    private JTable                                      bookTable;
+    private TableFilter<BookTableModel>                 tableFilter;
+    private OnlyAvailableFilter<BookTableModel, Object> onlyAvailableFilter;
+    private JPanel                                      centerPanel;
+    private JButton                                     viewSelectedButton;
+    private JButton                                     addBookButton;
+    private JPanel                                      inventoryStatisticsPanel;
+    private JPanel                                      inventoryPanel;
+    private JLabel                                      numberOfBooksLabel;
+    private JLabel                                      numberOfCopiesLabel;
+    private GhostHintJTextField                         searchTextField;
+    private JCheckBox                                   onlyAvailableCheckbox;
+    private Component                                   horizontalStrut;
+    private JPanel                                      panel;
+    private JPanel                                      bookInventoryPanel;
+    private JPanel                                      outerStatisticsPanel;
+    private BookDetailJDialog                           bookDetailDialog;
 
-    private List<BookDO>                   bookList;
-    private Library                        bookMasterlibrary;
+    private List<BookDO>                                bookList;
+    private Library                                     bookMasterlibrary;
 
     public BookMainJPanel(Library library) {
         bookList = library.getBooks();
@@ -183,10 +187,8 @@ public class BookMainJPanel extends JPanel implements Observer {
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         bookTable = new JTable();
-        bookTable.setRowSorter(tableSorter);
         bookTable.setModel(new BookTableModel(bookList));
-        tableSorter = new TableRowSorter<>(
-                (BookTableModel) bookTable.getModel());
+        tableFilter = new TableFilter<>(bookTable, searchTextField);
         bookTable.getTableHeader().setReorderingAllowed(false);
         bookTable.setAutoCreateRowSorter(true);
         bookTable.setCellSelectionEnabled(true);
@@ -207,6 +209,22 @@ public class BookMainJPanel extends JPanel implements Observer {
         bookTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
+        // ctrl+f: switch focus to searchfield for table
+        Action searchAction = new AbstractAction("search") { //$NON-NLS-1$
+            private static final long serialVersionUID = -6626318103198277780L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                searchTextField.requestFocus();
+            }
+        };
+
+        KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+                InputEvent.CTRL_DOWN_MASK);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ctrlF,
+                searchAction.getValue(Action.NAME));
+        getActionMap().put(searchAction.getValue(Action.NAME), searchAction);
+
         ((BookTableModel) bookTable.getModel())
                 .addTableModelChangeListener(new TableModelChangeListener() {
                     private Collection<BookDO> previouslySelectedBooks;
@@ -222,15 +240,20 @@ public class BookMainJPanel extends JPanel implements Observer {
                     }
                 });
 
-        searchTextField.getDocument().addDocumentListener(
-                new SearchFieldDocumentListener(searchTextField));
+        onlyAvailableFilter = new OnlyAvailableFilter<>();
         onlyAvailableCheckbox.addItemListener(new ItemListener() {
 
             @Override
-            public void itemStateChanged(ItemEvent anItemChangeEvent) {
-                filterTable(searchTextField.getText());
+            public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
+                if (anItemStateChangedEvent.getStateChange() == ItemEvent.SELECTED) {
+                    tableFilter.addFilter(onlyAvailableFilter);
+                } else {
+                    tableFilter.removeFilter(onlyAvailableFilter);
+                }
+                tableFilter.filterTable();
             }
         });
+        ColumnsAutoSizer.sizeColumnsToFit(bookTable, 5);
     }
 
     /**
@@ -271,38 +294,6 @@ public class BookMainJPanel extends JPanel implements Observer {
         }
     }
 
-    /**
-     * Filters the booktable based on some rules. The search field
-     */
-    private void filterTable(final String aSearchText) {
-        List<RowFilter<BookTableModel, Object>> combiningRowFilterList = new ArrayList<>(
-                2);
-        combiningRowFilterList
-                .add(new TextBookTableFilter<BookTableModel, Object>(
-                        aSearchText));
-        if (onlyAvailableCheckbox.isSelected()) {
-            RowFilter<BookTableModel, Object> onlyAvailableFilter = new RowFilter<BookTableModel, Object>() {
-                @Override
-                public boolean include(
-                        javax.swing.RowFilter.Entry<? extends BookTableModel, ? extends Object> anEntry) {
-                    int copiesAvailable = ((Integer) anEntry
-                            .getModel()
-                            .getValueAt(
-                                    ((Integer) anEntry.getIdentifier())
-                                            .intValue(),
-                                    0)).intValue();
-                    return copiesAvailable > 0;
-                }
-            };
-            // TODO folgendes verwenden, habe aber noch Probleme mit Generics
-            // combiningRowFilterList.add(RowFilter.numberFilter(
-            // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0));
-            combiningRowFilterList.add(onlyAvailableFilter);
-        }
-        tableSorter.setRowFilter(RowFilter.andFilter(combiningRowFilterList));
-        bookTable.setRowSorter(tableSorter);
-    }
-
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
@@ -326,7 +317,6 @@ public class BookMainJPanel extends JPanel implements Observer {
                                 modelChange.getNewValue()));
             }
         }
-
     }
 
     /**
@@ -399,30 +389,18 @@ public class BookMainJPanel extends JPanel implements Observer {
         }
     }
 
-    private class SearchFieldDocumentListener implements DocumentListener {
-        private GhostHintJTextField searchField;
-
-        public SearchFieldDocumentListener(GhostHintJTextField aSearchField) {
-            searchField = aSearchField;
-        }
-
-        private void filter() {
-            filterTable(searchField.getText());
-        }
-
+    // TODO folgendes verwenden, habe aber noch Probleme mit Generics
+    // combiningRowFilterList.add(RowFilter.numberFilter(
+    // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0));
+    private class OnlyAvailableFilter<M extends BookTableModel, I extends Object>
+            extends RowFilter<M, I> {
         @Override
-        public void insertUpdate(DocumentEvent anInsertUpdateEvent) {
-            filter();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent aRemoveUpdateEvent) {
-            filter();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent aChangedUpdateEvent) {
-            filter();
+        public boolean include(
+                javax.swing.RowFilter.Entry<? extends M, ? extends I> anEntry) {
+            int copiesAvailable = ((Integer) anEntry.getModel().getValueAt(
+                    ((Integer) anEntry.getIdentifier()).intValue(), 0))
+                    .intValue();
+            return copiesAvailable > 0;
         }
     }
 }

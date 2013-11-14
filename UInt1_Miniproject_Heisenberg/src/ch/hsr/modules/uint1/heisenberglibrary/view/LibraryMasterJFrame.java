@@ -31,7 +31,7 @@ public class LibraryMasterJFrame extends JFrame {
     private JPanel            contentPanel;
     private JTabbedPane       tabbedPane;
     private JPanel            booksPanel;
-    private JPanel            lendingPanel;
+    private JPanel            loanPanel;
 
     private Library           bookMasterlibrary;
 
@@ -68,10 +68,10 @@ public class LibraryMasterJFrame extends JFrame {
                 .addTab(UiComponentStrings
                         .getString("LibraryMasterJFrame.tab.books.text"), null, booksPanel, null); //$NON-NLS-1$
         booksPanel.setLayout(new BoxLayout(booksPanel, BoxLayout.Y_AXIS));
-        lendingPanel = new LoanMainJPanel(bookMasterlibrary);
+        loanPanel = new LoanMainJPanel(bookMasterlibrary);
         tabbedPane
                 .addTab(UiComponentStrings
-                        .getString("LibraryMasterJFrame.tab.lending.text"), null, lendingPanel, null); //$NON-NLS-1$
+                        .getString("LibraryMasterJFrame.tab.lending.text"), null, loanPanel, null); //$NON-NLS-1$
     }
 
     private void initHandlers() {
