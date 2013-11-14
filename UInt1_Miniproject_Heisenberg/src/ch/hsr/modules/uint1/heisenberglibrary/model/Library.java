@@ -90,7 +90,7 @@ public class Library extends AbstractObservableDO {
     public Loan getActiveLoanForCopy(Copy aCopy) {
         List<Loan> allLoansForBook = getLentCopiesOfBook(aCopy.getTitle());
         for (Loan tempLoan : allLoansForBook) {
-            if (tempLoan.equals(aCopy)) {
+            if (tempLoan.getCopy().equals(aCopy)) {
                 return tempLoan;
             }
         }
