@@ -30,7 +30,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListene
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
-import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateFormatterUtil;
+import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
 
 /**
  * Lists all books in a JTable with columns: Status, Exemplar-ID, Title, Lent
@@ -149,10 +149,10 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
                 ret = currentLoan.getCopy().getTitle().getTitle();
                 break;
             case 3:
-                long daysFromTodayToDueDate = DateFormatterUtil.daysDiff(
+                long daysFromTodayToDueDate = DateUtil.daysDiff(
                         new Date(), currentLoan.getDueDate().getTime());
                 Object[] messageArguments = {
-                        DateFormatterUtil.getFormattedDate(currentLoan
+                        DateUtil.getFormattedDate(currentLoan
                                 .getDueDate()),
                         Long.valueOf(daysFromTodayToDueDate),
                         Long.valueOf(Math.abs(daysFromTodayToDueDate)) };
