@@ -46,13 +46,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChange;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
 
@@ -100,8 +101,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * 
      * @param aBookDo
      */
-    public BookDetailJPanel(BookDO aBookDo, Library library) {
-        detailLibrary = library;
+    public BookDetailJPanel(BookDO aBookDo, Library aLibrary) {
+        detailLibrary = aLibrary;
+        detailLibrary.addObserver(this);
         initEverything(aBookDo);
     }
 
@@ -141,7 +143,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         setBookDO(aBookDo);
         bookExemplarTable.setModel(new BookExemplarModel(displayedBookDO,
                 detailLibrary));
-
         initHandlers();
     }
 
@@ -495,7 +496,16 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        updateDisplay();
+        if (anArgument instanceof ObservableModelChange) {
+            ObservableModelChange modelChange = (ObservableModelChange) anArgument;
+            if (modelChange.getChangeType() == ModelChangeType.COPY_REMOVED) {
+                ((BookExemplarModel) bookExemplarTable.getModel())
+                        .fireTableDataChanged();
+
+            }
+        } else if (anArgument instanceof BookDO) {
+            updateDisplay();
+        }
     }
 
     private void updateDisplay() {
@@ -586,9 +596,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
                         .convertRowIndexToModel(tempCopy));
                 detailLibrary.removeCopy(selectedCopy);
             }
-            System.out.println("blubb");
-            ((AbstractTableModel) bookExemplarTable.getModel())
-                    .fireTableDataChanged();
         }
     }
 
