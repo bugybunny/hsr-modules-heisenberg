@@ -48,6 +48,11 @@ public class Library extends AbstractObservableDO {
         return c;
     }
 
+    public void removeCopy(BookDO title) {
+        copies.remove(new Copy(title));
+        doNotify(Integer.valueOf(getCopies().size()));
+    }
+
     public BookDO findByBookTitle(String title) {
         for (BookDO b : bookDOs) {
             if (b.getTitle().equals(title)) {

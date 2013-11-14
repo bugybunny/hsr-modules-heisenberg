@@ -49,6 +49,7 @@ import javax.swing.event.DocumentListener;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookExemplarModel;
@@ -571,12 +572,23 @@ public class BookDetailJPanel extends JPanel implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // TODO: temp temp
             System.out.println("remove selected pressed");
             /*
-             * detailLibrary.getCopiesOfBook(displayedBookDO).remove(
-             * bookExemplarTable.getSelectedRow());
+             * for (int tempBook : bookTable.getSelectedRows()) { BookDO
+             * selectedBook = bookList.get(bookTable
+             * .convertRowIndexToModel(tempBook));
+             * bookDetailDialog.openBookTab(selectedBook, bookMasterlibrary); }
              */
+            int[] selectedCopies = bookExemplarTable.getSelectedRows();
+
+            for (int i = 0; i < selectedCopies.length; i++) {
+                Copy selectedCopy = detailLibrary.getCopiesOfBook(
+                        displayedBookDO).get(
+                        bookExemplarTable
+                                .convertRowIndexToModel(selectedCopies[i]));
+                detailLibrary.removeCopy(selectedCopy.getTitle());
+            }
+
         }
     }
 
@@ -586,9 +598,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // TODO: temp
-            // detailLibrary.getCopiesOfBook(displayedBookDO).add("blub");
-            // System.out.println("add new exemplar pressed");
+            detailLibrary.createAndAddCopy(displayedBookDO);
         }
     }
 }
