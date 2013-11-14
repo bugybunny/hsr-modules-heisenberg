@@ -14,7 +14,6 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view.util;
 
-import java.text.ChoiceFormat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,8 +25,7 @@ import java.util.GregorianCalendar;
  * @author msyfrig
  */
 public class DateFormatterUtil {
-    private static DateFormat df   = SimpleDateFormat.getDateInstance();
-    private static double[]   days = { 0, 1, ChoiceFormat.nextDouble(1) };
+    private static DateFormat df = SimpleDateFormat.getDateInstance();
 
     public static String getFormattedDate(GregorianCalendar aDate) {
         if (aDate != null) {
@@ -36,11 +34,33 @@ public class DateFormatterUtil {
         return "00.00.00";
     }
 
+    /**
+     * Calculates the difference between two dates in days. Can be negative if
+     * {@code from > to}.
+     * 
+     * @param from
+     *            first date
+     * @param to
+     *            secend date
+     * @return difference between the two given dates, more formally
+     *         {@code to - from} in days, can be negative
+     */
     public static long daysDiff(Date from, Date to) {
         return daysDiff(from.getTime(), to.getTime());
     }
 
+    /**
+     * Calculates the difference between two dates in days. Can be negative if
+     * {@code from > to}.
+     * 
+     * @param from
+     *            first date in milliseconds
+     * @param to
+     *            secend date in milliseconds
+     * @return difference between the two given dates, more formally
+     *         {@code to - from} in days, can be negative
+     */
     public static long daysDiff(long from, long to) {
-        return Math.round((to - from) / 86400000D);
+        return Math.round((to - from) / 86400000d);
     }
 }

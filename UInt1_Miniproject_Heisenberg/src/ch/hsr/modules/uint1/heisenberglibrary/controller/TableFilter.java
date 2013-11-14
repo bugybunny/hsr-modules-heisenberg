@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
@@ -29,17 +30,57 @@ import javax.swing.table.TableRowSorter;
 import ch.hsr.modules.uint1.heisenberglibrary.view.GhostHintJTextField;
 import ch.hsr.modules.uint1.heisenberglibrary.view.TextBookTableFilter;
 
+//@formatter:off
 /**
- * TODO COMMENT ME!
+ * Class to help filtering a table. A table needs to have an associated
+ * {@link GhostHintJTextField} as it's search field.
  * 
+ * <br>The input made in this textfield is handled automatically by this class
+ * and additional filters can be added and removed via
+ * {@link #addFilter(RowFilter)} and {@link #removeFilter(RowFilter)} when
+ * events happen outside of the table that should trigger the filter.
+ * 
+ * <br>To add additonal filters when for example a {@link JCheckBox} should be
+ * considerer when filtering and should trigger the filter, add or remove the
+ * filter when the checkbox is selected or deselected and <b>call
+ * {@link #filterTable()} after adding or removing the filter</b>. Make sure to
+ * use the same generics as in this instance.
+ * 
+ * For example
+ * <blockquote>
+ * <pre>
+ * checkbox.addItemListener(new ItemListener() {
+ *     public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
+ *         if (anItemStateChangedEvent.getStateChange() == ItemEvent.SELECTED) {
+ *             tableFilter.addFilter(filter);
+ *         } else {
+ *             tableFilter.removeFilter(filter);
+ *         }
+ *         tableFilter.filterTable();
+ *     }
+ * });
+ * </pre>
+ *</blockquote>
+ *
  * @author msyfrig
  */
+//@formatter:on
 public class TableFilter<M extends TableModel> {
     private JTable                    table;
     private GhostHintJTextField       searchField;
-    private Set<RowFilter<M, Object>> filters;
+    /**
+     * Additional filters to the text contains filter that are combined with
+     * {@link #combiningFilterType} when {@link #filterTable()} is called.
+     */
+    private Set<RowFilter<M, Object>> additionalFilters;
     private FilterType                combiningFilterType;
 
+    /**
+     * 
+     * 
+     * @param aTable
+     * @param aSearchField
+     */
     public TableFilter(JTable aTable, GhostHintJTextField aSearchField) {
         this(aTable, aSearchField, FilterType.AND);
     }
@@ -51,7 +92,7 @@ public class TableFilter<M extends TableModel> {
         }
         table = aTable;
         searchField = aSearchField;
-        filters = new HashSet<>();
+        additionalFilters = new HashSet<>();
         combiningFilterType = aCombiningFilterType;
         searchField.getDocument().addDocumentListener(
                 new SearchFieldDocumentListener());
@@ -59,10 +100,10 @@ public class TableFilter<M extends TableModel> {
 
     public void filterTable() {
         List<RowFilter<M, Object>> combiningRowFilterList = new ArrayList<>(
-                filters.size());
+                additionalFilters.size() + 1);
         combiningRowFilterList.add(new TextBookTableFilter<M, Object>(
                 searchField.getText()));
-        combiningRowFilterList.addAll(filters);
+        combiningRowFilterList.addAll(additionalFilters);
         @SuppressWarnings("unchecked")
         TableRowSorter<M> tableSorter = new TableRowSorter<>(
                 (M) table.getModel());
@@ -84,28 +125,27 @@ public class TableFilter<M extends TableModel> {
     }
 
     public boolean addFilter(RowFilter<M, Object> aFilterToAdd) {
-        return filters.add(aFilterToAdd);
+        return additionalFilters.add(aFilterToAdd);
     }
 
     public boolean removeFilter(RowFilter<M, Object> aFilterToRemove) {
-        return filters.remove(aFilterToRemove);
+        return additionalFilters.remove(aFilterToRemove);
     }
 
     /**
-     * @return the combiningFilterType
-     */
-    public FilterType getCombiningFilterType() {
-        return combiningFilterType;
-    }
-
-    /**
-     * @param aCombiningFilterType
-     *            the combiningFilterType to set
+     * Change how the filters should be combined in {@link #filterTable()}.
+     * {@link #filterTable()} needs to be called seperately after this if
+     * needed.
      */
     public void setCombiningFilterType(FilterType aCombiningFilterType) {
         combiningFilterType = aCombiningFilterType;
     }
 
+    public FilterType getCombiningFilterType() {
+        return combiningFilterType;
+    }
+
+    /** Possible values how all the filters should be combined. */
     enum FilterType {
         AND, OR;
     }
