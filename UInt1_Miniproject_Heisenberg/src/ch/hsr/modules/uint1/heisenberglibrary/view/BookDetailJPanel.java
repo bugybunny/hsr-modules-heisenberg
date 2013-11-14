@@ -46,6 +46,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
@@ -585,6 +586,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
                         .convertRowIndexToModel(tempCopy));
                 detailLibrary.removeCopy(selectedCopy);
             }
+            System.out.println("blubb");
+            ((AbstractTableModel) bookExemplarTable.getModel())
+                    .fireTableDataChanged();
         }
     }
 

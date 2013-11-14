@@ -132,4 +132,15 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         return columnNames.get(aColumnIndex);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.AbstractTableModel#fireTableDataChanged()
+     */
+    @Override
+    public void fireTableDataChanged() {
+        // TODO Auto-generated method stub
+        super.fireTableDataChanged();
+    }
+
 }
