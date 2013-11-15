@@ -19,8 +19,10 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,14 +31,18 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
@@ -169,8 +175,6 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
                 .getString("BookMainJPanel.button.addbook.disabled.tooltip"); //$NON-NLS-1$
         addBookButton = new ToolTipJButton(addBookButtonText,
                 addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
-        addBookButton = new ToolTipJButton(addBookButtonText,
-                addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
         inventoryPanel.add(addBookButton);
 
         String viewSelectedButtonText = UiComponentStrings
@@ -214,7 +218,19 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
 
     private void initHandlers() {
         viewSelectedButton.addActionListener(new ViewSelectedButtonListener());
-        addBookButton.addActionListener(new AddBookButtonListener());
+        AddBookAction addBookAction = new AddBookAction(addBookButton.getText());
+        addBookButton.setAction(addBookAction);
+        // needs to be set after setAction, setAction seems to reset the set
+        // mnemonic
+        // TODO googlen wieso zur Hölle das so ist
+        addBookButton.setMnemonic('n');
+
+        // ctrl+n: add book for Mac OS x users since they don't have mnemonics
+        KeyStroke ctrlN = KeyStroke.getKeyStroke(KeyEvent.VK_N,
+                InputEvent.CTRL_DOWN_MASK);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ctrlN,
+                addBookAction.getValue(Action.NAME));
+        getActionMap().put(addBookAction.getValue(Action.NAME), addBookAction);
 
         bookTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
@@ -348,14 +364,18 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
         }
     }
 
-    private class AddBookButtonListener implements ActionListener {
+    private class AddBookAction extends AbstractAction {
+        private static final long serialVersionUID = -8717212722696829048L;
+
+        private AddBookAction(String anActionName) {
+            super(anActionName);
+        }
+
         /**
          * Opens an empty detail view with the ability to save a new book.
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // TODO Opens a new window, should open a new tab instead
-
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (bookDetailDialog == null) {
@@ -365,7 +385,6 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
             bookDetailDialog.toFront();
 
             bookDetailDialog.openBookTab(null, bookMasterlibrary);
-
         }
     }
 

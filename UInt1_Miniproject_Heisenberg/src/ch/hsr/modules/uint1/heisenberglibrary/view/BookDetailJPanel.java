@@ -428,7 +428,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      *            : action that should be fired when keystroke has been pressed
      * 
      */
-    void setAncestorActions(Map<KeyStroke, Action> someActions) {
+    void addAncestorActions(Map<KeyStroke, Action> someActions) {
         for (Map.Entry<KeyStroke, Action> tempAction : someActions.entrySet()) {
             Object actionName = tempAction.getValue().getValue(Action.NAME);
             getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(

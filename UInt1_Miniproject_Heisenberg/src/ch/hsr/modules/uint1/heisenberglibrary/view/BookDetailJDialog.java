@@ -130,6 +130,8 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
             } else {
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
                         "Entering a new book");
+                // focus the newly created tab
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
             }
             Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
             actionMapForBookTab.put(
@@ -138,8 +140,9 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
             actionMapForBookTab.put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                     new SaveAction("save", detailBookPanel)); //$NON-NLS-1$
-            detailBookPanel.setAncestorActions(actionMapForBookTab);
-            // add asteriks in tabtitle if tab has unsaved changes
+            detailBookPanel.addAncestorActions(actionMapForBookTab);
+            // add asteriks in tabtitle if tab has unsaved changes and listen
+            // for added books to set the title
             detailBookPanel
                     .addModelStateChangeListener(new BookDetailModelChangeListener(
                             detailBookPanel));
