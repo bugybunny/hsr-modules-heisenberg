@@ -451,6 +451,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
                     authorTextfield.getText(), publisherTextfield.getText(),
                     (Shelf) comboShelf.getSelectedItem());
             setBook(createdBook);
+            ModelStateChangeEvent newState = new ModelStateChangeEvent(this,
+                    ModelStateChangeEvent.NEW_ENTRY_ADDED);
+            notifyListenersAboutModelChange(newState);
             addBookButton.setEnabled(false);
         }
 
@@ -484,12 +487,14 @@ public class BookDetailJPanel extends JPanel implements Observer {
                         ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY);
             }
         }
-
+        notifyListenersAboutModelChange(newState);
         dirty = isDirty;
+    }
 
+    private void notifyListenersAboutModelChange(ModelStateChangeEvent aNewState) {
         for (ModelStateChangeListener tempListener : listenerList
                 .getListeners(ModelStateChangeListener.class)) {
-            tempListener.stateChanged(newState);
+            tempListener.stateChanged(aNewState);
         }
     }
 

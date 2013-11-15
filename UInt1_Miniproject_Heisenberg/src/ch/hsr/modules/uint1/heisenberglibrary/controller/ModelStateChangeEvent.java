@@ -32,6 +32,8 @@ public class ModelStateChangeEvent extends ChangeEvent {
     public static final byte  MODEL_UPDATE_FROM_OTHER_SOURCE = 4;
     /** Model changed from dirty to saved. */
     public static final byte  MODEL_CHANGED_TO_SAVED         = 8;
+    /** A new entry has been added/saved to this model. */
+    public static final byte  NEW_ENTRY_ADDED                = 16;
 
     /** The state of the model when this event has been created. */
     private byte              state;

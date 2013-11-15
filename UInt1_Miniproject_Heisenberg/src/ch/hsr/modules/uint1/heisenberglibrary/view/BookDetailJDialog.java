@@ -281,8 +281,15 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
                             tabbedPane.setTitleAt(tabIndex, "*" + oldTitle);
                             break;
                         case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
+                            if (oldTitle.charAt(0) == '*') {
+                                tabbedPane.setTitleAt(tabIndex,
+                                        oldTitle.substring(1));
+                            }
+                            break;
+                        case ModelStateChangeEvent.NEW_ENTRY_ADDED:
                             tabbedPane.setTitleAt(tabIndex,
-                                    oldTitle.substring(1));
+                                    getTabTitleForBook(associatedDetailView
+                                            .getDisplayedBookDO()));
                             break;
                         default:
                             break;
