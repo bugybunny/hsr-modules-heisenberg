@@ -107,6 +107,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
     private AddCopyAction     addCopyAction;
     private RemoveCopyAction  removeCopyAction;
+    private SaveBookAction    saveBookAction;
 
     /**
      * Creates a new instance of this class and sets the models.
@@ -138,7 +139,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
             } else {
                 addCopyAction.setEnabled(false);
             }
-
+            bookCopyTable.setModel(new BookCopyModel(displayedBook, library));
             updateDisplay();
         }
     }
@@ -275,8 +276,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 .getString("BookDetailJPanel.button.addbook.disabled.tooltip"); //$NON-NLS-1$
         addBookButton = new ToolTipJButton(addBookButtonText,
                 addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
-        addBookButton.addActionListener(new SaveBookButtonListener());
-        addBookButton.setEnabled(false);
 
         GridBagConstraints gbcBtnAddABook = new GridBagConstraints();
         gbcBtnAddABook.anchor = GridBagConstraints.EAST;
@@ -368,6 +367,10 @@ public class BookDetailJPanel extends JPanel implements Observer {
         removeSelectedCopiesButton.setAction(removeCopyAction);
         removeCopyAction.setEnabled(false);
 
+        saveBookAction = new SaveBookAction(addBookButton.getText());
+        addBookButton.setAction(saveBookAction);
+        saveBookAction.setEnabled(false);
+
         bookCopyTable.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
                     @Override
@@ -389,9 +392,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
             @Override
             public void stateChanged(ModelStateChangeEvent aModelStateChange) {
                 if (isDirty()) {
-                    addBookButton.setEnabled(true);
+                    saveBookAction.setEnabled(true);
                 } else {
-                    addBookButton.setEnabled(false);
+                    saveBookAction.setEnabled(false);
                 }
             }
         });
@@ -648,7 +651,13 @@ public class BookDetailJPanel extends JPanel implements Observer {
         }
     }
 
-    private class SaveBookButtonListener implements ActionListener {
+    private class SaveBookAction extends AbstractAction {
+        private static final long serialVersionUID = -2974999148987189986L;
+
+        private SaveBookAction(String anActionName) {
+            super(anActionName);
+        }
+
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
             save();

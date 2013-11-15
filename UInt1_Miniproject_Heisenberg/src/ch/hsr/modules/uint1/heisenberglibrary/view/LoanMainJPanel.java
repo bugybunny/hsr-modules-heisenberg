@@ -19,7 +19,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.MessageFormat;
@@ -30,6 +29,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -83,6 +83,9 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
     private JPanel                                    loanInventoryPanel;
     private JPanel                                    outerStatisticsPanel;
     private BookDetailJDialog                         loanDetailDialog;
+
+    private ViewSelectedLoansAction                   viewSelectedLoansAction;
+    private AddLoanAction                             addLoanAction;
 
     private List<Loan>                                activeLoanList;
     private Library                                   bookMasterlibrary;
@@ -199,8 +202,6 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         viewSelectedButton
                 .setToolTipText(UiComponentStrings
                         .getString("LoanMainJPanel.button.viewselected.disabled.tooltip")); //$NON-NLS-1$
-        viewSelectedButton.setEnabled(false);
-        viewSelectedButton.setMnemonic('v');
 
         centerPanel = new JPanel();
         loanInventoryPanel.add(centerPanel, BorderLayout.CENTER);
@@ -223,8 +224,14 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
     }
 
     private void initHandlers() {
-        viewSelectedButton.addActionListener(new ViewSelectedButtonListener());
-        addLoanButton.addActionListener(new AddBookButtonListener());
+        viewSelectedLoansAction = new ViewSelectedLoansAction(
+                viewSelectedButton.getText());
+        viewSelectedLoansAction.setEnabled(false);
+        viewSelectedButton.setAction(viewSelectedLoansAction);
+        viewSelectedButton.setMnemonic('v');
+
+        addLoanAction = new AddLoanAction(addLoanButton.getText());
+        addLoanButton.setAction(addLoanAction);
 
         loanTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
@@ -339,7 +346,11 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
      * 
      * @author msyfrig
      */
-    private class ViewSelectedButtonListener implements ActionListener {
+    private class ViewSelectedLoansAction extends AbstractAction {
+        private ViewSelectedLoansAction(String anActionName) {
+            super(anActionName);
+        }
+
         /**
          * Opens all selected booksPanel and their detailview. If a dialog for a
          * detailview is already open and not on top of the z-order stack, it
@@ -365,14 +376,18 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         }
     }
 
-    private class AddBookButtonListener implements ActionListener {
+    private class AddLoanAction extends AbstractAction {
+        private static final long serialVersionUID = -1615608675302687626L;
+
+        private AddLoanAction(String anActionName) {
+            super(anActionName);
+        }
+
         /**
          * Opens an empty detail view with the ability to save a new book.
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // TODO Opens a new window, should open a new tab instead
-
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (loanDetailDialog == null) {
@@ -394,13 +409,9 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
             if (loanTable.getSelectedRows().length > 0) {
-                viewSelectedButton.setEnabled(true);
-                UiComponentStrings
-                        .getString("LoanMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
+                viewSelectedLoansAction.setEnabled(true);
             } else {
-                viewSelectedButton.setEnabled(false);
-                UiComponentStrings
-                        .getString("LoanMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
+                viewSelectedLoansAction.setEnabled(false);
             }
         }
     }
