@@ -21,6 +21,12 @@ import javax.swing.border.EmptyBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
+/**
+ * 
+ * @author msyfrig
+ */
+// TODO ctrl + f in librarymasterjframe, delegiert dann requestfocus an panel
+// weiter, welches momentan selektiert ist
 public class LibraryMasterJFrame extends JFrame {
     private static final long serialVersionUID = 8186612854405487707L;
 
@@ -71,7 +77,7 @@ public class LibraryMasterJFrame extends JFrame {
         loanPanel = new LoanMainJPanel(bookMasterlibrary);
         tabbedPane
                 .addTab(UiComponentStrings
-                        .getString("LibraryMasterJFrame.tab.lending.text"), null, loanPanel, null); //$NON-NLS-1$
+                        .getString("LibraryMasterJFrame.tab.loan.text"), null, loanPanel, null); //$NON-NLS-1$
     }
 
     private void initHandlers() {

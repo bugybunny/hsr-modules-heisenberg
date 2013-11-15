@@ -19,19 +19,17 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
  * 
  * @author twinter
  */
-public class BookExemplarModel extends AbstractTableModel implements Observer {
+public class BookCopyModel extends AbstractTableModel implements Observer {
     private static final long   serialVersionUID = -1293482132910701521L;
     private static List<String> columnNames      = new ArrayList<>(3);
 
     static {
         columnNames.add(UiComponentStrings
-                .getString("BookExemplarModel.exemplarTableColumn.id")); //$NON-NLS-1$
-        columnNames
-                .add(UiComponentStrings
-                        .getString("BookExemplarModel.exemplarTableColumn.availability")); //$NON-NLS-1$
-        columnNames
-                .add(UiComponentStrings
-                        .getString("BookExemplarModel.exemplarTableColumn.borrowedUntil")); //$NON-NLS-1$
+                .getString("BookCopyModel.copyTableColumn.id")); //$NON-NLS-1$
+        columnNames.add(UiComponentStrings
+                .getString("BookCopyModel.copyTableColumn.availability")); //$NON-NLS-1$
+        columnNames.add(UiComponentStrings
+                .getString("BookCopyModel.copyTableColumn.borrowedUntil")); //$NON-NLS-1$
     }
 
     private List<Copy>          copyList;
@@ -44,7 +42,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
      * @param aDisplayedBookDO
      *            the specific book from the DetailPanel
      */
-    public BookExemplarModel(BookDO aDisplayedBookDO, Library aLibrary) {
+    public BookCopyModel(BookDO aDisplayedBookDO, Library aLibrary) {
         library = aLibrary;
         specificBook = aDisplayedBookDO;
         copyList = library.getCopiesOfBook(aDisplayedBookDO);
@@ -70,7 +68,7 @@ public class BookExemplarModel extends AbstractTableModel implements Observer {
         }
 
         Object borrowedUntil = UiComponentStrings
-                .getString("BookExemplarModel.copy.date.isAvailable");
+                .getString("BookCopyModel.copy.date.isAvailable");
 
         Loan tempLoan = library.getActiveLoanForCopy(copyOfSpecificBook);
         if (tempLoan != null) {

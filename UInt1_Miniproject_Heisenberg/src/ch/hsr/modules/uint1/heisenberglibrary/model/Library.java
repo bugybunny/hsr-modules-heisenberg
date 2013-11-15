@@ -54,8 +54,8 @@ public class Library extends AbstractObservable {
     public BookDO createAndAddBook(String name) {
         BookDO b = new BookDO(name);
         books.add(b);
-        doNotify(new ObservableModelChangeEvent(ModelChangeTypeEnums.Book.ADDED,
-                null, b));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Book.ADDED, null, b));
         doNotify(new ObservableModelChangeEvent(
                 ModelChangeTypeEnums.Book.NUMBER,
                 Integer.valueOf(books.size() - 1),
@@ -68,8 +68,8 @@ public class Library extends AbstractObservable {
         Copy c = new Copy(title);
         copies.add(c);
 
-        doNotify(new ObservableModelChangeEvent(ModelChangeTypeEnums.Copy.ADDED,
-                null, c));
+        doNotify(new ObservableModelChangeEvent(
+                ModelChangeTypeEnums.Copy.ADDED, null, c));
         doNotify(new ObservableModelChangeEvent(
                 ModelChangeTypeEnums.Copy.NUMBER,
                 Integer.valueOf(copies.size() - 1), Integer.valueOf(copies
@@ -162,6 +162,17 @@ public class Library extends AbstractObservable {
 
     public List<Copy> getAvailableCopies() {
         return getCopies(false);
+    }
+
+    public List<Copy> getAvailableCopiesForBook(BookDO aBook) {
+        List<Copy> res = new ArrayList<>();
+        for (Copy c : copies) {
+            if (c.getTitle().equals(aBook) && !isCopyLent(c)) {
+                res.add(c);
+            }
+        }
+
+        return res;
     }
 
     public List<Copy> getLentOutBooks() {

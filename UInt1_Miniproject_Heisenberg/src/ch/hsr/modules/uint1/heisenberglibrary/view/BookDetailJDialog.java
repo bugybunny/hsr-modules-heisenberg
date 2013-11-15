@@ -42,6 +42,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
  * 
  * @author msyfrig
  */
+// TODO update booktitle if changed or new book added
 public class BookDetailJDialog extends AbstractDefaultJDialog {
     private static final long      serialVersionUID = 439819991326389792L;
     /** The tabbed pane that holds all detailviews as tabs for all books. */

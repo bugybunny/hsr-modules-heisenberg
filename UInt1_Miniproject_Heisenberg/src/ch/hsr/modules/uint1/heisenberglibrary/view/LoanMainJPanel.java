@@ -180,14 +180,26 @@ public class LoanMainJPanel extends JPanel implements Observer {
         horizontalStrut = Box.createHorizontalStrut(50);
         inventoryPanel.add(horizontalStrut);
 
-        addLoanButton = new JButton(
-                UiComponentStrings
-                        .getString("LoanMainJPanel.button.addloan.text")); //$NON-NLS-1$
+        String addLoanButtonText = UiComponentStrings
+                .getString("LoanMainJPanel.button.addloan.text"); //$NON-NLS-1$
+        String addLoanButtonEnabledTooltip = UiComponentStrings
+                .getString("LoanMainJPanel.button.addloan.enabled.tooltip");//$NON-NLS-1$
+        String addLoanButtonDisabledTooltip = UiComponentStrings
+                .getString("LoanMainJPanel.button.addloan.disabled.tooltip");//$NON-NLS-1$
+        addLoanButton = new ToolTipJButton(addLoanButtonText,
+                addLoanButtonEnabledTooltip, addLoanButtonDisabledTooltip);
+
         inventoryPanel.add(addLoanButton);
 
-        viewSelectedButton = new JButton(
-                UiComponentStrings
-                        .getString("LoanMainJPanel.button.viewselected.text")); //$NON-NLS-1$
+        String viewSelectedButtonText = UiComponentStrings
+                .getString("LoanMainJPanel.button.viewselected.text"); //$NON-NLS-1$
+        String viewSelectedButtonEnabledToolTip = UiComponentStrings
+                .getString("LoanMainJPanel.button.viewselected.enabled.tooltip");
+        String viewSelectedButtonDisabledToolTip = UiComponentStrings
+                .getString("LoanMainJPanel.button.viewselected.disabled.tooltip");
+        viewSelectedButton = new ToolTipJButton(viewSelectedButtonText,
+                viewSelectedButtonEnabledToolTip,
+                viewSelectedButtonDisabledToolTip);
         inventoryPanel.add(viewSelectedButton);
         viewSelectedButton
                 .setToolTipText(UiComponentStrings
@@ -265,7 +277,7 @@ public class LoanMainJPanel extends JPanel implements Observer {
                 tableFilter.filterTable();
             }
         });
-        ColumnsAutoSizer.sizeColumnsToFit(loanTable, 10);
+        ColumnsAutoSizer.sizeColumnsToFit(loanTable);
     }
 
     /**

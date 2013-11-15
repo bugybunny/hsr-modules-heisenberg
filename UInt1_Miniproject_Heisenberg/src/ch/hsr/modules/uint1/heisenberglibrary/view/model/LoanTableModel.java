@@ -33,14 +33,18 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
 
 /**
- * Lists all books in a JTable with columns: Status, Exemplar-ID, Title, Lent
- * until and Lent to.
+ * Lists all books in a JTable with columns: Status, Copy-ID, Title, Lent until
+ * and Lent to.
  * 
  * <br><b>This tablemodel is not editable!</b>
  * 
  * @author msyfrig
  */
 public class LoanTableModel extends AbstractTableModel implements Observer {
+
+
+
+
 
 
 
@@ -79,7 +83,7 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
         columnNames.add(UiComponentStrings
                 .getString("LoanTableModel.loanTableColumn.status")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
-                .getString("LoanTableModel.loanTableColumn.exemplarid")); //$NON-NLS-1$
+                .getString("LoanTableModel.loanTableColumn.copyid")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
                 .getString("LoanTableModel.loanTableColumn.title")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings

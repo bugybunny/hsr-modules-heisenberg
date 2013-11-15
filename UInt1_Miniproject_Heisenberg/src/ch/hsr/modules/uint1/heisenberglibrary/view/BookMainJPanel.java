@@ -166,14 +166,29 @@ public class BookMainJPanel extends JPanel implements Observer {
         horizontalStrut = Box.createHorizontalStrut(50);
         inventoryPanel.add(horizontalStrut);
 
-        addBookButton = new JButton(
-                UiComponentStrings
-                        .getString("BookMainJPanel.button.addbook.text")); //$NON-NLS-1$
+        String addBookButtonText = UiComponentStrings
+                .getString("BookMainJPanel.button.addbook.text");//$NON-NLS-1$
+        String addBookButtonEnabledTooltip = UiComponentStrings
+                .getString("BookMainJPanel.button.addbook.enabled.tooltip"); //$NON-NLS-1$
+        String addBookButtonDisabledTooltip = UiComponentStrings
+                .getString("BookMainJPanel.button.addbook.disabled.tooltip"); //$NON-NLS-1$
+        addBookButton = new ToolTipJButton(addBookButtonText,
+                addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
+        addBookButton = new ToolTipJButton(addBookButtonText,
+                addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
         inventoryPanel.add(addBookButton);
 
-        viewSelectedButton = new JButton(
-                UiComponentStrings
-                        .getString("BookMainJPanel.button.viewselected.text")); //$NON-NLS-1$
+        String viewSelectedButtonText = UiComponentStrings
+                .getString("BookMainJPanel.button.viewselected.text"); //$NON-NLS-1$
+        String viewSelectedButtonEnabledToolTip = UiComponentStrings
+                .getString("BookMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
+        String viewSelectedButtonDisabledToolTip = UiComponentStrings
+                .getString("BookMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
+
+        viewSelectedButton = new ToolTipJButton(viewSelectedButtonText,
+                viewSelectedButtonEnabledToolTip,
+                viewSelectedButtonDisabledToolTip);
+
         inventoryPanel.add(viewSelectedButton);
         viewSelectedButton
                 .setToolTipText(UiComponentStrings
@@ -377,14 +392,10 @@ public class BookMainJPanel extends JPanel implements Observer {
          */
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
-            if (bookTable.getSelectedRows().length > 0) {
+            if (bookTable.getSelectedRowCount() > 0) {
                 viewSelectedButton.setEnabled(true);
-                UiComponentStrings
-                        .getString("BookMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
             } else {
                 viewSelectedButton.setEnabled(false);
-                UiComponentStrings
-                        .getString("BookMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
             }
         }
     }
