@@ -20,10 +20,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,18 +30,14 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
@@ -67,7 +61,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
  * 
  * @author msyfrig
  */
-public class LoanMainJPanel extends JPanel implements Observer {
+public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
+        Observer {
     private static final long                         serialVersionUID = 8186612854405487707L;
 
     private JTable                                    loanTable;
@@ -234,22 +229,6 @@ public class LoanMainJPanel extends JPanel implements Observer {
         loanTable.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
-        // ctrl+f: switch focus to searchfield for table
-        Action searchAction = new AbstractAction("search") { //$NON-NLS-1$
-            private static final long serialVersionUID = -6626318103198277780L;
-
-            @Override
-            public void actionPerformed(ActionEvent anActionEvent) {
-                searchTextField.requestFocus();
-            }
-        };
-
-        KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-                InputEvent.CTRL_DOWN_MASK);
-        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ctrlF,
-                searchAction.getValue(Action.NAME));
-        getActionMap().put(searchAction.getValue(Action.NAME), searchAction);
-
         ((LoanTableModel) loanTable.getModel())
                 .addTableModelChangeListener(new TableModelChangeListener() {
                     private Collection<Loan> previouslySelectedBooks;
@@ -278,6 +257,11 @@ public class LoanMainJPanel extends JPanel implements Observer {
             }
         });
         ColumnsAutoSizer.sizeColumnsToFit(loanTable);
+    }
+
+    @Override
+    public GhostHintJTextField getSearchTextField() {
+        return searchTextField;
     }
 
     /**

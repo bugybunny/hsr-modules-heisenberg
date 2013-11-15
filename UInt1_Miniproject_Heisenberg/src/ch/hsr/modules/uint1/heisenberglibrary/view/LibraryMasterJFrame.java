@@ -28,18 +28,18 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 // TODO ctrl + f in librarymasterjframe, delegiert dann requestfocus an panel
 // weiter, welches momentan selektiert ist
 public class LibraryMasterJFrame extends JFrame {
-    private static final long serialVersionUID = 8186612854405487707L;
+    private static final long             serialVersionUID = 8186612854405487707L;
 
     /**
      * The table that displays all different booktypes in the library, not the
      * actual copies.
      */
-    private JPanel            contentPanel;
-    private JTabbedPane       tabbedPane;
-    private JPanel            booksPanel;
-    private JPanel            loanPanel;
+    private JPanel                        contentPanel;
+    private JTabbedPane                   tabbedPane;
+    private AbstractSearchableTableJPanel booksPanel;
+    private AbstractSearchableTableJPanel loanPanel;
 
-    private Library           bookMasterlibrary;
+    private Library                       bookMasterlibrary;
 
     /**
      * Creates the frame.
@@ -145,5 +145,32 @@ public class LibraryMasterJFrame extends JFrame {
         getRootPane().getActionMap().put(
                 navigateToPreviousTabAction.getValue(Action.NAME),
                 navigateToPreviousTabAction);
+
+        /*
+         * cltr+f for all subpanels is implemented here because after switching
+         * the tab for the first time, the focus is on the tabbedpane and ctrl+f
+         * does nothing when we add it just to the subpanels and all its
+         * ancestors
+         */
+        // ctrl+f: switch focus to searchfield for table
+        Action searchAction = new AbstractAction("search") { //$NON-NLS-1$
+            private static final long serialVersionUID = -6626318103198277780L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                ((AbstractSearchableTableJPanel) tabbedPane
+                        .getSelectedComponent()).getSearchTextField()
+                        .requestFocus();
+            }
+        };
+
+        KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlF, searchAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(searchAction.getValue(Action.NAME),
+                searchAction);
+
     }
 }
