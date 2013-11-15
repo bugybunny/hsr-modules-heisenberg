@@ -15,6 +15,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -117,7 +118,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
         if (detailBookPanel == null) {
             detailBookPanel = new BookDetailJPanel(aBookToOpen, aLibrary);
 
-            String tabTitle = "a new book";
+            String tabTitle = "add new book";
             if (aBookToOpen != null) {
                 // add observer to this book so we notice when the title has
                 // changed
@@ -130,9 +131,10 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
             } else {
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
                         "Entering a new book");
-                // focus the newly created tab
-                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
             }
+            // focus the newly created tab, well should happen automatically but
+            // does not always work
+            tabbedPane.setSelectedComponent(detailBookPanel);
             Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
             actionMapForBookTab.put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -290,6 +292,15 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
                             }
                             break;
                         case ModelStateChangeEvent.NEW_ENTRY_ADDED:
+                            // add observer for newly created book
+                            Component tempComp = tabbedPane
+                                    .getComponentAt(tabIndex);
+                            if (tempComp instanceof BookDetailJPanel) {
+                                BookDetailJPanel detailPanel = (BookDetailJPanel) tempComp;
+                                detailPanel.getDisplayedBookDO().addObserver(
+                                        BookDetailJDialog.this);
+                            }
+
                             tabbedPane.setTitleAt(tabIndex,
                                     getTabTitleForBook(associatedDetailView
                                             .getDisplayedBookDO()));

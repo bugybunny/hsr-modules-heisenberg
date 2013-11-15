@@ -225,6 +225,9 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
         // TODO googlen wieso zur Hölle das so ist
         addBookButton.setMnemonic('n');
 
+        // TODO sollte in LibraryMasterJFrame sein, damit Keystrokes auf der
+        // JTabbedPane auch noch erkannt werden, der Keystroke müsste irgendwie
+        // an den aktuell selektierten Tab delegiert werden
         // ctrl+n: add book for Mac OS x users since they don't have mnemonics
         KeyStroke ctrlN = KeyStroke.getKeyStroke(KeyEvent.VK_N,
                 InputEvent.CTRL_DOWN_MASK);

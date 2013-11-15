@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -104,6 +105,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private JLabel            numberOfCopiesLabel;
     private JLabel            numberOfAvailableCopiesLabel;
 
+    private AddCopyAction     addCopyAction;
+    private RemoveCopyAction  removeCopyAction;
+
     /**
      * Creates a new instance of this class and sets the models.
      */
@@ -130,9 +134,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
             // add observers for new book object
             if (displayedBook != null) {
                 displayedBook.addObserver(this);
-                addCopyButton.setEnabled(true);
+                addCopyAction.setEnabled(true);
             } else {
-                addCopyButton.setEnabled(false);
+                addCopyAction.setEnabled(false);
             }
 
             updateDisplay();
@@ -147,11 +151,11 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     private void initEverything(BookDO aBookDo) {
         initComponents();
+        initHandlers();
         setBook(aBookDo);
         updateNumberOfCopiesLabel();
         updateNumberOfAvailableCopiesLabel();
         bookCopyTable.setModel(new BookCopyModel(displayedBook, library));
-        initHandlers();
     }
 
     /**
@@ -328,10 +332,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 .getString("BookDetailJDialog.button.addcopy.disabled.tooltip"); //$NON-NLS-1$
         addCopyButton = new ToolTipJButton(addCopyButtonText,
                 addCopyButtonEnabledTooltip, addCopyButtonDisabledTooltip);
-        addCopyButton.setEnabled(false);
         southInformationPanel.add(addCopyButton);
         addCopyButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        addCopyButton.addActionListener(new AddCopyListener());
 
         JPanel southBookList = new JPanel();
 
@@ -360,7 +362,11 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * 
      * @see ChangeToDirtyDocumentListener
      */
-    protected void initHandlers() {
+    private void initHandlers() {
+        removeCopyAction = new RemoveCopyAction(
+                removeSelectedCopiesButton.getText());
+        removeSelectedCopiesButton.setAction(removeCopyAction);
+        removeCopyAction.setEnabled(false);
 
         bookCopyTable.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
@@ -368,12 +374,16 @@ public class BookDetailJPanel extends JPanel implements Observer {
                     public void valueChanged(
                             ListSelectionEvent aListSelectionEvent) {
                         if (bookCopyTable.getSelectedRowCount() > 0) {
-                            removeSelectedCopiesButton.setEnabled(true);
+                            removeCopyAction.setEnabled(true);
                         } else {
-                            removeSelectedCopiesButton.setEnabled(false);
+                            removeCopyAction.setEnabled(false);
                         }
                     }
                 });
+
+        addCopyAction = new AddCopyAction(addCopyButton.getText());
+        addCopyButton.setAction(addCopyAction);
+        addCopyAction.setEnabled(false);
 
         addModelStateChangeListener(new ModelStateChangeListener() {
             @Override
@@ -385,7 +395,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 }
             }
         });
-        removeSelectedCopiesButton.addActionListener(new RemoveCopyListener());
 
         // set focus to titlefield after tab has been switched
         addComponentListener(new ComponentAdapter() {
@@ -646,7 +655,13 @@ public class BookDetailJPanel extends JPanel implements Observer {
         }
     }
 
-    private class RemoveCopyListener implements ActionListener {
+    private class RemoveCopyAction extends AbstractAction {
+        private static final long serialVersionUID = 5191625301014725399L;
+
+        private RemoveCopyAction(String anActionName) {
+            super(anActionName);
+        }
+
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
 
@@ -662,7 +677,13 @@ public class BookDetailJPanel extends JPanel implements Observer {
         }
     }
 
-    private class AddCopyListener implements ActionListener {
+    private class AddCopyAction extends AbstractAction {
+        private static final long serialVersionUID = -4973712671800673981L;
+
+        private AddCopyAction(String anActionName) {
+            super(anActionName);
+        }
+
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
             library.createAndAddCopy(displayedBook);
