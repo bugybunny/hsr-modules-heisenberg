@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,6 +36,9 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 
 /**
  * This dialog holds all opened details views for all books. Each tab represents
@@ -43,7 +48,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
  * @author msyfrig
  */
 // TODO update booktitle if changed or new book added
-public class BookDetailJDialog extends AbstractDefaultJDialog {
+public class BookDetailJDialog extends AbstractDefaultJDialog implements
+        Observer {
     private static final long      serialVersionUID = 439819991326389792L;
     /** The tabbed pane that holds all detailviews as tabs for all books. */
     private JTabbedPane            tabbedPane;
@@ -103,33 +109,27 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
      * @param aBookToOpen
      *            the book domain object to open in a tab
      */
-
-    public void openBookTab(BookDO aBookToOpen, Library library) {
-        BookDetailJPanel detailBookPanel = null;
-
+    public void openBookTab(BookDO aBookToOpen, Library aLibrary) {
         // check if a tab with the given tab is already open
-        if (aBookToOpen != null) {
-            for (BookDetailJPanel tempBookDetailView : openBookTabList) {
-                if (tempBookDetailView.getDisplayedBookDO() == aBookToOpen) {
-                    detailBookPanel = tempBookDetailView;
-                }
-            }
-        }
+        BookDetailJPanel detailBookPanel = getTabForBook(aBookToOpen);
 
         // if not open yet, create it and all listeners and actions
         if (detailBookPanel == null) {
-            detailBookPanel = new BookDetailJPanel(aBookToOpen, library);
+            detailBookPanel = new BookDetailJPanel(aBookToOpen, aLibrary);
 
             String tabTitle = "a new book";
             if (aBookToOpen != null) {
-                tabTitle = (aBookToOpen.toString().length() >= 15) ? aBookToOpen
-                        .toString().substring(0, 15) : toString();
+                // add observer to this book so we notice when the title has
+                // changed
+                aBookToOpen.addObserver(this);
+
+                tabTitle = getTabTitleForBook(aBookToOpen);
 
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
                         aBookToOpen.toString());
             } else {
-                tabbedPane
-                        .addTab(tabTitle, null, detailBookPanel, "a new book");
+                tabbedPane.addTab(tabTitle, null, detailBookPanel,
+                        "Entering a new book");
             }
             Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
             actionMapForBookTab.put(
@@ -152,6 +152,23 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         }
     }
 
+    private BookDetailJPanel getTabForBook(BookDO aBook) {
+        BookDetailJPanel detailBookPanel = null;
+        if (aBook != null) {
+            for (BookDetailJPanel tempBookDetailView : openBookTabList) {
+                if (tempBookDetailView.getDisplayedBookDO() == aBook) {
+                    detailBookPanel = tempBookDetailView;
+                }
+            }
+        }
+        return detailBookPanel;
+    }
+
+    private static String getTabTitleForBook(BookDO aBook) {
+        return (aBook.toString().length() >= 15) ? aBook.toString().substring(
+                0, 15) : aBook.toString();
+    }
+
     @Override
     protected boolean save() {
         return false;
@@ -162,10 +179,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
      * so it can be reopened. If the closed tab was the last one, this dialog is
      * closed.
      * 
-     * <br> Instance is set to null because it is unknown if the gc would
-     * collect it, most likely the panels won't be set to null if we close it
-     * and it is not used anymore. TODO set instance to null
-     * 
      * @param aBookDetailTabToClose
      *            the book detail tab to close
      */
@@ -173,7 +186,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
         if (aBookDetailTabToClose != null) {
             tabbedPane.remove(aBookDetailTabToClose);
             openBookTabList.remove(aBookDetailTabToClose);
-
             // close this dialog if this was the last open tab
             if (openBookTabList.isEmpty()) {
                 dispose();
@@ -276,6 +288,21 @@ public class BookDetailJDialog extends AbstractDefaultJDialog {
                             break;
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void update(Observable anObservable, Object anArgument) {
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            ModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Book.TITLE
+                    || type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED) {
+                BookDetailJPanel detailBookPanel = getTabForBook((BookDO) anObservable);
+                int tabIndex = tabbedPane.indexOfComponent(detailBookPanel);
+                tabbedPane.setTitleAt(tabIndex,
+                        getTabTitleForBook((BookDO) anObservable));
             }
         }
     }
