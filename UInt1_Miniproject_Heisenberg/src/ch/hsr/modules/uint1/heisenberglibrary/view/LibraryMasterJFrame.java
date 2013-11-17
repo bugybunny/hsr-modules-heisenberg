@@ -60,7 +60,7 @@ public class LibraryMasterJFrame extends JFrame {
         setIconImage(frameIcon.getImage());
         setTitle(UiComponentStrings.getString("LibraryMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1200, 441);
+        setBounds(100, 100, 1200, 600);
         contentPanel = new JPanel();
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPanel);

@@ -370,6 +370,11 @@ public class BookDetailJPanel extends JPanel implements Observer {
         addCopyButton.setAction(addCopyAction);
         addCopyAction.setEnabled(false);
 
+        removeCopyAction = new RemoveCopyAction(
+                removeSelectedCopiesButton.getText());
+        removeSelectedCopiesButton.setAction(removeCopyAction);
+        removeCopyAction.setEnabled(false);
+
         bookCopyTable.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
                     @Override
@@ -406,11 +411,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         saveBookAction.setEnabled(false);
         addBookButton.setText(UiComponentStrings
                 .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
-
-        removeCopyAction = new RemoveCopyAction(
-                removeSelectedCopiesButton.getText());
-        removeSelectedCopiesButton.setAction(removeCopyAction);
-        removeCopyAction.setEnabled(false);
 
         comboShelf.setSelectedItem(displayedBook.getShelf());
         comboShelf.addItemListener(new ItemListener() {

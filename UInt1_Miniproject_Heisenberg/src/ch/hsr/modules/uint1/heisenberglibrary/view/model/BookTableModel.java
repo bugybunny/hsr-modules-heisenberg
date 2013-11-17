@@ -172,7 +172,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
          * changed we have to update the whole table (done in some miliseconds)
          * the problem is, that rows can be added or deleted and we cannot just
          * search for the index of the updatet book and update this row and also
-         * the shown data can be reduced by filtering
+         * the shown bookData can be reduced by filtering
          */
         fireTableDataChanged();
         notifyListenersAfterUpdate();

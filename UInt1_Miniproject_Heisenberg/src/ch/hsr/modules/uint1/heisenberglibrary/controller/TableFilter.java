@@ -23,6 +23,8 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -95,6 +97,18 @@ public class TableFilter<M extends TableModel> {
         combiningFilterType = aCombiningFilterType;
         searchField.getDocument().addDocumentListener(
                 new SearchFieldDocumentListener());
+        table.getModel().addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent aTableChangedEvent) {
+                if (table.getRowCount() > 0) {
+                    searchField.setPositiveBackground();
+                } else {
+                    searchField.setNegativeBackground();
+                }
+
+            }
+        });
     }
 
     public void filterTable() {
