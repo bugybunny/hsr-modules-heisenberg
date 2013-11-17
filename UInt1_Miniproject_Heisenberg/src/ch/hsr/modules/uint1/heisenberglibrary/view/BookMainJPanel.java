@@ -92,14 +92,14 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
     private BookDetailJDialog                           bookDetailDialog;
 
     private List<BookDO>                                bookList;
-    private Library                                     bookMasterlibrary;
+    private Library                                     library;
 
-    public BookMainJPanel(Library library) {
-        bookList = library.getBooks();
-        bookMasterlibrary = library;
+    public BookMainJPanel(Library aLibrary) {
+        bookList = aLibrary.getBooks();
+        library = aLibrary;
         initComponents();
         initHandlers();
-        bookMasterlibrary.addObserver(this);
+        library.addObserver(this);
     }
 
     private void initComponents() {
@@ -122,7 +122,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
 
         String numberOfBooksText = MessageFormat.format(UiComponentStrings
                 .getString("BookMainJPanel.label.numberofbooks.text"), //$NON-NLS-1$
-                Integer.valueOf(bookMasterlibrary.getBooks().size()));
+                Integer.valueOf(library.getBooks().size()));
         numberOfBooksLabel = new JLabel(numberOfBooksText);
         inventoryStatisticsPanel.add(numberOfBooksLabel);
 
@@ -130,7 +130,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
 
         String numberOfCopiesText = MessageFormat.format(UiComponentStrings
                 .getString("BookMainJPanel.label.copiesnumber.text"), //$NON-NLS-1$
-                Integer.valueOf(bookMasterlibrary.getCopies().size()));
+                Integer.valueOf(library.getCopies().size()));
         numberOfCopiesLabel = new JLabel(numberOfCopiesText);
         inventoryStatisticsPanel.add(numberOfCopiesLabel);
 
@@ -201,7 +201,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
         centerPanel.setLayout(new BorderLayout(0, 0));
 
         bookTable = new JTable();
-        bookTable.setModel(new BookTableModel(bookList));
+        bookTable.setModel(new BookTableModel(library));
         tableFilter = new TableFilter<>(bookTable, searchTextField);
         bookTable.getTableHeader().setReorderingAllowed(false);
         bookTable.setAutoCreateRowSorter(true);
@@ -362,7 +362,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
             for (int tempBook : bookTable.getSelectedRows()) {
                 BookDO selectedBook = bookList.get(bookTable
                         .convertRowIndexToModel(tempBook));
-                bookDetailDialog.openBookTab(selectedBook, bookMasterlibrary);
+                bookDetailDialog.openBookTab(selectedBook, library);
             }
         }
     }
@@ -387,7 +387,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel implements
             bookDetailDialog.setVisible(true);
             bookDetailDialog.toFront();
 
-            bookDetailDialog.openBookTab(null, bookMasterlibrary);
+            bookDetailDialog.openBookTab(null, library);
         }
     }
 

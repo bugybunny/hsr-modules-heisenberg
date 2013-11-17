@@ -9,6 +9,7 @@ import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -31,25 +32,22 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         columnNames.add(UiComponentStrings
                 .getString("BookTableModel.bookTableColumn.publisher"));  //$NON-NLS-1$
     }
-    private List<BookDO>        data;
+    private Library             library;
+    private List<BookDO>        bookData;
 
-    /**
-     * Creates a new instance of this class.
-     * 
-     * @param someBooks
-     *            the books to display
-     */
-    public BookTableModel(List<BookDO> someBooks) {
-        data = someBooks;
+    public BookTableModel(Library aLibrary) {
+        library = aLibrary;
+        bookData = library.getBooks();
 
-        for (BookDO tempBook : someBooks) {
+        library.addObserver(this);
+        for (BookDO tempBook : bookData) {
             tempBook.addObserver(this);
         }
     }
 
     @Override
     public int getRowCount() {
-        return data.size();
+        return bookData.size();
     }
 
     @Override
@@ -65,15 +63,15 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         return aColumnIndex != 0;
     }
 
-    // TODO: specific books with availability
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
-        BookDO book = data.get(aRowIndex);
+        BookDO book = bookData.get(aRowIndex);
         Object ret = null;
 
         switch (aColumnIndex) {
             case 0:
-                ret = Integer.valueOf(aRowIndex % 7);
+                ret = Integer.valueOf(library.getAvailableCopiesForBook(book)
+                        .size());
                 break;
             case 1:
                 ret = book.getTitle();
@@ -92,7 +90,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 
     @Override
     public void setValueAt(Object value, int aRowIndex, int aColumnIndex) {
-        BookDO book = data.get(aRowIndex);
+        BookDO book = bookData.get(aRowIndex);
         switch (aColumnIndex) {
             case 1:
                 book.setTitle((String) value);
@@ -106,8 +104,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
             default:
                 // do nothing
         }
-        notifyListenersBeforeUpdate();
-        fireTableDataChanged();
+        updateTableData();
     }
 
     @Override
@@ -136,7 +133,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 
     /**
      * Adds a listener that listens for events when this model is about to fire
-     * a {@link #fireTableDataChanged()} or any other table data updates.
+     * a {@link #fireTableDataChanged()} or any other table bookData updates.
      */
     public void addTableModelChangeListener(TableModelChangeListener aListener) {
         listenerList.add(TableModelChangeListener.class, aListener);
@@ -162,8 +159,8 @@ public class BookTableModel extends AbstractTableModel implements Observer {
     }
 
     /**
-     * Updates all table cells with the data from the model and reselects all
-     * previously selected cells if they still exist. More technically, all
+     * Updates all table cells with the bookData from the model and reselects
+     * all previously selected cells if they still exist. More technically, all
      * selected books with their fields are saved in a collection and reselected
      * after the update if they still can be found. Very bad performance but
      * user friendly.
@@ -178,11 +175,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
          * the shown data can be reduced by filtering
          */
         fireTableDataChanged();
-
-        for (TableModelChangeListener tempListener : listenerList
-                .getListeners(TableModelChangeListener.class)) {
-            tempListener.tableChanged();
-        }
+        notifyListenersAfterUpdate();
     }
 
     /**
@@ -192,6 +185,17 @@ public class BookTableModel extends AbstractTableModel implements Observer {
         for (TableModelChangeListener tempListener : listenerList
                 .getListeners(TableModelChangeListener.class)) {
             tempListener.tableIsAboutToUpdate();
+        }
+    }
+
+    /**
+     * Notifies all listeners that the model has changed and the table has been
+     * updated.
+     */
+    private void notifyListenersAfterUpdate() {
+        for (TableModelChangeListener tempListener : listenerList
+                .getListeners(TableModelChangeListener.class)) {
+            tempListener.tableChanged();
         }
     }
 }

@@ -106,7 +106,6 @@ public class BookCopyModel extends AbstractTableModel implements Observer {
 
     @Override
     public void fireTableDataChanged() {
-        // TODO Auto-generated method stub
         copyList = library.getCopiesOfBook(specificBook);
         super.fireTableDataChanged();
     }
