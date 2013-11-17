@@ -24,7 +24,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -75,7 +78,9 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookCopyModel;
  * @author msyfrig
  * @author twinter
  */
-// TODO copies are not updated in table if a new book has been added
+// TODO sternchen wird nicht angezeigt wenn neues Buch gespeichert wurde und der
+// save Button ist nicht enabled
+
 public class BookDetailJPanel extends JPanel implements Observer {
     private static final long serialVersionUID = 3353323227207467624L;
 
@@ -152,11 +157,16 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     private void initEverything(BookDO aBookDo) {
         initComponents();
-        initHandlers();
+        // needs to be before the initHandlers call otherwise some listeners
+        // won't be added since displayedBookDO is null
+        initHandlersForNewBook();
         setBook(aBookDo);
+        if (displayedBook != null) {
+            initHandlersForSetBook();
+        }
         updateNumberOfCopiesLabel();
         updateNumberOfAvailableCopiesLabel();
-        bookCopyTable.setModel(new BookCopyModel(displayedBook, library));
+        // bookCopyTable.setModel(new BookCopyModel(displayedBook, library));
     }
 
     /**
@@ -253,14 +263,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         for (Shelf tempShelfValues : Shelf.values()) {
             comboShelf.addItem(tempShelfValues);
         }
-        comboShelf.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (displayedBook != null) {
-                    displayedBook.setShelf((Shelf) comboShelf.getSelectedItem());
-                }
-            }
-        });
         GridBagConstraints gbcComboShelf = new GridBagConstraints();
         gbcComboShelf.insets = new Insets(0, 0, 5, 0);
         gbcComboShelf.fill = GridBagConstraints.HORIZONTAL;
@@ -295,7 +297,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
         southInformationPanel.setLayout(new BoxLayout(southInformationPanel,
                 BoxLayout.X_AXIS));
 
-        // TODO updaten
         numberOfCopiesLabel = new JLabel();
         southInformationPanel.add(numberOfCopiesLabel);
         numberOfCopiesLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -320,7 +321,6 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 removeSelectedCopiesButtonText,
                 removeSelectedCopiesButtonEnabledToolTip,
                 removeSelectedCopiesButtonDisabledToolTip);
-        removeSelectedCopiesButton.setEnabled(false);
         southInformationPanel.add(removeSelectedCopiesButton);
 
         String addCopyButtonText = UiComponentStrings
@@ -331,8 +331,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 .getString("BookDetailJDialog.button.addcopy.disabled.tooltip"); //$NON-NLS-1$
         addCopyButton = new ToolTipJButton(addCopyButtonText,
                 addCopyButtonEnabledTooltip, addCopyButtonDisabledTooltip);
-        southInformationPanel.add(addCopyButton);
         addCopyButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        southInformationPanel.add(addCopyButton);
 
         JPanel southBookList = new JPanel();
 
@@ -361,15 +361,14 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * 
      * @see ChangeToDirtyDocumentListener
      */
-    private void initHandlers() {
-        removeCopyAction = new RemoveCopyAction(
-                removeSelectedCopiesButton.getText());
-        removeSelectedCopiesButton.setAction(removeCopyAction);
-        removeCopyAction.setEnabled(false);
-
+    private void initHandlersForNewBook() {
         saveBookAction = new SaveBookAction(addBookButton.getText());
+        saveBookAction.setEnabled(true);
         addBookButton.setAction(saveBookAction);
-        saveBookAction.setEnabled(false);
+
+        addCopyAction = new AddCopyAction(addCopyButton.getText());
+        addCopyButton.setAction(addCopyAction);
+        addCopyAction.setEnabled(false);
 
         bookCopyTable.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
@@ -384,21 +383,16 @@ public class BookDetailJPanel extends JPanel implements Observer {
                     }
                 });
 
-        addCopyAction = new AddCopyAction(addCopyButton.getText());
-        addCopyButton.setAction(addCopyAction);
-        addCopyAction.setEnabled(false);
-
         addModelStateChangeListener(new ModelStateChangeListener() {
             @Override
             public void stateChanged(ModelStateChangeEvent aModelStateChange) {
-                if (isDirty()) {
+                if (aModelStateChange.getState() == ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY) {
                     saveBookAction.setEnabled(true);
-                } else {
+                } else if (aModelStateChange.getState() == ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED) {
                     saveBookAction.setEnabled(false);
                 }
             }
         });
-
         // set focus to titlefield after tab has been switched
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -406,28 +400,46 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 titleTextfield.requestFocus();
             }
         });
+    }
 
-        if (displayedBook != null) {
-            addBookButton
-                    .setText(UiComponentStrings
-                            .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
-            comboShelf.setSelectedItem(displayedBook.getShelf());
-            titleTextfield.getDocument().addDocumentListener(
-                    new ChangeToDirtyDocumentListener(titleTextfield,
-                            displayedBook.getTitle()));
+    private void initHandlersForSetBook() {
+        saveBookAction.setEnabled(false);
+        addBookButton.setText(UiComponentStrings
+                .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
 
-            authorTextfield.getDocument().addDocumentListener(
-                    new ChangeToDirtyDocumentListener(authorTextfield,
-                            displayedBook.getAuthor()));
+        removeCopyAction = new RemoveCopyAction(
+                removeSelectedCopiesButton.getText());
+        removeSelectedCopiesButton.setAction(removeCopyAction);
+        removeCopyAction.setEnabled(false);
 
-            publisherTextfield.getDocument().addDocumentListener(
-                    new ChangeToDirtyDocumentListener(publisherTextfield,
-                            displayedBook.getPublisher()));
-        }
+        comboShelf.setSelectedItem(displayedBook.getShelf());
+        comboShelf.addItemListener(new ItemListener() {
 
-        if (displayedBook == null) {
-            addBookButton.setEnabled(true);
-        }
+            @Override
+            public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
+
+            }
+        });
+        comboShelf.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (displayedBook != null) {
+                    displayedBook.setShelf((Shelf) comboShelf.getSelectedItem());
+                }
+            }
+        });
+        titleTextfield.getDocument().addDocumentListener(
+                new ChangeToDirtyDocumentListener(titleTextfield, displayedBook
+                        .getTitle()));
+
+        authorTextfield.getDocument().addDocumentListener(
+                new ChangeToDirtyDocumentListener(authorTextfield,
+                        displayedBook.getAuthor()));
+
+        publisherTextfield.getDocument().addDocumentListener(
+                new ChangeToDirtyDocumentListener(publisherTextfield,
+                        displayedBook.getPublisher()));
+
     }
 
     /**
@@ -456,6 +468,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      *         {@code dirty==false}
      */
     protected boolean save() {
+
         if (displayedBook == null) {
             BookDO createdBook = library.createAndAddBook(titleTextfield
                     .getText());
@@ -466,7 +479,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
             ModelStateChangeEvent newState = new ModelStateChangeEvent(this,
                     ModelStateChangeEvent.NEW_ENTRY_ADDED);
             notifyListenersAboutModelChange(newState);
-            addBookButton.setEnabled(false);
+            initHandlersForSetBook();
+            saveBookAction.setEnabled(false);
         }
 
         if (isDirty()) {
@@ -633,6 +647,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
             if (!textFieldToCheck.getText().equals(stringToCheck)) {
                 setDirty(true);
             }
+            // TODO allenfalls else implementieren und die anderen Felder
+            // prüfen, ob die geändert wurden
         }
 
         @Override
@@ -676,13 +692,21 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
             List<Copy> copyList = library.getCopiesOfBook(displayedBook);
 
+            // we need an extra list because we would need to update the
+            // copyList each time we deleted one copy with the new list in the
+            // library with copyList = library.getCopiesOfBook(displayedBook)
+            // because the indexes changes
+            List<Copy> copiesToDelete = new ArrayList<>(
+                    bookCopyTable.getSelectedRowCount());
             for (int tempCopy : bookCopyTable.getSelectedRows()) {
                 // TODO wenn ich mit Shift + Page Down selektiere erhalte ich
                 // eine IndexOutOfBounds oO untersuchen und beheben
-                Copy selectedCopy = copyList.get(bookCopyTable
-                        .convertRowIndexToModel(tempCopy));
-                library.removeCopy(selectedCopy);
+                copiesToDelete.add(copyList.get(bookCopyTable
+                        .convertRowIndexToModel(tempCopy)));
+
             }
+            library.removeCopies(copiesToDelete);
+            copyList = library.getCopiesOfBook(displayedBook);
         }
     }
 

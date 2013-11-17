@@ -1,6 +1,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Library extends AbstractObservable {
@@ -88,6 +89,12 @@ public class Library extends AbstractObservable {
                 Integer.valueOf(copies.size() - 1), Integer.valueOf(copies
                         .size())));
 
+    }
+
+    public void removeCopies(Collection<Copy> someCopiesToDelete) {
+        for (Copy tempCopy : someCopiesToDelete) {
+            removeCopy(tempCopy);
+        }
     }
 
     public BookDO findByBookTitle(String title) {

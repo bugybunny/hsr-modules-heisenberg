@@ -118,6 +118,9 @@ public class TableFilter<M extends TableModel> {
         table.setRowSorter(tableSorter);
         if (tableSorter.getViewRowCount() > 0) {
             searchField.setPositiveBackground();
+            if (tableSorter.getViewRowCount() == 1) {
+                table.getSelectionModel().setSelectionInterval(0, 0);
+            }
         } else {
             searchField.setNegativeBackground();
         }

@@ -124,7 +124,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
                 // changed
                 aBookToOpen.addObserver(this);
 
-                tabTitle = getTabTitleForBook(aBookToOpen);
+                tabTitle = getTabTitleForBook(aBookToOpen, false);
 
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
                         aBookToOpen.toString());
@@ -169,9 +169,24 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
         return detailBookPanel;
     }
 
-    private static String getTabTitleForBook(BookDO aBook) {
-        return (aBook.toString().length() >= 15) ? aBook.toString().substring(
-                0, 15) : aBook.toString();
+    private static String getTabTitleForBook(BookDO aBook, boolean isDirty) {
+        StringBuffer title = new StringBuffer(15);
+        String bookTitle = aBook.toString();
+        if (isDirty) {
+            title.append('*');
+            if (bookTitle.length() >= 14) {
+                title.append(bookTitle.substring(0, 14));
+            } else {
+                title.append(bookTitle);
+            }
+        } else {
+            if (bookTitle.length() >= 15) {
+                title.append(bookTitle.substring(0, 15));
+            } else {
+                title.append(bookTitle);
+            }
+        }
+        return title.toString();
     }
 
     @Override
@@ -283,12 +298,17 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
                     String oldTitle = tabbedPane.getTitleAt(tabIndex);
                     switch (aModelStateChange.getState()) {
                         case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
-                            tabbedPane.setTitleAt(tabIndex, "*" + oldTitle);
+                            tabbedPane.setTitleAt(
+                                    tabIndex,
+                                    getTabTitleForBook(associatedDetailView
+                                            .getDisplayedBookDO(), true));
                             break;
                         case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
                             if (oldTitle.charAt(0) == '*') {
-                                tabbedPane.setTitleAt(tabIndex,
-                                        oldTitle.substring(1));
+                                tabbedPane.setTitleAt(
+                                        tabIndex,
+                                        getTabTitleForBook(associatedDetailView
+                                                .getDisplayedBookDO(), false));
                             }
                             break;
                         case ModelStateChangeEvent.NEW_ENTRY_ADDED:
@@ -301,9 +321,10 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
                                         BookDetailJDialog.this);
                             }
 
-                            tabbedPane.setTitleAt(tabIndex,
+                            tabbedPane.setTitleAt(
+                                    tabIndex,
                                     getTabTitleForBook(associatedDetailView
-                                            .getDisplayedBookDO()));
+                                            .getDisplayedBookDO(), false));
                             break;
                         default:
                             break;
@@ -323,7 +344,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
                 BookDetailJPanel detailBookPanel = getTabForBook((BookDO) anObservable);
                 int tabIndex = tabbedPane.indexOfComponent(detailBookPanel);
                 tabbedPane.setTitleAt(tabIndex,
-                        getTabTitleForBook((BookDO) anObservable));
+                        getTabTitleForBook((BookDO) anObservable, false));
             }
         }
     }
