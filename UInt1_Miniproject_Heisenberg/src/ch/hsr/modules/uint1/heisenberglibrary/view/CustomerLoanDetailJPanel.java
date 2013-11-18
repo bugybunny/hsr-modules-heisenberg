@@ -159,24 +159,25 @@ public class CustomerLoanDetailJPanel extends JPanel {
         gbc_cityNameLable.gridy = 6;
         customerDetailJpanel.add(cityNameLable, gbc_cityNameLable);
 
-        JPanel loanDetailJaPanel = new JPanel();
-        loanDetailJaPanel.setBorder(new TitledBorder(null, "Loan details",
+        JPanel loanDetailJpanel = new JPanel();
+        loanDetailJpanel.setBorder(new TitledBorder(null, "Loan details",
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(loanDetailJaPanel, BorderLayout.SOUTH);
-        loanDetailJaPanel.setLayout(new BorderLayout(0, 0));
+        add(loanDetailJpanel, BorderLayout.SOUTH);
+        loanDetailJpanel.setLayout(new BorderLayout(0, 0));
 
-        JPanel panel = new JPanel();
-        loanDetailJaPanel.add(panel, BorderLayout.NORTH);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        JPanel loanButtonJpanel = new JPanel();
+        loanDetailJpanel.add(loanButtonJpanel, BorderLayout.NORTH);
+        loanButtonJpanel.setLayout(new BoxLayout(loanButtonJpanel,
+                BoxLayout.X_AXIS));
 
-        JButton btnNewButton = new JButton("Add new loan");
-        panel.add(btnNewButton);
+        JButton addNewLoanButton = new JButton("Add new loan");
+        loanButtonJpanel.add(addNewLoanButton);
 
-        JButton btnNewButton_1 = new JButton("Remove loan");
-        panel.add(btnNewButton_1);
+        JButton removeLoanButton = new JButton("Remove loan");
+        loanButtonJpanel.add(removeLoanButton);
 
         loanDetailTable = new JTable();
-        loanDetailJaPanel.add(loanDetailTable);
+        loanDetailJpanel.add(loanDetailTable);
 
     }
 
