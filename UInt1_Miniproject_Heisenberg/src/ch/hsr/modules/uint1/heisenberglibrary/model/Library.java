@@ -97,6 +97,23 @@ public class Library extends AbstractObservable {
         }
     }
 
+    /**
+     * Returns a copy to the library. The copy will be available again and will
+     * be removed from the customer loan.
+     * 
+     * @param aCopyToReturn
+     *            the copy to return to the library
+     * @return the changed loan object or {@code null} if a not lent out book
+     *         has been passed
+     */
+    public Loan returnCopy(Copy aCopyToReturn) {
+        Loan activeLoan = getActiveLoanForCopy(aCopyToReturn);
+        if (activeLoan != null) {
+            activeLoan.returnCopy();
+        }
+        return activeLoan;
+    }
+
     public BookDO findByBookTitle(String title) {
         for (BookDO b : books) {
             if (b.getTitle().equals(title)) {
@@ -151,6 +168,16 @@ public class Library extends AbstractObservable {
         List<Loan> lentCopies = new ArrayList<>();
         for (Loan l : loans) {
             if (l.getCustomer().equals(customer)) {
+                lentCopies.add(l);
+            }
+        }
+        return lentCopies;
+    }
+
+    public List<Loan> getActiveCustomerLoans(Customer customer) {
+        List<Loan> lentCopies = new ArrayList<>();
+        for (Loan l : loans) {
+            if (l.isLent() && l.getCustomer().equals(customer)) {
                 lentCopies.add(l);
             }
         }

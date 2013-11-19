@@ -49,6 +49,7 @@ import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
@@ -82,20 +83,20 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
     private JPanel                                    panel;
     private JPanel                                    loanInventoryPanel;
     private JPanel                                    outerStatisticsPanel;
-    private BookDetailJDialog                         loanDetailDialog;
+    private LoanDetailJDialog                         loanDetailDialog;
 
-    private ViewSelectedLoansAction                   viewSelectedLoansAction;
+    private ViewSelectedCustomerLoansAction           viewSelectedCustomerLoansAction;
     private AddLoanAction                             addLoanAction;
 
     private List<Loan>                                activeLoanList;
-    private Library                                   bookMasterlibrary;
+    private Library                                   library;
 
     /**
      * Creates the panel.
      */
-    public LoanMainJPanel(Library library) {
+    public LoanMainJPanel(Library aLibrary) {
+        library = aLibrary;
         activeLoanList = library.getActiveLoans();
-        bookMasterlibrary = library;
         initComponents();
         initHandlers();
         library.addObserver(this);
@@ -121,7 +122,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
 
         String numberOfLoansText = MessageFormat.format(UiComponentStrings
                 .getString("LoanMainJPanel.label.loannumber.text"), //$NON-NLS-1$
-                Integer.valueOf(bookMasterlibrary.getLoans().size()));
+                Integer.valueOf(library.getLoans().size()));
         numberOfLoansLabel = new JLabel(numberOfLoansText);
         inventoryStatisticsPanel.add(numberOfLoansLabel);
 
@@ -130,8 +131,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         String numberOfCurrentlyLoanedCopiesText = MessageFormat
                 .format(UiComponentStrings
                         .getString("LoanMainJPanel.label.currentlyloaned.text"), //$NON-NLS-1$
-                        Integer.valueOf(bookMasterlibrary.getLentOutBooks()
-                                .size()));
+                        Integer.valueOf(library.getLentOutBooks().size()));
         numberOfCurrentyLoanedCopiesLabel = new JLabel(
                 numberOfCurrentlyLoanedCopiesText);
         inventoryStatisticsPanel.add(numberOfCurrentyLoanedCopiesLabel);
@@ -141,7 +141,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         String numberOfOverdueLoansText = MessageFormat.format(
                 UiComponentStrings
                         .getString("LoanMainJPanel.label.overdueloans.text"), //$NON-NLS-1$
-                Integer.valueOf(bookMasterlibrary.getOverdueLoans().size()));
+                Integer.valueOf(library.getOverdueLoans().size()));
         overdueLabel = new JLabel(numberOfOverdueLoansText);
         inventoryStatisticsPanel.add(overdueLabel);
 
@@ -217,17 +217,18 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         loanTable.setCellSelectionEnabled(true);
         loanTable.setFillsViewportHeight(true);
         loanTable.setColumnSelectionAllowed(false);
-        loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        loanTable
+                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         JScrollPane jsp = new JScrollPane(loanTable);
         centerPanel.add(jsp);
     }
 
     private void initHandlers() {
-        viewSelectedLoansAction = new ViewSelectedLoansAction(
+        viewSelectedCustomerLoansAction = new ViewSelectedCustomerLoansAction(
                 viewSelectedButton.getText());
-        viewSelectedLoansAction.setEnabled(false);
-        viewSelectedButton.setAction(viewSelectedLoansAction);
+        viewSelectedCustomerLoansAction.setEnabled(false);
+        viewSelectedButton.setAction(viewSelectedCustomerLoansAction);
         viewSelectedButton.setMnemonic('v');
 
         addLoanAction = new AddLoanAction(addLoanButton.getText());
@@ -346,8 +347,10 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
      * 
      * @author msyfrig
      */
-    private class ViewSelectedLoansAction extends AbstractAction {
-        private ViewSelectedLoansAction(String anActionName) {
+    private class ViewSelectedCustomerLoansAction extends AbstractAction {
+        private static final long serialVersionUID = 8000376743315270169L;
+
+        private ViewSelectedCustomerLoansAction(String anActionName) {
             super(anActionName);
         }
 
@@ -361,17 +364,23 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (loanDetailDialog == null) {
-                loanDetailDialog = new BookDetailJDialog(null);
+                loanDetailDialog = new LoanDetailJDialog(null);
             }
             loanDetailDialog.setVisible(true);
             loanDetailDialog.toFront();
 
-            for (int tempBook : loanTable.getSelectedRows()) {
-                Loan selectedBook = activeLoanList.get(loanTable
-                        .convertRowIndexToModel(tempBook));
-                // TODO openloan detail
-                // loanDetailDialog.openBookTab(selectedBook,
-                // bookMasterlibrary);
+            // add all unique customers to open to a set, faster than check if
+            // the tab is already open
+            Set<Customer> customersToOpenSet = new HashSet<>();
+
+            for (int tempLoan : loanTable.getSelectedRows()) {
+                Customer selectedCustomerLoan = activeLoanList.get(
+                        loanTable.convertRowIndexToModel(tempLoan))
+                        .getCustomer();
+                customersToOpenSet.add(selectedCustomerLoan);
+            }
+            for (Customer tempCustomer : customersToOpenSet) {
+                loanDetailDialog.openCustomerLoanTab(tempCustomer, library);
             }
         }
     }
@@ -391,12 +400,11 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (loanDetailDialog == null) {
-                loanDetailDialog = new BookDetailJDialog(null);
+                loanDetailDialog = new LoanDetailJDialog(null);
             }
             loanDetailDialog.setVisible(true);
             loanDetailDialog.toFront();
-
-            loanDetailDialog.openBookTab(null, bookMasterlibrary);
+            // TODO enter new loan
 
         }
     }
@@ -409,9 +417,9 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
             if (loanTable.getSelectedRows().length > 0) {
-                viewSelectedLoansAction.setEnabled(true);
+                viewSelectedCustomerLoansAction.setEnabled(true);
             } else {
-                viewSelectedLoansAction.setEnabled(false);
+                viewSelectedCustomerLoansAction.setEnabled(false);
             }
         }
     }

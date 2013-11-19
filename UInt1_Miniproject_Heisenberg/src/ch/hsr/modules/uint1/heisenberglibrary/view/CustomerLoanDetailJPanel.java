@@ -19,17 +19,22 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.border.TitledBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 
 /**
  * TODO COMMENT ME!
@@ -37,12 +42,20 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
  * @author twinter
  */
 public class CustomerLoanDetailJPanel extends JPanel {
-    private JTable loanDetailTable;
+    private JTable   loanDetailTable;
+    private Customer displayedCustomer;
+    private Library  library;
 
     /**
      * Create the panel.
      */
-    public CustomerLoanDetailJPanel() {
+    public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
+        displayedCustomer = aCustomer;
+        library = aLibrary;
+        initComponents();
+    }
+
+    private void initComponents() {
         setLayout(new BorderLayout(0, 0));
 
         JPanel customerPictureJPanel = new JPanel();
@@ -68,7 +81,8 @@ public class CustomerLoanDetailJPanel extends JPanel {
                 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         customerDetailJpanel.setLayout(gbl_customerDetailJpanel);
 
-        JComboBox<Customer> selectCustomerComboBox = new JComboBox<Customer>();
+        JComboBox<Customer> selectCustomerComboBox = new JComboBox<Customer>(
+                new CustomerComboboxModel(library));
         GridBagConstraints gbc_selectCustomerComboBox = new GridBagConstraints();
         gbc_selectCustomerComboBox.gridwidth = 3;
         gbc_selectCustomerComboBox.insets = new Insets(0, 0, 5, 5);
@@ -178,7 +192,28 @@ public class CustomerLoanDetailJPanel extends JPanel {
 
         loanDetailTable = new JTable();
         loanDetailJpanel.add(loanDetailTable);
-
     }
 
+    /**
+     * Registers a collection of actions to a given keystroke on this panel and
+     * all subcomponents.
+     * 
+     * @param someActions
+     *            map with keystrokes and their associated actions<br>
+     *            {@code key}: keystroke to bind the action to<br> {@code value}
+     *            : action that should be fired when keystroke has been pressed
+     * 
+     */
+    void addAncestorActions(Map<KeyStroke, Action> someActions) {
+        for (Map.Entry<KeyStroke, Action> tempAction : someActions.entrySet()) {
+            Object actionName = tempAction.getValue().getValue(Action.NAME);
+            getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                    tempAction.getKey(), actionName);
+            getActionMap().put(actionName, tempAction.getValue());
+        }
+    }
+
+    public Customer getDisplayedCustomer() {
+        return displayedCustomer;
+    }
 }

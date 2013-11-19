@@ -49,7 +49,7 @@ public class Loan extends AbstractObservable {
             throw new IllegalLoanOperationException(
                     "Return Date is before pickupDate");
         }
-        this.returnDate = aReturnDate;
+        returnDate = aReturnDate;
     }
 
     public void setPickupDate(GregorianCalendar aPickupDate)

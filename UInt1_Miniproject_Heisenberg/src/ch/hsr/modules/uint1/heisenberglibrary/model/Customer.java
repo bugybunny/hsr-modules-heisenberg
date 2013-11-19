@@ -110,4 +110,61 @@ public class Customer extends AbstractObservable {
         return name + " " + surname + " , " + street + " , " + zip + " " + city;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((city == null) ? 0 : city.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((street == null) ? 0 : street.hashCode());
+        result = prime * result + ((surname == null) ? 0 : surname.hashCode());
+        result = prime * result + zip;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object anObject) {
+        if (this == anObject) {
+            return true;
+        }
+        if (anObject == null) {
+            return false;
+        }
+        if (getClass() != anObject.getClass()) {
+            return false;
+        }
+        Customer other = (Customer) anObject;
+        if (city == null) {
+            if (other.city != null) {
+                return false;
+            }
+        } else if (!city.equals(other.city)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (street == null) {
+            if (other.street != null) {
+                return false;
+            }
+        } else if (!street.equals(other.street)) {
+            return false;
+        }
+        if (surname == null) {
+            if (other.surname != null) {
+                return false;
+            }
+        } else if (!surname.equals(other.surname)) {
+            return false;
+        }
+        if (zip != other.zip) {
+            return false;
+        }
+        return true;
+    }
 }

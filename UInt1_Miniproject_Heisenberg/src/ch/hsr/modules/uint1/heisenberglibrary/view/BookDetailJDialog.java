@@ -15,7 +15,6 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -48,8 +47,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
  * 
  * @author msyfrig
  */
-public class BookDetailJDialog extends AbstractDefaultJDialog implements
-        Observer {
+public class BookDetailJDialog extends NonModalJDialog implements Observer {
     private static final long      serialVersionUID = 439819991326389792L;
     /** The tabbed pane that holds all detailviews as tabs for all books. */
     private JTabbedPane            tabbedPane;
@@ -146,8 +144,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
         aBookTab.addAncestorActions(actionMapForBookTab);
         // add asteriks in tabtitle if tab has unsaved changes and listen
         // for added books to set the title
-        aBookTab.addModelStateChangeListener(new BookDetailModelChangeListener(
-                aBookTab));
+        aBookTab.addModelStateChangeListener(new BookDetailModelChangeListener());
     }
 
     private BookDetailJPanel getTabForBook(BookDO aBook) {
@@ -182,11 +179,6 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
         return title.toString();
     }
 
-    @Override
-    protected boolean save() {
-        return false;
-    }
-
     /**
      * Closes an opened tab for a book, removes it from the list of opened books
      * so it can be reopened. If the closed tab was the last one, this dialog is
@@ -213,11 +205,7 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
             ModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.TITLE
                     || type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED) {
-                BookDetailJPanel detailBookPanel = getTabForBook((BookDO) anObservable);
-                int tabIndex = tabbedPane.indexOfComponent(detailBookPanel);
-                tabbedPane.setTitleAt(tabIndex,
-                        getTabTitleForBook((BookDO) anObservable, false));
-                tabbedPane.setToolTipTextAt(tabIndex, anObservable.toString());
+                bookInTabUpdated((BookDO) anObservable);
             }
         }
     }
@@ -283,6 +271,22 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
     }
 
     /**
+     * Refreshes the tabtitle and tooltip.
+     */
+    private void bookInTabUpdated(BookDO anUpdatedBook) {
+        BookDetailJPanel detailBookPanel = getTabForBook(anUpdatedBook);
+        if (detailBookPanel != null) {
+            int tabIndex = tabbedPane.indexOfComponent(detailBookPanel);
+            tabbedPane
+                    .setTitleAt(
+                            tabIndex,
+                            getTabTitleForBook(anUpdatedBook,
+                                    detailBookPanel.isDirty()));
+            tabbedPane.setToolTipTextAt(tabIndex, anUpdatedBook.toString());
+        }
+    }
+
+    /**
      * Lists for changes in the model for a specific tab and if it has unsaved
      * changes, the title gets an asterisk indicating the unsaved changes in
      * this tab.
@@ -291,56 +295,31 @@ public class BookDetailJDialog extends AbstractDefaultJDialog implements
      */
     private class BookDetailModelChangeListener implements
             ModelStateChangeListener {
-        private BookDetailJPanel associatedDetailView;
-
-        public BookDetailModelChangeListener(
-                BookDetailJPanel anAssociatedDetailView) {
-            associatedDetailView = anAssociatedDetailView;
-        }
-
         @Override
         public void stateChanged(ModelStateChangeEvent aModelStateChange) {
-            if (associatedDetailView != null) {
-                int tabIndex = tabbedPane
-                        .indexOfComponent(associatedDetailView);
-                if (tabIndex >= 0) {
-                    String oldTitle = tabbedPane.getTitleAt(tabIndex);
-                    switch (aModelStateChange.getState()) {
-                        case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
-                            tabbedPane.setTitleAt(
-                                    tabIndex,
-                                    getTabTitleForBook(associatedDetailView
-                                            .getDisplayedBookDO(), true));
-                            break;
-                        case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
-                            if (oldTitle.charAt(0) == '*') {
-                                tabbedPane.setTitleAt(
-                                        tabIndex,
-                                        getTabTitleForBook(associatedDetailView
-                                                .getDisplayedBookDO(), false));
-                            }
-                            break;
-                        case ModelStateChangeEvent.NEW_ENTRY_ADDED:
-                            // add observer for newly created book
-                            Component tempComp = tabbedPane
-                                    .getComponentAt(tabIndex);
-                            if (tempComp instanceof BookDetailJPanel) {
-                                BookDetailJPanel detailPanel = (BookDetailJPanel) tempComp;
-                                detailPanel.getDisplayedBookDO().addObserver(
-                                        BookDetailJDialog.this);
-                                tabbedPane.setToolTipTextAt(tabIndex,
-                                        detailPanel.getDisplayedBookDO()
-                                                .toString());
-
-                            }
-
-                            tabbedPane.setTitleAt(
-                                    tabIndex,
-                                    getTabTitleForBook(associatedDetailView
-                                            .getDisplayedBookDO(), false));
-                            break;
-                        default:
-                            break;
+            if (aModelStateChange.getSource() instanceof BookDetailJPanel) {
+                BookDetailJPanel associatedDetailView = (BookDetailJPanel) aModelStateChange
+                        .getSource();
+                if (associatedDetailView != null) {
+                    int tabIndex = tabbedPane
+                            .indexOfComponent(associatedDetailView);
+                    if (tabIndex >= 0) {
+                        switch (aModelStateChange.getState()) {
+                            case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
+                            case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
+                                bookInTabUpdated(associatedDetailView
+                                        .getDisplayedBookDO());
+                                break;
+                            case ModelStateChangeEvent.NEW_ENTRY_ADDED:
+                                // add observer for newly created book
+                                associatedDetailView.getDisplayedBookDO()
+                                        .addObserver(BookDetailJDialog.this);
+                                bookInTabUpdated(associatedDetailView
+                                        .getDisplayedBookDO());
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }

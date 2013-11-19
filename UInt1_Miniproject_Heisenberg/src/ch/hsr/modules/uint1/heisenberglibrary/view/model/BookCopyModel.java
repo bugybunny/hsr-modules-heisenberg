@@ -95,8 +95,9 @@ public class BookCopyModel extends AbstractTableModel implements Observer {
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        // TODO Auto-generated method stub
-
+        // TODO observer auf library und auf Buchrückgabe hören, das
+        // Rückgabedatum und availabilty muss aktualisiert werden oder wird das
+        // bereits über fireTableDataChanged gemacht? Prüfen!
     }
 
     @Override
