@@ -65,8 +65,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
  * 
  * @author msyfrig
  */
-public class BookMainJPanel extends AbstractSearchableTableJPanel implements
-        Observer {
+public class BookMainJPanel extends SearchableTableJPanel implements Observer {
     private static final long                           serialVersionUID = 8186612854405487707L;
 
     /**

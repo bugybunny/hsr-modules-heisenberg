@@ -28,18 +28,18 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 // TODO ctrl + f in librarymasterjframe, delegiert dann requestfocus an panel
 // weiter, welches momentan selektiert ist
 public class LibraryMasterJFrame extends JFrame {
-    private static final long             serialVersionUID = 8186612854405487707L;
+    private static final long     serialVersionUID = 8186612854405487707L;
 
     /**
      * The table that displays all different booktypes in the library, not the
      * actual copies.
      */
-    private JPanel                        contentPanel;
-    private JTabbedPane                   tabbedPane;
-    private AbstractSearchableTableJPanel booksPanel;
-    private AbstractSearchableTableJPanel loanPanel;
+    private JPanel                contentPanel;
+    private JTabbedPane           tabbedPane;
+    private SearchableTableJPanel booksPanel;
+    private SearchableTableJPanel loanPanel;
 
-    private Library                       bookMasterlibrary;
+    private Library               bookMasterlibrary;
 
     /**
      * Creates the frame.
@@ -158,9 +158,8 @@ public class LibraryMasterJFrame extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
-                ((AbstractSearchableTableJPanel) tabbedPane
-                        .getSelectedComponent()).getSearchTextField()
-                        .requestFocus();
+                ((SearchableTableJPanel) tabbedPane.getSelectedComponent())
+                        .getSearchTextField().requestFocus();
             }
         };
 

@@ -40,11 +40,13 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
  * TODO COMMENT ME!
  * 
  * @author twinter
+ * @author msyfrig
  */
 public class CustomerLoanDetailJPanel extends JPanel {
-    private JTable   loanDetailTable;
-    private Customer displayedCustomer;
-    private Library  library;
+    private static final long serialVersionUID = 1811625089328376836L;
+    private JTable            loanDetailTable;
+    private Customer          displayedCustomer;
+    private Library           library;
 
     /**
      * Create the panel.
@@ -60,118 +62,115 @@ public class CustomerLoanDetailJPanel extends JPanel {
 
         JPanel customerPictureJPanel = new JPanel();
         add(customerPictureJPanel, BorderLayout.WEST);
-        FlowLayout fl_customerPictureJPanel = (FlowLayout) customerPictureJPanel
+        FlowLayout flCustomerPictureJPanel = (FlowLayout) customerPictureJPanel
                 .getLayout();
-        fl_customerPictureJPanel.setAlignment(FlowLayout.LEFT);
+        flCustomerPictureJPanel.setAlignment(FlowLayout.LEFT);
 
-        JLabel pokemonLable = new JLabel("");
-        pokemonLable.setIcon(new ImageIcon(CustomerLoanDetailJPanel.class
+        JLabel pokemonLabel = new JLabel("");
+        pokemonLabel.setIcon(new ImageIcon(CustomerLoanDetailJPanel.class
                 .getResource("/images/kuser.png")));
-        customerPictureJPanel.add(pokemonLable);
+        customerPictureJPanel.add(pokemonLabel);
 
         JPanel customerDetailJpanel = new JPanel();
         add(customerDetailJpanel, BorderLayout.CENTER);
-        GridBagLayout gbl_customerDetailJpanel = new GridBagLayout();
-        gbl_customerDetailJpanel.columnWidths = new int[] { 10, 0, 10, 0, 0 };
-        gbl_customerDetailJpanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0,
-                0 };
-        gbl_customerDetailJpanel.columnWeights = new double[] { 0.0, 0.0, 0.0,
+        GridBagLayout gblCustomerDetailJpanel = new GridBagLayout();
+        gblCustomerDetailJpanel.columnWidths = new int[] { 10, 0, 10, 0, 0 };
+        gblCustomerDetailJpanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        gblCustomerDetailJpanel.columnWeights = new double[] { 0.0, 0.0, 0.0,
                 1.0, Double.MIN_VALUE };
-        gbl_customerDetailJpanel.rowWeights = new double[] { 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-        customerDetailJpanel.setLayout(gbl_customerDetailJpanel);
+        gblCustomerDetailJpanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, Double.MIN_VALUE };
+        customerDetailJpanel.setLayout(gblCustomerDetailJpanel);
 
-        JComboBox<Customer> selectCustomerComboBox = new JComboBox<Customer>(
+        JComboBox<Customer> selectCustomerComboBox = new JComboBox<>(
                 new CustomerComboboxModel(library));
-        GridBagConstraints gbc_selectCustomerComboBox = new GridBagConstraints();
-        gbc_selectCustomerComboBox.gridwidth = 3;
-        gbc_selectCustomerComboBox.insets = new Insets(0, 0, 5, 5);
-        gbc_selectCustomerComboBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_selectCustomerComboBox.gridx = 1;
-        gbc_selectCustomerComboBox.gridy = 0;
+        GridBagConstraints gbcSelectCustomerComboBox = new GridBagConstraints();
+        gbcSelectCustomerComboBox.gridwidth = 3;
+        gbcSelectCustomerComboBox.insets = new Insets(0, 0, 5, 5);
+        gbcSelectCustomerComboBox.fill = GridBagConstraints.HORIZONTAL;
+        gbcSelectCustomerComboBox.gridx = 1;
+        gbcSelectCustomerComboBox.gridy = 0;
         customerDetailJpanel.add(selectCustomerComboBox,
-                gbc_selectCustomerComboBox);
+                gbcSelectCustomerComboBox);
 
-        JLabel nameLable = new JLabel("Name:");
-        GridBagConstraints gbc_nameLable = new GridBagConstraints();
-        gbc_nameLable.anchor = GridBagConstraints.EAST;
-        gbc_nameLable.insets = new Insets(0, 0, 5, 5);
-        gbc_nameLable.gridx = 1;
-        gbc_nameLable.gridy = 2;
-        customerDetailJpanel.add(nameLable, gbc_nameLable);
+        JLabel nameLabel = new JLabel("Name:");
+        GridBagConstraints gbcNameLabel = new GridBagConstraints();
+        gbcNameLabel.anchor = GridBagConstraints.EAST;
+        gbcNameLabel.insets = new Insets(0, 0, 5, 5);
+        gbcNameLabel.gridx = 1;
+        gbcNameLabel.gridy = 2;
+        customerDetailJpanel.add(nameLabel, gbcNameLabel);
 
-        JLabel customerNameLable = new JLabel("Hans");
-        GridBagConstraints gbc_customerNameLable = new GridBagConstraints();
-        gbc_customerNameLable.anchor = GridBagConstraints.WEST;
-        gbc_customerNameLable.insets = new Insets(0, 0, 5, 0);
-        gbc_customerNameLable.gridx = 3;
-        gbc_customerNameLable.gridy = 2;
-        customerDetailJpanel.add(customerNameLable, gbc_customerNameLable);
+        JLabel customerNameLabel = new JLabel("Hans");
+        GridBagConstraints gbcCustomerNameLabel = new GridBagConstraints();
+        gbcCustomerNameLabel.anchor = GridBagConstraints.WEST;
+        gbcCustomerNameLabel.insets = new Insets(0, 0, 5, 0);
+        gbcCustomerNameLabel.gridx = 3;
+        gbcCustomerNameLabel.gridy = 2;
+        customerDetailJpanel.add(customerNameLabel, gbcCustomerNameLabel);
 
-        JLabel surnameLable = new JLabel("Surname:");
-        GridBagConstraints gbc_surnameLable = new GridBagConstraints();
-        gbc_surnameLable.anchor = GridBagConstraints.EAST;
-        gbc_surnameLable.insets = new Insets(0, 0, 5, 5);
-        gbc_surnameLable.gridx = 1;
-        gbc_surnameLable.gridy = 3;
-        customerDetailJpanel.add(surnameLable, gbc_surnameLable);
+        JLabel surnameLabel = new JLabel("Surname:");
+        GridBagConstraints gbcSurnameLabel = new GridBagConstraints();
+        gbcSurnameLabel.anchor = GridBagConstraints.EAST;
+        gbcSurnameLabel.insets = new Insets(0, 0, 5, 5);
+        gbcSurnameLabel.gridx = 1;
+        gbcSurnameLabel.gridy = 3;
+        customerDetailJpanel.add(surnameLabel, gbcSurnameLabel);
 
-        JLabel customerSurnameLable = new JLabel("Müller-Meier");
-        GridBagConstraints gbc_customerSurnameLable = new GridBagConstraints();
-        gbc_customerSurnameLable.anchor = GridBagConstraints.WEST;
-        gbc_customerSurnameLable.insets = new Insets(0, 0, 5, 0);
-        gbc_customerSurnameLable.gridx = 3;
-        gbc_customerSurnameLable.gridy = 3;
-        customerDetailJpanel
-                .add(customerSurnameLable, gbc_customerSurnameLable);
+        JLabel customerSurnameLabel = new JLabel("Müller-Meier");
+        GridBagConstraints gbcCustomerSurnameLabel = new GridBagConstraints();
+        gbcCustomerSurnameLabel.anchor = GridBagConstraints.WEST;
+        gbcCustomerSurnameLabel.insets = new Insets(0, 0, 5, 0);
+        gbcCustomerSurnameLabel.gridx = 3;
+        gbcCustomerSurnameLabel.gridy = 3;
+        customerDetailJpanel.add(customerSurnameLabel, gbcCustomerSurnameLabel);
 
-        JLabel addressLable = new JLabel("Address:");
-        GridBagConstraints gbc_addressLable = new GridBagConstraints();
-        gbc_addressLable.anchor = GridBagConstraints.EAST;
-        gbc_addressLable.insets = new Insets(0, 0, 5, 5);
-        gbc_addressLable.gridx = 1;
-        gbc_addressLable.gridy = 4;
-        customerDetailJpanel.add(addressLable, gbc_addressLable);
+        JLabel addressLabel = new JLabel("Address:");
+        GridBagConstraints gbcAddressLabel = new GridBagConstraints();
+        gbcAddressLabel.anchor = GridBagConstraints.EAST;
+        gbcAddressLabel.insets = new Insets(0, 0, 5, 5);
+        gbcAddressLabel.gridx = 1;
+        gbcAddressLabel.gridy = 4;
+        customerDetailJpanel.add(addressLabel, gbcAddressLabel);
 
-        JLabel customerAddressLable = new JLabel("Exemplarstrasse 33");
-        GridBagConstraints gbc_customerAddressLable = new GridBagConstraints();
-        gbc_customerAddressLable.anchor = GridBagConstraints.WEST;
-        gbc_customerAddressLable.insets = new Insets(0, 0, 5, 0);
-        gbc_customerAddressLable.gridx = 3;
-        gbc_customerAddressLable.gridy = 4;
-        customerDetailJpanel
-                .add(customerAddressLable, gbc_customerAddressLable);
+        JLabel customerAddressLabel = new JLabel("Exemplarstrasse 33");
+        GridBagConstraints gbcCustomerAddressLabel = new GridBagConstraints();
+        gbcCustomerAddressLabel.anchor = GridBagConstraints.WEST;
+        gbcCustomerAddressLabel.insets = new Insets(0, 0, 5, 0);
+        gbcCustomerAddressLabel.gridx = 3;
+        gbcCustomerAddressLabel.gridy = 4;
+        customerDetailJpanel.add(customerAddressLabel, gbcCustomerAddressLabel);
 
-        JLabel zipLable = new JLabel("Zip Code:");
-        GridBagConstraints gbc_zipLable = new GridBagConstraints();
-        gbc_zipLable.anchor = GridBagConstraints.EAST;
-        gbc_zipLable.insets = new Insets(0, 0, 5, 5);
-        gbc_zipLable.gridx = 1;
-        gbc_zipLable.gridy = 5;
-        customerDetailJpanel.add(zipLable, gbc_zipLable);
+        JLabel zipLabel = new JLabel("Zip Code:");
+        GridBagConstraints gbcZipLabel = new GridBagConstraints();
+        gbcZipLabel.anchor = GridBagConstraints.EAST;
+        gbcZipLabel.insets = new Insets(0, 0, 5, 5);
+        gbcZipLabel.gridx = 1;
+        gbcZipLabel.gridy = 5;
+        customerDetailJpanel.add(zipLabel, gbcZipLabel);
 
-        JLabel customerZipLable = new JLabel("8645");
-        GridBagConstraints gbc_customerZipLable = new GridBagConstraints();
-        gbc_customerZipLable.anchor = GridBagConstraints.WEST;
-        gbc_customerZipLable.insets = new Insets(0, 0, 5, 0);
-        gbc_customerZipLable.gridx = 3;
-        gbc_customerZipLable.gridy = 5;
-        customerDetailJpanel.add(customerZipLable, gbc_customerZipLable);
+        JLabel customerZipLabel = new JLabel("8645");
+        GridBagConstraints gbcCustomerZipLabel = new GridBagConstraints();
+        gbcCustomerZipLabel.anchor = GridBagConstraints.WEST;
+        gbcCustomerZipLabel.insets = new Insets(0, 0, 5, 0);
+        gbcCustomerZipLabel.gridx = 3;
+        gbcCustomerZipLabel.gridy = 5;
+        customerDetailJpanel.add(customerZipLabel, gbcCustomerZipLabel);
 
-        JLabel cityLable = new JLabel("City:");
-        GridBagConstraints gbc_cityLable = new GridBagConstraints();
-        gbc_cityLable.anchor = GridBagConstraints.EAST;
-        gbc_cityLable.insets = new Insets(0, 0, 0, 5);
-        gbc_cityLable.gridx = 1;
-        gbc_cityLable.gridy = 6;
-        customerDetailJpanel.add(cityLable, gbc_cityLable);
+        JLabel cityLabel = new JLabel("City:");
+        GridBagConstraints gbcCityLabel = new GridBagConstraints();
+        gbcCityLabel.anchor = GridBagConstraints.EAST;
+        gbcCityLabel.insets = new Insets(0, 0, 0, 5);
+        gbcCityLabel.gridx = 1;
+        gbcCityLabel.gridy = 6;
+        customerDetailJpanel.add(cityLabel, gbcCityLabel);
 
-        JLabel cityNameLable = new JLabel("Rapperswil-Jona");
-        GridBagConstraints gbc_cityNameLable = new GridBagConstraints();
-        gbc_cityNameLable.anchor = GridBagConstraints.WEST;
-        gbc_cityNameLable.gridx = 3;
-        gbc_cityNameLable.gridy = 6;
-        customerDetailJpanel.add(cityNameLable, gbc_cityNameLable);
+        JLabel cityNameLabel = new JLabel("Rapperswil-Jona");
+        GridBagConstraints gbcCityNameLabel = new GridBagConstraints();
+        gbcCityNameLabel.anchor = GridBagConstraints.WEST;
+        gbcCityNameLabel.gridx = 3;
+        gbcCityNameLabel.gridy = 6;
+        customerDetailJpanel.add(cityNameLabel, gbcCityNameLabel);
 
         JPanel loanDetailJpanel = new JPanel();
         loanDetailJpanel.setBorder(new TitledBorder(null, "Loan details",
@@ -194,6 +193,14 @@ public class CustomerLoanDetailJPanel extends JPanel {
         loanDetailJpanel.add(loanDetailTable);
     }
 
+    private void initHandlersForExistingLoan() {
+
+    }
+
+    private void initHandlersForNewLoan() {
+
+    }
+
     /**
      * Registers a collection of actions to a given keystroke on this panel and
      * all subcomponents.
@@ -202,7 +209,6 @@ public class CustomerLoanDetailJPanel extends JPanel {
      *            map with keystrokes and their associated actions<br>
      *            {@code key}: keystroke to bind the action to<br> {@code value}
      *            : action that should be fired when keystroke has been pressed
-     * 
      */
     void addAncestorActions(Map<KeyStroke, Action> someActions) {
         for (Map.Entry<KeyStroke, Action> tempAction : someActions.entrySet()) {

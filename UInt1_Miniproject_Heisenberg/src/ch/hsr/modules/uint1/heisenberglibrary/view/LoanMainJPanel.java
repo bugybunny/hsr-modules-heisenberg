@@ -62,8 +62,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
  * 
  * @author msyfrig
  */
-public class LoanMainJPanel extends AbstractSearchableTableJPanel implements
-        Observer {
+public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
     private static final long                         serialVersionUID = 8186612854405487707L;
 
     private JTable                                    loanTable;
