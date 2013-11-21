@@ -44,15 +44,15 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
  */
 public class CustomerLoanDetailJPanel extends
         AbstractObservableObjectJPanel<Customer> {
-    private static final long   serialVersionUID = 1811625089328376836L;
-    private JTable              loanDetailTable;
-    private Library             library;
-    private JLabel              customerAddressLabel;
-    private JLabel              customerZipLabel;
-    private JLabel              cityNameLabel;
-    private JLabel              customerSurnameLabel;
-    private JLabel              customerNameLabel;
-    private JComboBox<Customer> selectCustomerComboBox;
+    private static final long                                    serialVersionUID = 1811625089328376836L;
+    private JTable                                               loanDetailTable;
+    private Library                                              library;
+    private JLabel                                               customerAddressLabel;
+    private JLabel                                               customerZipLabel;
+    private JLabel                                               cityNameLabel;
+    private JLabel                                               customerSurnameLabel;
+    private JLabel                                               customerNameLabel;
+    private JComboBox<CustomerComboboxModel.DisplayableCustomer> selectCustomerComboBox;
 
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
         super(aCustomer);
@@ -243,8 +243,9 @@ public class CustomerLoanDetailJPanel extends
             customerSurnameLabel.setText(displayedObject.getSurname());
             customerNameLabel.setText(displayedObject.getName());
             customerZipLabel.setText(String.valueOf(displayedObject.getZip()));
-            customerAddressLabel.setText(displayedObject.getStreet() + ", "
-                    + displayedObject.getCity());
+            customerAddressLabel.setText(displayedObject.getStreet());
+            cityNameLabel.setText(displayedObject.getCity());
+
         }
     }
 }

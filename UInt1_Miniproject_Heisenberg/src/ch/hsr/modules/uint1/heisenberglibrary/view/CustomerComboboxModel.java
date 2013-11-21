@@ -14,6 +14,7 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -23,25 +24,46 @@ import javax.swing.ComboBoxModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
+import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
 
 /**
  * TODO COMMENT ME!
  * 
  * @author msyfrig
  */
-public class CustomerComboboxModel extends AbstractListModel<Customer>
-        implements ComboBoxModel<Customer>, Observer {
-    private static final long serialVersionUID = -5830729956015597480L;
-    private Library           library;
-    private Customer          selectedCustomer;
-    private List<Customer>    customers;
+public class CustomerComboboxModel extends
+        AbstractListModel<DisplayableCustomer> implements
+        ComboBoxModel<DisplayableCustomer>, Observer {
+    private static final long         serialVersionUID = -5830729956015597480L;
+    private Library                   library;
+    private Customer                  selectedCustomer;
+    private List<DisplayableCustomer> customers;
 
     public CustomerComboboxModel(Library aLibrary) {
         library = aLibrary;
         library.addObserver(this);
-        customers = library.getCustomers();
+        initCustomers(library.getCustomers());
         if (customers.size() > 0) {
             selectedCustomer = customers.get(0);
+        }
+    }
+
+    private void initCustomers(List<Customer> someCustomers) {
+        if (customers == null) {
+            customers = new ArrayList<>(someCustomers.size());
+        } else {
+            customers.clear();
+        }
+
+        for (Customer tempCustomer : someCustomers) {
+            int activeLoanCount = library.getActiveCustomerLoans(
+                    selectedCustomer).size();
+            DisplayableCustomer customerToAdd = new DisplayableCustomer(
+                    tempCustomer, activeLoanCount);
+            customers.add(customerToAdd);
         }
     }
 
@@ -60,7 +82,7 @@ public class CustomerComboboxModel extends AbstractListModel<Customer>
     }
 
     @Override
-    public Customer getElementAt(int anIndex) {
+    public DisplayableCustomer getElementAt(int anIndex) {
         return customers.get(anIndex);
     }
 
@@ -82,7 +104,34 @@ public class CustomerComboboxModel extends AbstractListModel<Customer>
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        // TODO Auto-generated method stub
-
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            ModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
+                initCustomers(library.getCustomers());
+                fireContentsChanged(this, -1, -1);
+            }
+        }
     }
+
+    protected class DisplayableCustomer extends Customer {
+        private int activeLoanCount;
+
+        private DisplayableCustomer(Customer aCustomer, int anActiveLoanCount) {
+            super(aCustomer.getName(), aCustomer.getSurname());
+            city = aCustomer.getCity();
+            street = aCustomer.getStreet();
+            zip = aCustomer.getZip();
+            activeLoanCount = anActiveLoanCount;
+        }
+
+        public int getActiveLoanCount() {
+            return activeLoanCount;
+        }
+
+        protected void setActiveLoanCount(int aActiveLoanCount) {
+            activeLoanCount = aActiveLoanCount;
+        }
+    }
+
 }

@@ -21,11 +21,11 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
  */
 public class Customer extends AbstractObservable {
 
-    private String name;
-    private String surname;
-    private String street;
-    private String city;
-    private int    zip;
+    protected String name;
+    protected String surname;
+    protected String street;
+    protected String city;
+    protected int    zip;
 
     public Customer(String aName, String aSurname) {
         name = aName;

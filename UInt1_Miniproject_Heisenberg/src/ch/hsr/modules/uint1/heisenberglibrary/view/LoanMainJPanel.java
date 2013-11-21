@@ -199,6 +199,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
         // init the table with the model with all properties and handlers and
         // add it the panel
         initTable(new LoanTableModel(dataList));
+        tableFilter = new TableFilter<>(table, searchTextField);
         centerPanel.add(tableScrollPane);
     }
 
