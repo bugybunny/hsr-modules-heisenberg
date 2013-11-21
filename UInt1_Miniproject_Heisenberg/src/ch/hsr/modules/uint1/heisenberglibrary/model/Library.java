@@ -31,11 +31,10 @@ public class Library extends AbstractObservable {
             doNotify(new ObservableModelChangeEvent(
                     ModelChangeTypeEnums.Loan.NUMBER, Integer.valueOf(loans
                             .size() - 1), Integer.valueOf(loans.size())));
-            activeLoanCount++;
             doNotify(new ObservableModelChangeEvent(
                     ModelChangeTypeEnums.Loan.ACTIVE_NUMBER,
-                    Integer.valueOf(activeLoanCount - 1),
-                    Integer.valueOf(activeLoanCount)));
+                    Integer.valueOf(activeLoanCount),
+                    Integer.valueOf(++activeLoanCount)));
             return l;
         }
         return null;
@@ -80,6 +79,12 @@ public class Library extends AbstractObservable {
     }
 
     public void removeCopy(Copy removeCopy) {
+        if (isCopyLent(removeCopy)) {
+            doNotify(new ObservableModelChangeEvent(
+                    ModelChangeTypeEnums.Loan.ACTIVE_NUMBER,
+                    Integer.valueOf(activeLoanCount),
+                    Integer.valueOf(--activeLoanCount)));
+        }
         copies.remove(removeCopy);
 
         doNotify(new ObservableModelChangeEvent(
@@ -88,7 +93,6 @@ public class Library extends AbstractObservable {
                 ModelChangeTypeEnums.Copy.NUMBER,
                 Integer.valueOf(copies.size() - 1), Integer.valueOf(copies
                         .size())));
-
     }
 
     public void removeCopies(Collection<Copy> someCopiesToDelete) {
@@ -110,6 +114,12 @@ public class Library extends AbstractObservable {
         Loan activeLoan = getActiveLoanForCopy(aCopyToReturn);
         if (activeLoan != null) {
             activeLoan.returnCopy();
+            doNotify(new ObservableModelChangeEvent(
+                    ModelChangeTypeEnums.Loan.RETURNED, activeLoan, activeLoan));
+            doNotify(new ObservableModelChangeEvent(
+                    ModelChangeTypeEnums.Loan.ACTIVE_NUMBER,
+                    Integer.valueOf(activeLoanCount),
+                    Integer.valueOf(--activeLoanCount)));
         }
         return activeLoan;
     }

@@ -16,15 +16,12 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -36,9 +33,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -48,7 +42,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
-import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
@@ -62,10 +55,10 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
  * 
  * @author msyfrig
  */
-public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
+public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
+        Observer {
     private static final long                         serialVersionUID = 8186612854405487707L;
 
-    private JTable                                    loanTable;
     private TableFilter<LoanTableModel>               tableFilter;
     private OnlyOverdueFilter<LoanTableModel, Object> onlyOverdueFilter;
     private JPanel                                    centerPanel;
@@ -76,7 +69,6 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
     private JLabel                                    numberOfLoansLabel;
     private JLabel                                    numberOfCurrentyLoanedCopiesLabel;
     private JLabel                                    overdueLabel;
-    private GhostHintJTextField                       searchTextField;
     private JCheckBox                                 onlyOverdueCheckbox;
     private Component                                 horizontalStrut;
     private JPanel                                    panel;
@@ -87,15 +79,14 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
     private ViewSelectedCustomerLoansAction           viewSelectedCustomerLoansAction;
     private AddLoanAction                             addLoanAction;
 
-    private List<Loan>                                activeLoanList;
     private Library                                   library;
 
     /**
      * Creates the panel.
      */
     public LoanMainJPanel(Library aLibrary) {
+        super(aLibrary.getActiveLoans());
         library = aLibrary;
-        activeLoanList = library.getActiveLoans();
         initComponents();
         initHandlers();
         library.addObserver(this);
@@ -163,11 +154,9 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
         topPane.add(inventoryPanel);
         inventoryPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-        searchTextField = new GhostHintJTextField(
-                UiComponentStrings
-                        .getString("LoanMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
+        initSearchTextField(UiComponentStrings
+                .getString("LoanMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
         inventoryPanel.add(searchTextField);
-        searchTextField.setColumns(10);
 
         onlyOverdueCheckbox = new JCheckBox(
                 UiComponentStrings
@@ -207,20 +196,10 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
 
         centerPanel.setLayout(new BorderLayout(0, 0));
 
-        loanTable = new JTable();
-        loanTable.setMinimumSize(new Dimension(200, 100));
-        loanTable.setModel(new LoanTableModel(activeLoanList));
-        tableFilter = new TableFilter<>(loanTable, searchTextField);
-        loanTable.getTableHeader().setReorderingAllowed(false);
-        loanTable.setAutoCreateRowSorter(true);
-        loanTable.setCellSelectionEnabled(true);
-        loanTable.setFillsViewportHeight(true);
-        loanTable.setColumnSelectionAllowed(false);
-        loanTable
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        JScrollPane jsp = new JScrollPane(loanTable);
-        centerPanel.add(jsp);
+        // init the table with the model with all properties and handlers and
+        // add it the panel
+        initTable(new LoanTableModel(dataList));
+        centerPanel.add(tableScrollPane);
     }
 
     private void initHandlers() {
@@ -233,23 +212,9 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
         addLoanAction = new AddLoanAction(addLoanButton.getText());
         addLoanButton.setAction(addLoanAction);
 
-        loanTable.getSelectionModel().addListSelectionListener(
+        table.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
 
-        ((LoanTableModel) loanTable.getModel())
-                .addTableModelChangeListener(new TableModelChangeListener() {
-                    private Collection<Loan> previouslySelectedBooks;
-
-                    @Override
-                    public void tableIsAboutToUpdate() {
-                        previouslySelectedBooks = saveSelectedRows();
-                    }
-
-                    @Override
-                    public void tableChanged() {
-                        restoreSelectedRows(previouslySelectedBooks);
-                    }
-                });
         onlyOverdueFilter = new OnlyOverdueFilter<>();
         onlyOverdueCheckbox.addItemListener(new ItemListener() {
 
@@ -263,49 +228,6 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
                 tableFilter.filterTable();
             }
         });
-        ColumnsAutoSizer.sizeColumnsToFit(loanTable);
-    }
-
-    @Override
-    public GhostHintJTextField getSearchTextField() {
-        return searchTextField;
-    }
-
-    /**
-     * Saves the selected loans in the table. The actual loan instances are
-     * saved since loans can be added or removed so only saving the row index is
-     * not enough.
-     * 
-     * @return set of currently selected loans
-     */
-    private Set<Loan> saveSelectedRows() {
-        Set<Loan> selectedLoans = new HashSet<>(loanTable.getSelectedRowCount());
-        for (int selectionIndex : loanTable.getSelectedRows()) {
-            Loan singleSelectedBook = activeLoanList.get(loanTable
-                    .convertRowIndexToModel(selectionIndex));
-            selectedLoans.add(singleSelectedBook);
-        }
-        return selectedLoans;
-    }
-
-    /**
-     * Reselect the given loans in the table if they still exist.
-     * 
-     * @param someLoansToSelect
-     *            the loans to select
-     */
-    private void restoreSelectedRows(Collection<Loan> someLoansToSelect) {
-        for (Loan tempLoanToSelect : someLoansToSelect) {
-
-            int indexInList = activeLoanList.indexOf(tempLoanToSelect);
-            // do nothing if not found and loan has been removed
-            if (indexInList > -1) {
-                int indexToSelectInView = loanTable
-                        .convertRowIndexToView(indexInList);
-                loanTable.getSelectionModel().addSelectionInterval(
-                        indexToSelectInView, indexToSelectInView);
-            }
-        }
     }
 
     @Override
@@ -328,9 +250,9 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
                                 modelChange.getNewValue()));
             } else if (type == ModelChangeTypeEnums.Loan.ADDED
                     || type == ModelChangeTypeEnums.Loan.REMOVED) {
-                ((AbstractTableModel) loanTable.getModel())
-                        .fireTableDataChanged();
+                ((AbstractTableModel) table.getModel()).fireTableDataChanged();
             }
+            // TODO dataList neu setzen wenn sich bei den activeLoans was ändert
             // TODO event für overdue loan Anzahl Verniedrigung, sobald ein eine
             // overdue Ausleihe zurückgegeben wurde
             // TODO events für remove und update und added von loans mit
@@ -372,10 +294,9 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
             // the tab is already open
             Set<Customer> customersToOpenSet = new HashSet<>();
 
-            for (int tempLoan : loanTable.getSelectedRows()) {
-                Customer selectedCustomerLoan = activeLoanList.get(
-                        loanTable.convertRowIndexToModel(tempLoan))
-                        .getCustomer();
+            for (int tempLoan : table.getSelectedRows()) {
+                Customer selectedCustomerLoan = dataList.get(
+                        table.convertRowIndexToModel(tempLoan)).getCustomer();
                 customersToOpenSet.add(selectedCustomerLoan);
             }
             for (Customer tempCustomer : customersToOpenSet) {
@@ -415,7 +336,7 @@ public class LoanMainJPanel extends SearchableTableJPanel implements Observer {
          */
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
-            if (loanTable.getSelectedRows().length > 0) {
+            if (table.getSelectedRows().length > 0) {
                 viewSelectedCustomerLoansAction.setEnabled(true);
             } else {
                 viewSelectedCustomerLoansAction.setEnabled(false);

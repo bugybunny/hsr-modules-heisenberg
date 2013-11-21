@@ -30,7 +30,7 @@ public class ModelChangeTypeEnums {
     }
 
     public enum Loan implements ModelChangeType {
-        ADDED, REMOVED, NUMBER, ACTIVE_NUMBER, PICKUP_DATE, EVERYTHING_CHANGED;
+        ADDED, REMOVED, NUMBER, ACTIVE_NUMBER, PICKUP_DATE, EVERYTHING_CHANGED, RETURNED;
     }
 
     public enum Customer implements ModelChangeType {

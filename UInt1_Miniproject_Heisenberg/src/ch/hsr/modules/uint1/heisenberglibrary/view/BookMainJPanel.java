@@ -24,12 +24,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,10 +36,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -53,7 +46,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
-import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
@@ -65,14 +57,10 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
  * 
  * @author msyfrig
  */
-public class BookMainJPanel extends SearchableTableJPanel implements Observer {
+public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
+        Observer {
     private static final long                           serialVersionUID = 8186612854405487707L;
 
-    /**
-     * The table that displays all different booktypes in the library, not the
-     * actual copies.
-     */
-    private JTable                                      bookTable;
     private TableFilter<BookTableModel>                 tableFilter;
     private OnlyAvailableFilter<BookTableModel, Object> onlyAvailableFilter;
     private JPanel                                      centerPanel;
@@ -82,7 +70,6 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
     private JPanel                                      inventoryPanel;
     private JLabel                                      numberOfBooksLabel;
     private JLabel                                      numberOfCopiesLabel;
-    private GhostHintJTextField                         searchTextField;
     private JCheckBox                                   onlyAvailableCheckbox;
     private Component                                   horizontalStrut;
     private JPanel                                      panel;
@@ -90,11 +77,10 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
     private JPanel                                      outerStatisticsPanel;
     private BookDetailJDialog                           bookDetailDialog;
 
-    private List<BookDO>                                bookList;
     private Library                                     library;
 
     public BookMainJPanel(Library aLibrary) {
-        bookList = aLibrary.getBooks();
+        super(aLibrary.getBooks());
         library = aLibrary;
         initComponents();
         initHandlers();
@@ -152,11 +138,11 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
         topPane.add(inventoryPanel);
         inventoryPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-        searchTextField = new GhostHintJTextField(
-                UiComponentStrings
-                        .getString("BookMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
+        // initialize the searchfield for the table, add all handlers and add it
+        // to the layout
+        initSearchTextField(UiComponentStrings
+                .getString("BookMainJPanel.textfield.search.defaulttext")); //$NON-NLS-1$
         inventoryPanel.add(searchTextField);
-        searchTextField.setColumns(10);
 
         onlyAvailableCheckbox = new JCheckBox(
                 UiComponentStrings
@@ -199,20 +185,11 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
 
         centerPanel.setLayout(new BorderLayout(0, 0));
 
-        bookTable = new JTable();
-        bookTable.setModel(new BookTableModel(library));
-        tableFilter = new TableFilter<>(bookTable, searchTextField);
-        bookTable.getTableHeader().setReorderingAllowed(false);
-        bookTable.setAutoCreateRowSorter(true);
-        bookTable.setCellSelectionEnabled(true);
-        bookTable.setFillsViewportHeight(true);
-        bookTable.setColumnSelectionAllowed(false);
-
-        bookTable.getSelectionModel().setSelectionMode(
-                ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        JScrollPane jsp = new JScrollPane(bookTable);
-        centerPanel.add(jsp);
+        // init the table with the model with all properties and handlers and
+        // add it the panel
+        initTable(new BookTableModel(library));
+        tableFilter = new TableFilter<>(table, searchTextField);
+        centerPanel.add(tableScrollPane);
     }
 
     private void initHandlers() {
@@ -234,23 +211,8 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
                 addBookAction.getValue(Action.NAME));
         getActionMap().put(addBookAction.getValue(Action.NAME), addBookAction);
 
-        bookTable.getSelectionModel().addListSelectionListener(
+        table.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
-
-        ((BookTableModel) bookTable.getModel())
-                .addTableModelChangeListener(new TableModelChangeListener() {
-                    private Collection<BookDO> previouslySelectedBooks;
-
-                    @Override
-                    public void tableIsAboutToUpdate() {
-                        previouslySelectedBooks = saveSelectedRows();
-                    }
-
-                    @Override
-                    public void tableChanged() {
-                        restoreSelectedRows(previouslySelectedBooks);
-                    }
-                });
 
         onlyAvailableFilter = new OnlyAvailableFilter<>();
         onlyAvailableCheckbox.addItemListener(new ItemListener() {
@@ -265,50 +227,6 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
                 tableFilter.filterTable();
             }
         });
-        ColumnsAutoSizer.sizeColumnsToFit(bookTable, 5);
-    }
-
-    @Override
-    public GhostHintJTextField getSearchTextField() {
-        return searchTextField;
-    }
-
-    /**
-     * Saves the selected books in the table. The actual book instances are
-     * saved since books can be added or removed so only saving the row index is
-     * not enough.
-     * 
-     * @return set of currently selected books
-     */
-    private Set<BookDO> saveSelectedRows() {
-        Set<BookDO> selectedBooks = new HashSet<>(
-                bookTable.getSelectedRowCount());
-        for (int selectionIndex : bookTable.getSelectedRows()) {
-            BookDO singleSelectedBook = bookList.get(bookTable
-                    .convertRowIndexToModel(selectionIndex));
-            selectedBooks.add(singleSelectedBook);
-        }
-        return selectedBooks;
-    }
-
-    /**
-     * Reselect the given books in the table if they still exist.
-     * 
-     * @param someBooksToSelect
-     *            the books to select
-     */
-    private void restoreSelectedRows(Collection<BookDO> someBooksToSelect) {
-        for (BookDO tempBookToSelect : someBooksToSelect) {
-
-            int indexInList = bookList.indexOf(tempBookToSelect);
-            // do nothing if not found and books has been removed
-            if (indexInList > -1) {
-                int indexToSelectInView = bookTable
-                        .convertRowIndexToView(indexInList);
-                bookTable.getSelectionModel().addSelectionInterval(
-                        indexToSelectInView, indexToSelectInView);
-            }
-        }
     }
 
     @Override
@@ -318,8 +236,7 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
             ModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.ADDED
                     || type == ModelChangeTypeEnums.Book.REMOVED) {
-                ((AbstractTableModel) bookTable.getModel())
-                        .fireTableDataChanged();
+                ((AbstractTableModel) table.getModel()).fireTableDataChanged();
             } else if (type == ModelChangeTypeEnums.Book.NUMBER) {
                 numberOfBooksLabel
                         .setText(MessageFormat.format(
@@ -358,8 +275,8 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
             bookDetailDialog.setVisible(true);
             bookDetailDialog.toFront();
 
-            for (int tempBook : bookTable.getSelectedRows()) {
-                BookDO selectedBook = bookList.get(bookTable
+            for (int tempBook : table.getSelectedRows()) {
+                BookDO selectedBook = dataList.get(table
                         .convertRowIndexToModel(tempBook));
                 bookDetailDialog.openBookTab(selectedBook, library);
             }
@@ -397,7 +314,7 @@ public class BookMainJPanel extends SearchableTableJPanel implements Observer {
          */
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
-            if (bookTable.getSelectedRowCount() > 0) {
+            if (table.getSelectedRowCount() > 0) {
                 viewSelectedButton.setEnabled(true);
             } else {
                 viewSelectedButton.setEnabled(false);

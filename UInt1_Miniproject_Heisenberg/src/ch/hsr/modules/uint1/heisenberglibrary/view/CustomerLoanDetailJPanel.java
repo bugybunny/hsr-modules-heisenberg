@@ -19,42 +19,56 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.Map;
+import java.util.Observable;
 
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.border.TitledBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 
 /**
- * TODO COMMENT ME!
+ * Panel to display a customer and his currently lent out books and to enter new
+ * loans.
  * 
  * @author twinter
  * @author msyfrig
  */
-public class CustomerLoanDetailJPanel extends JPanel {
-    private static final long serialVersionUID = 1811625089328376836L;
-    private JTable            loanDetailTable;
-    private Customer          displayedCustomer;
-    private Library           library;
+public class CustomerLoanDetailJPanel extends
+        AbstractObservableObjectJPanel<Customer> {
+    private static final long   serialVersionUID = 1811625089328376836L;
+    private JTable              loanDetailTable;
+    private Library             library;
+    private JLabel              customerAddressLabel;
+    private JLabel              customerZipLabel;
+    private JLabel              cityNameLabel;
+    private JLabel              customerSurnameLabel;
+    private JLabel              customerNameLabel;
+    private JComboBox<Customer> selectCustomerComboBox;
 
-    /**
-     * Create the panel.
-     */
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
-        displayedCustomer = aCustomer;
+        super(aCustomer);
         library = aLibrary;
         initComponents();
+        setCustomer(aCustomer);
+        library.addObserver(this);
+    }
+
+    private void setCustomer(Customer aNewCustomer) {
+        setDisplayedObject(aNewCustomer);
+        if (displayedObject != null) {
+            selectCustomerComboBox.setSelectedItem(displayedObject);
+            selectCustomerComboBox.setEnabled(false);
+        }
+        updateDisplay();
     }
 
     private void initComponents() {
@@ -82,8 +96,8 @@ public class CustomerLoanDetailJPanel extends JPanel {
                 0.0, 0.0, 0.0, Double.MIN_VALUE };
         customerDetailJpanel.setLayout(gblCustomerDetailJpanel);
 
-        JComboBox<Customer> selectCustomerComboBox = new JComboBox<>(
-                new CustomerComboboxModel(library));
+        selectCustomerComboBox = new JComboBox<>(new CustomerComboboxModel(
+                library));
         GridBagConstraints gbcSelectCustomerComboBox = new GridBagConstraints();
         gbcSelectCustomerComboBox.gridwidth = 3;
         gbcSelectCustomerComboBox.insets = new Insets(0, 0, 5, 5);
@@ -101,7 +115,7 @@ public class CustomerLoanDetailJPanel extends JPanel {
         gbcNameLabel.gridy = 2;
         customerDetailJpanel.add(nameLabel, gbcNameLabel);
 
-        JLabel customerNameLabel = new JLabel("Hans");
+        customerNameLabel = new JLabel("Hans");
         GridBagConstraints gbcCustomerNameLabel = new GridBagConstraints();
         gbcCustomerNameLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerNameLabel.insets = new Insets(0, 0, 5, 0);
@@ -117,7 +131,7 @@ public class CustomerLoanDetailJPanel extends JPanel {
         gbcSurnameLabel.gridy = 3;
         customerDetailJpanel.add(surnameLabel, gbcSurnameLabel);
 
-        JLabel customerSurnameLabel = new JLabel("Müller-Meier");
+        customerSurnameLabel = new JLabel(UiComponentStrings.getString("empty"));
         GridBagConstraints gbcCustomerSurnameLabel = new GridBagConstraints();
         gbcCustomerSurnameLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerSurnameLabel.insets = new Insets(0, 0, 5, 0);
@@ -133,7 +147,7 @@ public class CustomerLoanDetailJPanel extends JPanel {
         gbcAddressLabel.gridy = 4;
         customerDetailJpanel.add(addressLabel, gbcAddressLabel);
 
-        JLabel customerAddressLabel = new JLabel("Exemplarstrasse 33");
+        customerAddressLabel = new JLabel(UiComponentStrings.getString("empty"));
         GridBagConstraints gbcCustomerAddressLabel = new GridBagConstraints();
         gbcCustomerAddressLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerAddressLabel.insets = new Insets(0, 0, 5, 0);
@@ -149,7 +163,7 @@ public class CustomerLoanDetailJPanel extends JPanel {
         gbcZipLabel.gridy = 5;
         customerDetailJpanel.add(zipLabel, gbcZipLabel);
 
-        JLabel customerZipLabel = new JLabel("8645");
+        customerZipLabel = new JLabel(UiComponentStrings.getString("empty"));
         GridBagConstraints gbcCustomerZipLabel = new GridBagConstraints();
         gbcCustomerZipLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerZipLabel.insets = new Insets(0, 0, 5, 0);
@@ -165,7 +179,7 @@ public class CustomerLoanDetailJPanel extends JPanel {
         gbcCityLabel.gridy = 6;
         customerDetailJpanel.add(cityLabel, gbcCityLabel);
 
-        JLabel cityNameLabel = new JLabel("Rapperswil-Jona");
+        cityNameLabel = new JLabel(UiComponentStrings.getString("empty"));
         GridBagConstraints gbcCityNameLabel = new GridBagConstraints();
         gbcCityNameLabel.anchor = GridBagConstraints.WEST;
         gbcCityNameLabel.gridx = 3;
@@ -201,25 +215,36 @@ public class CustomerLoanDetailJPanel extends JPanel {
 
     }
 
-    /**
-     * Registers a collection of actions to a given keystroke on this panel and
-     * all subcomponents.
-     * 
-     * @param someActions
-     *            map with keystrokes and their associated actions<br>
-     *            {@code key}: keystroke to bind the action to<br> {@code value}
-     *            : action that should be fired when keystroke has been pressed
-     */
-    void addAncestorActions(Map<KeyStroke, Action> someActions) {
-        for (Map.Entry<KeyStroke, Action> tempAction : someActions.entrySet()) {
-            Object actionName = tempAction.getValue().getValue(Action.NAME);
-            getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-                    tempAction.getKey(), actionName);
-            getActionMap().put(actionName, tempAction.getValue());
+    @Override
+    public void update(Observable anObesrvable, Object anArgument) {
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            ModelChangeType type = modelChange.getChangeType();
+            // TODO implementieren
         }
     }
 
-    public Customer getDisplayedCustomer() {
-        return displayedCustomer;
+    @Override
+    protected boolean save() {
+        // nothing to do here since we cannot change customers
+        return false;
+    }
+
+    private void updateDisplay() {
+        // this case should never happen, that the book is null but it still
+        // prevents us from a npe
+        if (displayedObject == null) {
+            customerSurnameLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
+            customerNameLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
+            customerZipLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
+            customerAddressLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
+
+        } else {
+            customerSurnameLabel.setText(displayedObject.getSurname());
+            customerNameLabel.setText(displayedObject.getName());
+            customerZipLabel.setText(String.valueOf(displayedObject.getZip()));
+            customerAddressLabel.setText(displayedObject.getStreet() + ", "
+                    + displayedObject.getCity());
+        }
     }
 }

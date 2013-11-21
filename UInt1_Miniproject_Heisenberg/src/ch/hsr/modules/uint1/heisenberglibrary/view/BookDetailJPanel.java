@@ -29,28 +29,22 @@ import java.awt.event.ItemListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -78,24 +72,11 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookCopyModel;
  * @author msyfrig
  * @author twinter
  */
-// TODO sternchen wird nicht angezeigt wenn neues Buch gespeichert wurde und der
-// save Button ist nicht enabled
-
-public class BookDetailJPanel extends JPanel implements Observer {
+public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
+        implements Observer {
     private static final long serialVersionUID = 3353323227207467624L;
 
-    /**
-     * The displayed book that can be edited and is observed via observer
-     * pattern.
-     */
-    private BookDO            displayedBook;
-
     private Library           library;
-
-    /**
-     * Flag to indicate if there are unsaved changes in this panel.
-     */
-    private boolean           dirty;
 
     // components
     private JTextField        titleTextfield;
@@ -118,6 +99,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * Creates a new instance of this class and sets the models.
      */
     public BookDetailJPanel(BookDO aBookDo, Library aLibrary) {
+        super(aBookDo);
         library = aLibrary;
         initEverything(aBookDo);
         library.addObserver(this);
@@ -129,24 +111,14 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * added.
      */
     private void setBook(BookDO aNewBook) {
-
-        // do nothing if same book is set
-        if (aNewBook != displayedBook) {
-            // delete observers for this old, not anymore displayed book
-            if (displayedBook != null) {
-                displayedBook.deleteObserver(this);
-            }
-            displayedBook = aNewBook;
-            // add observers for new book object
-            if (displayedBook != null) {
-                displayedBook.addObserver(this);
-                addCopyAction.setEnabled(true);
-            } else {
-                addCopyAction.setEnabled(false);
-            }
-            bookCopyTable.setModel(new BookCopyModel(displayedBook, library));
-            updateDisplay();
+        setDisplayedObject(aNewBook);
+        if (displayedObject != null) {
+            addCopyAction.setEnabled(true);
+        } else {
+            addCopyAction.setEnabled(false);
         }
+        bookCopyTable.setModel(new BookCopyModel(displayedObject, library));
+        updateDisplay();
     }
 
     /**
@@ -157,16 +129,13 @@ public class BookDetailJPanel extends JPanel implements Observer {
      */
     private void initEverything(BookDO aBookDo) {
         initComponents();
-        // needs to be before the initHandlers call otherwise some listeners
-        // won't be added since displayedBookDO is null
         initHandlersForNewBook();
         setBook(aBookDo);
-        if (displayedBook != null) {
+        if (displayedObject != null) {
             initHandlersForSetBook();
         }
         updateNumberOfCopiesLabel();
         updateNumberOfAvailableCopiesLabel();
-        // bookCopyTable.setModel(new BookCopyModel(displayedBook, library));
     }
 
     /**
@@ -343,13 +312,11 @@ public class BookDetailJPanel extends JPanel implements Observer {
         bookCopyTable.setCellSelectionEnabled(true);
         bookCopyTable.setFillsViewportHeight(true);
         bookCopyTable.setColumnSelectionAllowed(false);
-        southBookList.add(bookCopyTable);
 
+        // TODO hier ist noch was komisch, jsp wird gar nicht angzeigt
         JScrollPane jsp = new JScrollPane(bookCopyTable);
-        southPanel.add(jsp, BorderLayout.CENTER);
-
-        JScrollPane scrollPane = new JScrollPane();
-        southBookList.add(scrollPane);
+        southBookList.add(jsp, BorderLayout.CENTER);
+        southPanel.add(southBookList);
     }
 
     /**
@@ -412,7 +379,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
         addBookButton.setText(UiComponentStrings
                 .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
 
-        comboShelf.setSelectedItem(displayedBook.getShelf());
+        comboShelf.setSelectedItem(displayedObject.getShelf());
         comboShelf.addItemListener(new ItemListener() {
 
             @Override
@@ -423,42 +390,23 @@ public class BookDetailJPanel extends JPanel implements Observer {
         comboShelf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (displayedBook != null) {
-                    displayedBook.setShelf((Shelf) comboShelf.getSelectedItem());
+                if (displayedObject != null) {
+                    displayedObject.setShelf((Shelf) comboShelf
+                            .getSelectedItem());
                 }
             }
         });
         titleTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(titleTextfield, displayedBook
-                        .getTitle()));
+                new ChangeToDirtyDocumentListener(titleTextfield,
+                        displayedObject.getTitle()));
 
         authorTextfield.getDocument().addDocumentListener(
                 new ChangeToDirtyDocumentListener(authorTextfield,
-                        displayedBook.getAuthor()));
+                        displayedObject.getAuthor()));
 
         publisherTextfield.getDocument().addDocumentListener(
                 new ChangeToDirtyDocumentListener(publisherTextfield,
-                        displayedBook.getPublisher()));
-
-    }
-
-    /**
-     * Registers a collection of actions to a given keystroke on this panel and
-     * all subcomponents.
-     * 
-     * @param someActions
-     *            map with keystrokes and their associated actions<br>
-     *            {@code key}: keystroke to bind the action to<br> {@code value}
-     *            : action that should be fired when keystroke has been pressed
-     * 
-     */
-    void addAncestorActions(Map<KeyStroke, Action> someActions) {
-        for (Map.Entry<KeyStroke, Action> tempAction : someActions.entrySet()) {
-            Object actionName = tempAction.getValue().getValue(Action.NAME);
-            getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-                    tempAction.getKey(), actionName);
-            getActionMap().put(actionName, tempAction.getValue());
-        }
+                        displayedObject.getPublisher()));
     }
 
     /**
@@ -467,9 +415,9 @@ public class BookDetailJPanel extends JPanel implements Observer {
      * @return if something has been saved, is not the case if
      *         {@code dirty==false}
      */
+    @Override
     protected boolean save() {
-
-        if (displayedBook == null) {
+        if (displayedObject == null) {
             BookDO createdBook = library.createAndAddBook(titleTextfield
                     .getText());
             createdBook.set(titleTextfield.getText(),
@@ -484,80 +432,13 @@ public class BookDetailJPanel extends JPanel implements Observer {
         }
 
         if (isDirty()) {
-            displayedBook.set(titleTextfield.getText(),
+            displayedObject.set(titleTextfield.getText(),
                     authorTextfield.getText(), publisherTextfield.getText(),
-                    displayedBook.getShelf());
+                    displayedObject.getShelf());
             setDirty(false);
             return true;
         }
         return false;
-    }
-
-    /**
-     * @param isDirty
-     *            the dirty to set
-     */
-    public void setDirty(boolean isDirty) {
-        ModelStateChangeEvent newState = null;
-        if (dirty) {
-            if (isDirty) {
-                newState = new ModelStateChangeEvent(this,
-                        ModelStateChangeEvent.MODEL_STILL_DIRTY);
-            } else {
-                newState = new ModelStateChangeEvent(this,
-                        ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED);
-            }
-        } else {
-            if (isDirty) {
-                newState = new ModelStateChangeEvent(this,
-                        ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY);
-            }
-        }
-        dirty = isDirty;
-        notifyListenersAboutModelChange(newState);
-    }
-
-    private void notifyListenersAboutModelChange(ModelStateChangeEvent aNewState) {
-        for (ModelStateChangeListener tempListener : listenerList
-                .getListeners(ModelStateChangeListener.class)) {
-            tempListener.stateChanged(aNewState);
-        }
-    }
-
-    /**
-     * @return if this book tab has unsaved changes
-     */
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    /**
-     * @return the displayedBook
-     */
-    public BookDO getDisplayedBookDO() {
-        return displayedBook;
-    }
-
-    /**
-     * Adds a listener that listens for events when any object in this panel has
-     * changed and {@link #isDirty()} returns {@code true} now.
-     * 
-     * @param aListener
-     *            the listener to add
-     */
-    public void addModelStateChangeListener(ModelStateChangeListener aListener) {
-        listenerList.add(ModelStateChangeListener.class, aListener);
-    }
-
-    /**
-     * Removes a {@code ModelStateChangeListener} from this panel.
-     * 
-     * @param aListener
-     *            the listener to remove
-     */
-    public void removeModelStateChangeListener(
-            ModelStateChangeListener aListener) {
-        listenerList.remove(ModelStateChangeListener.class, aListener);
     }
 
     @Override
@@ -586,7 +467,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
     private void updateDisplay() {
         // this case should never happen, that the book is null but it still
         // prevents us from a npe
-        if (displayedBook == null) {
+        if (displayedObject == null) {
             titleTextfield.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             titleTextfield.setEnabled(true);
             authorTextfield.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
@@ -596,22 +477,24 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
         } else {
             // TODO save caret position
-            titleTextfield.setText(displayedBook.getTitle());
+            titleTextfield.setText(displayedObject.getTitle());
             titleTextfield.setEnabled(true);
             titleTextfield.setCaretPosition(0);
-            authorTextfield.setText(displayedBook.getAuthor());
+            authorTextfield.setText(displayedObject.getAuthor());
             authorTextfield.setEnabled(true);
-            publisherTextfield.setText(displayedBook.getPublisher());
+            publisherTextfield.setText(displayedObject.getPublisher());
             publisherTextfield.setEnabled(true);
-            comboShelf.setSelectedItem(displayedBook.getShelf());
+            comboShelf.setSelectedItem(displayedObject.getShelf());
             comboShelf.setEnabled(true);
         }
     }
 
     private void updateNumberOfCopiesLabel() {
-        String numberOfCopiesString = MessageFormat.format(UiComponentStrings
-                .getString("BookDetailJPanel.label.numberofcopies.text"), //$NON-NLS-1$
-                Integer.valueOf(library.getCopiesOfBook(displayedBook).size()));
+        String numberOfCopiesString = MessageFormat
+                .format(UiComponentStrings
+                        .getString("BookDetailJPanel.label.numberofcopies.text"), //$NON-NLS-1$
+                        Integer.valueOf(library
+                                .getCopiesOfBook(displayedObject).size()));
         numberOfCopiesLabel.setText(numberOfCopiesString);
     }
 
@@ -620,51 +503,8 @@ public class BookDetailJPanel extends JPanel implements Observer {
                 .format(UiComponentStrings
                         .getString("BookDetailJPanel.label.numberofavailablecopies.text"), //$NON-NLS-1$
                         Integer.valueOf(library.getAvailableCopiesForBook(
-                                displayedBook).size()));
+                                displayedObject).size()));
         numberOfAvailableCopiesLabel.setText(numberOfAvailableCopiesString);
-    }
-
-    /**
-     * Checks if a value in a textfield has changed to its original content
-     * given in {@code aStringToCheck} and if so, set this panel to dirty (=has
-     * unsaved changes).
-     * 
-     * @author msyfrig
-     */
-    private class ChangeToDirtyDocumentListener implements DocumentListener {
-        private JTextField textFieldToCheck;
-        private String     stringToCheck;
-
-        private ChangeToDirtyDocumentListener(JTextField aTextFieldToCheck,
-                String aStringToCheck) {
-            textFieldToCheck = aTextFieldToCheck;
-            stringToCheck = aStringToCheck;
-        }
-
-        private void checkIfModified() {
-            // check if text differs from the loaded book object, if
-            // not set this panel to dirty
-            if (!textFieldToCheck.getText().equals(stringToCheck)) {
-                setDirty(true);
-            }
-            // TODO allenfalls else implementieren und die anderen Felder
-            // prüfen, ob die geändert wurden
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent aDocumentRemoveEvent) {
-            checkIfModified();
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent aDocumentInsertEvent) {
-            checkIfModified();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent aDocumentChangedEvent) {
-            checkIfModified();
-        }
     }
 
     private class SaveBookAction extends AbstractAction {
@@ -690,23 +530,21 @@ public class BookDetailJPanel extends JPanel implements Observer {
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
 
-            List<Copy> copyList = library.getCopiesOfBook(displayedBook);
+            List<Copy> copyList = library.getCopiesOfBook(displayedObject);
 
             // we need an extra list because we would need to update the
             // copyList each time we deleted one copy with the new list in the
-            // library with copyList = library.getCopiesOfBook(displayedBook)
+            // library with copyList = library.getCopiesOfBook(displayedObject)
             // because the indexes changes
             List<Copy> copiesToDelete = new ArrayList<>(
                     bookCopyTable.getSelectedRowCount());
             for (int tempCopy : bookCopyTable.getSelectedRows()) {
-                // TODO wenn ich mit Shift + Page Down selektiere erhalte ich
-                // eine IndexOutOfBounds oO untersuchen und beheben
                 copiesToDelete.add(copyList.get(bookCopyTable
                         .convertRowIndexToModel(tempCopy)));
 
             }
             library.removeCopies(copiesToDelete);
-            copyList = library.getCopiesOfBook(displayedBook);
+            copyList = library.getCopiesOfBook(displayedObject);
         }
     }
 
@@ -719,7 +557,7 @@ public class BookDetailJPanel extends JPanel implements Observer {
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            library.createAndAddCopy(displayedBook);
+            library.createAndAddCopy(displayedObject);
         }
     }
 }

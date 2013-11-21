@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.table.AbstractTableModel;
-
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -15,11 +13,13 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
 
 /**
- * The tableModel for the jTable in BookDetailJPanel.
+ * The table model for the JTable in BookDetailJPanel.
  * 
  * @author twinter
+ * @author msyfrig
  */
-public class BookCopyModel extends AbstractTableModel implements Observer {
+public class BookCopyModel extends AbstractExtendendedEventTableModel<Copy>
+        implements Observer {
     private static final long   serialVersionUID = -1293482132910701521L;
     private static List<String> columnNames      = new ArrayList<>(3);
 
@@ -32,7 +32,6 @@ public class BookCopyModel extends AbstractTableModel implements Observer {
                 .getString("BookCopyModel.copyTableColumn.borrowedUntil")); //$NON-NLS-1$
     }
 
-    private List<Copy>          copyList;
     private Library             library;
     private BookDO              specificBook;
 
@@ -43,14 +42,9 @@ public class BookCopyModel extends AbstractTableModel implements Observer {
      *            the specific book from the DetailPanel
      */
     public BookCopyModel(BookDO aDisplayedBookDO, Library aLibrary) {
+        super(aLibrary.getCopiesOfBook(aDisplayedBookDO));
         library = aLibrary;
         specificBook = aDisplayedBookDO;
-        copyList = library.getCopiesOfBook(aDisplayedBookDO);
-    }
-
-    @Override
-    public int getRowCount() {
-        return copyList.size();
     }
 
     @Override
@@ -60,7 +54,7 @@ public class BookCopyModel extends AbstractTableModel implements Observer {
 
     @Override
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
-        Copy copyOfSpecificBook = copyList.get(aRowIndex);
+        Copy copyOfSpecificBook = data.get(aRowIndex);
 
         String availability = "available";
         if (library.isCopyLent(copyOfSpecificBook)) {
@@ -107,7 +101,7 @@ public class BookCopyModel extends AbstractTableModel implements Observer {
 
     @Override
     public void fireTableDataChanged() {
-        copyList = library.getCopiesOfBook(specificBook);
+        data = library.getCopiesOfBook(specificBook);
         super.fireTableDataChanged();
     }
 

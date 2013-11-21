@@ -14,29 +14,11 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
-import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
@@ -53,30 +35,10 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
  * 
  * @author msyfrig
  */
-public class BookDetailJDialog extends NonModalJDialog implements Observer {
-    private static final long      serialVersionUID = 439819991326389792L;
-    /** The tabbed pane that holds all detailviews as tabs for all books. */
-    private JTabbedPane            tabbedPane;
+public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
+        implements Observer {
+    private static final long serialVersionUID = 439819991326389792L;
 
-    /**
-     * The list of all opened book detailviews. To check wheter a {@link BookDO}
-     * is already open an iteration over all items is necessary and then call
-     * {@link BookDetailJPanel#getDisplayedBookDO()} and compare it is
-     * necessary.
-     * 
-     * <br> And if you ask yourself why this is not implemented as a map with
-     * the book as key and the opened tab as value: the behavior for mutated
-     * keys is undefined and since we can modify the book it would not be
-     * possible to ever delete this book instance. See javadoc of map for
-     * undefined behavior for mutable objects as keys.
-     * 
-     * @see Map
-     */
-    private List<BookDetailJPanel> openBookTabList  = new ArrayList<>();
-
-    /**
-     * Create the dialog.
-     */
     public BookDetailJDialog(JFrame anOwner) {
         super(anOwner, UiComponentStrings.getString("BookDetailJDialog.title")); //$NON-NLS-1$
     }
@@ -85,90 +47,13 @@ public class BookDetailJDialog extends NonModalJDialog implements Observer {
     protected void initComponents() {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setSize(100, 100);
+        initTabbedPane();
         getContentPane().setLayout(new BorderLayout());
-        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
     }
 
     @Override
     protected void initHandlers() {
-        addComponentListener(new ComponentAdapter() {
-            /**
-             * All opened book tabs are closed before hiding this dialog so they
-             * are not still open if the user selects a new book and expects to
-             * open a completely new dialog.
-             */
-            @Override
-            public void componentHidden(ComponentEvent aComponentHiddenEvent) {
-                openBookTabList.clear();
-                tabbedPane.removeAll();
-            }
-        });
-
-        KeyStroke ctrlTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
-                InputEvent.CTRL_DOWN_MASK);
-        KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
-                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
-
-        // Remove ctrl-tab from normal focus traversal
-        Set<AWTKeyStroke> forwardKeys = new HashSet<>(
-                tabbedPane
-                        .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-        forwardKeys.remove(ctrlTab);
-        tabbedPane.setFocusTraversalKeys(
-                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
-
-        // Remove ctrl-shift-tab from normal focus traversal
-        Set<AWTKeyStroke> backwardKeys = new HashSet<>(
-                tabbedPane
-                        .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-        backwardKeys.remove(ctrlShiftTab);
-        tabbedPane.setFocusTraversalKeys(
-                KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
-
-        // ctrl+tab: switch to next tab
-        Action navigateToNextTabAction = new AbstractAction("navigateToNextTab") { //$NON-NLS-1$
-            private static final long serialVersionUID = -6626318103198277780L;
-
-            @Override
-            public void actionPerformed(ActionEvent anActionEvent) {
-                int newSelectedTabIndex = tabbedPane.getSelectedIndex() + 1;
-                if (newSelectedTabIndex > tabbedPane.getTabCount() - 1) {
-                    newSelectedTabIndex = 0;
-                }
-                tabbedPane.setSelectedIndex(newSelectedTabIndex);
-            }
-        };
-        getRootPane()
-                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(ctrlShiftTab,
-                        navigateToNextTabAction.getValue(Action.NAME));
-        getRootPane().getActionMap().put(
-                navigateToNextTabAction.getValue(Action.NAME),
-                navigateToNextTabAction);
-
-        // ctrl+shift+tab: switch to previous tab
-        Action navigateToPreviousTabAction = new AbstractAction(
-                "navigateToPreviousTab") { //$NON-NLS-1$
-            private static final long serialVersionUID = -6626318103198277780L;
-
-            @Override
-            public void actionPerformed(ActionEvent anActionEvent) {
-                int newSelectedTabIndex = tabbedPane.getSelectedIndex() - 1;
-                if (newSelectedTabIndex < 0) {
-                    newSelectedTabIndex = tabbedPane.getTabCount() - 1;
-                }
-                tabbedPane.setSelectedIndex(newSelectedTabIndex);
-            }
-        };
-
-        getRootPane()
-                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(ctrlShiftTab,
-                        navigateToPreviousTabAction.getValue(Action.NAME));
-        getRootPane().getActionMap().put(
-                navigateToPreviousTabAction.getValue(Action.NAME),
-                navigateToPreviousTabAction);
     }
 
     /**
@@ -180,7 +65,7 @@ public class BookDetailJDialog extends NonModalJDialog implements Observer {
      */
     public void openBookTab(BookDO aBookToOpen, Library aLibrary) {
         // check if a tab with the given tab is already open
-        BookDetailJPanel detailBookPanel = getTabForBook(aBookToOpen);
+        AbstractObservableObjectJPanel<BookDO> detailBookPanel = getTabForObject(aBookToOpen);
 
         // if not open yet, create it and all listeners and actions
         if (detailBookPanel == null) {
@@ -191,7 +76,7 @@ public class BookDetailJDialog extends NonModalJDialog implements Observer {
                 // add observer to this book so we notice when the title has
                 // changed
                 aBookToOpen.addObserver(this);
-                tabTitle = getTabTitleForBook(aBookToOpen, false);
+                tabTitle = getTabTitleForObject(aBookToOpen, false);
 
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
                         aBookToOpen.toString());
@@ -200,37 +85,18 @@ public class BookDetailJDialog extends NonModalJDialog implements Observer {
                         "Entering a new book");
             }
             addHandlersToTab(detailBookPanel);
-            openBookTabList.add(detailBookPanel);
+            // add asteriks in tabtitle if tab has unsaved changes and listen
+            // for added books to set the title
+            detailBookPanel
+                    .addModelStateChangeListener(new BookDetailModelChangeListener());
+            openObjectTabList.add(detailBookPanel);
         }
         tabbedPane.setSelectedComponent(detailBookPanel);
         pack();
     }
 
-    private void addHandlersToTab(BookDetailJPanel aBookTab) {
-        Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
-        actionMapForBookTab.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                new DisposeAction("dispose", aBookTab)); //$NON-NLS-1$
-        actionMapForBookTab.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-                new SaveAction("save", aBookTab)); //$NON-NLS-1$
-        aBookTab.addAncestorActions(actionMapForBookTab);
-        // add asteriks in tabtitle if tab has unsaved changes and listen
-        // for added books to set the title
-        aBookTab.addModelStateChangeListener(new BookDetailModelChangeListener());
-    }
-
-    private BookDetailJPanel getTabForBook(BookDO aBook) {
-        BookDetailJPanel detailBookPanel = null;
-        if (aBook != null) {
-            for (BookDetailJPanel tempBookDetailView : openBookTabList) {
-                if (tempBookDetailView.getDisplayedBookDO() == aBook) {
-                    detailBookPanel = tempBookDetailView;
-                }
-            }
-        }
-        return detailBookPanel;
-    }
-
-    private static String getTabTitleForBook(BookDO aBook, boolean isDirty) {
+    @Override
+    protected String getTabTitleForObject(BookDO aBook, boolean isDirty) {
         StringBuffer title = new StringBuffer(15);
         String bookTitle = aBook.toString();
         if (isDirty) {
@@ -250,109 +116,32 @@ public class BookDetailJDialog extends NonModalJDialog implements Observer {
         return title.toString();
     }
 
-    /**
-     * Closes an opened tab for a book, removes it from the list of opened books
-     * so it can be reopened. If the closed tab was the last one, this dialog is
-     * closed.
-     * 
-     * @param aBookDetailTabToClose
-     *            the book detail tab to close
-     */
-    private void closeTab(BookDetailJPanel aBookDetailTabToClose) {
-        if (aBookDetailTabToClose != null) {
-            tabbedPane.remove(aBookDetailTabToClose);
-            openBookTabList.remove(aBookDetailTabToClose);
-            // close this dialog if this was the last open tab
-            if (openBookTabList.isEmpty()) {
-                dispose();
-            }
-        }
-    }
-
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             ModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.TITLE
+                    || type == ModelChangeTypeEnums.Book.AUTHOR
+                    || type == ModelChangeTypeEnums.Book.PUBLISHER
                     || type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED) {
-                bookInTabUpdated((BookDO) anObservable);
+                objectInTabUpdated((BookDO) anObservable);
             }
-        }
-    }
-
-    /**
-     * Action to handle the save actions. Saves all unsaved changes and closes
-     * the tab.
-     * 
-     * @author msyfrig
-     */
-    private class SaveAction extends AbstractAction {
-        private static final long serialVersionUID = -4275362945903839390L;
-        private BookDetailJPanel  bookDetailTab;
-
-        private SaveAction(String anActionName,
-                BookDetailJPanel anAssociatedBookTab) {
-            super(anActionName);
-            bookDetailTab = anAssociatedBookTab;
-        }
-
-        /**
-         * Call {@link #save()} and close the tab.
-         */
-        @Override
-        public void actionPerformed(ActionEvent anActionEvent) {
-            bookDetailTab.save();
-            closeTab(bookDetailTab);
-        }
-    }
-
-    /**
-     * Action to handle the closing of a tab. Informs the user if there are
-     * unsaved changes in the tab before closing.
-     * 
-     * @author msyfrig
-     */
-    private class DisposeAction extends AbstractAction {
-        private static final long serialVersionUID = 2752048542262499446L;
-        private BookDetailJPanel  bookDetailTab;
-
-        /**
-         * Creates a new action with the given name and the associated book tab
-         * in which this
-         */
-        private DisposeAction(String anActionName,
-                BookDetailJPanel anAssociatedBookTab) {
-            super(anActionName);
-            bookDetailTab = anAssociatedBookTab;
-        }
-
-        /**
-         * Checks if the tab has unsaved changes and informs the user if so and
-         * closes the tab.
-         */
-        @Override
-        public void actionPerformed(ActionEvent anActionEvent) {
-            if (bookDetailTab.isDirty()) {
-                // TODO Warnung anzeigen, dass Änderungen verloren gehen und
-                // allenfalls Option geben, noch zu speichern oder abzubrechen
-            }
-            closeTab(bookDetailTab);
         }
     }
 
     /**
      * Refreshes the tabtitle and tooltip.
      */
-    private void bookInTabUpdated(BookDO anUpdatedBook) {
-        BookDetailJPanel detailBookPanel = getTabForBook(anUpdatedBook);
+    @Override
+    protected void objectInTabUpdated(BookDO anUpdatedBook) {
+        AbstractObservableObjectJPanel<BookDO> detailBookPanel = getTabForObject(anUpdatedBook);
         if (detailBookPanel != null) {
             int tabIndex = tabbedPane.indexOfComponent(detailBookPanel);
-            tabbedPane
-                    .setTitleAt(
-                            tabIndex,
-                            getTabTitleForBook(anUpdatedBook,
-                                    detailBookPanel.isDirty()));
+            tabbedPane.setTitleAt(
+                    tabIndex,
+                    getTabTitleForObject(anUpdatedBook,
+                            detailBookPanel.isDirty()));
             tabbedPane.setToolTipTextAt(tabIndex, anUpdatedBook.toString());
         }
     }
@@ -378,15 +167,15 @@ public class BookDetailJDialog extends NonModalJDialog implements Observer {
                         switch (aModelStateChange.getState()) {
                             case ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY:
                             case ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED:
-                                bookInTabUpdated(associatedDetailView
-                                        .getDisplayedBookDO());
+                                objectInTabUpdated(associatedDetailView
+                                        .getDisplayedObject());
                                 break;
                             case ModelStateChangeEvent.NEW_ENTRY_ADDED:
                                 // add observer for newly created book
-                                associatedDetailView.getDisplayedBookDO()
+                                associatedDetailView.getDisplayedObject()
                                         .addObserver(BookDetailJDialog.this);
-                                bookInTabUpdated(associatedDetailView
-                                        .getDisplayedBookDO());
+                                objectInTabUpdated(associatedDetailView
+                                        .getDisplayedObject());
                                 break;
                             default:
                                 break;

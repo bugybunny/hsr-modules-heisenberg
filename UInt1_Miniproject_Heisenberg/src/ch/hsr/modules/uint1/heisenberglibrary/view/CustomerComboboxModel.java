@@ -81,7 +81,7 @@ public class CustomerComboboxModel extends AbstractListModel<Customer>
     }
 
     @Override
-    public void update(Observable aO, Object aArg) {
+    public void update(Observable anObservable, Object anArgument) {
         // TODO Auto-generated method stub
 
     }
