@@ -68,6 +68,7 @@ public class SearchableTableJPanel<E extends Observable> extends JPanel {
         table.setCellSelectionEnabled(true);
         table.setFillsViewportHeight(true);
         table.setColumnSelectionAllowed(false);
+        table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
 
         table.getSelectionModel().setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

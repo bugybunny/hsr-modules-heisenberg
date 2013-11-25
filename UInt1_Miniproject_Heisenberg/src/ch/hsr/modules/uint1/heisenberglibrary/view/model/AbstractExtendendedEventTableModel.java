@@ -121,8 +121,4 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
             tempListener.tableChanged();
         }
     }
-    // TODO rausfinden wie das funktioniert
-    // public Class<E> getType() {
-    // return <E>.getClass();
-    // }
 }

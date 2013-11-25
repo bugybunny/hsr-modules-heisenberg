@@ -32,7 +32,7 @@ public class Copy extends AbstractObservable {
     private Condition    condition;
 
     public Copy(BookDO title) {
-        this.bookDO = title;
+        bookDO = title;
         inventoryNumber = nextInventoryNumber++;
         condition = Condition.NEW;
     }

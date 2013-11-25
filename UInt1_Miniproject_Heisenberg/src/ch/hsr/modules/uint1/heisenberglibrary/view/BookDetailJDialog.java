@@ -46,10 +46,10 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
     @Override
     protected void initComponents() {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setSize(100, 100);
         initTabbedPane();
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
+        // TOOD fixed size for dialog
     }
 
     @Override
@@ -75,7 +75,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
             if (aBookToOpen != null) {
                 // add observer to this book so we notice when the title has
                 // changed
-                aBookToOpen.addObserver(this);
+                addObserverForObservable(aBookToOpen, this);
                 tabTitle = getTabTitleForObject(aBookToOpen, false);
 
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
@@ -172,8 +172,10 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                                 break;
                             case ModelStateChangeEvent.NEW_ENTRY_ADDED:
                                 // add observer for newly created book
-                                associatedDetailView.getDisplayedObject()
-                                        .addObserver(BookDetailJDialog.this);
+                                addObserverForObservable(
+                                        associatedDetailView
+                                                .getDisplayedObject(),
+                                        BookDetailJDialog.this);
                                 objectInTabUpdated(associatedDetailView
                                         .getDisplayedObject());
                                 break;

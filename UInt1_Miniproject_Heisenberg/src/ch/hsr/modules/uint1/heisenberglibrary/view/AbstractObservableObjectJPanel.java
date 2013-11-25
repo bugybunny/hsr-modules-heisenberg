@@ -15,7 +15,9 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.AbstractAction;
@@ -37,17 +39,24 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.AbstractObservable;
  */
 public abstract class AbstractObservableObjectJPanel<M extends AbstractObservable>
         extends JPanel implements Observer {
-    private static final long serialVersionUID = 5272145643378743929L;
+    private static final long         serialVersionUID = 5272145643378743929L;
     /**
      * The displayed data/model object that can be edited and is observed via
      * observer pattern.
      */
-    protected M               displayedObject;
+    protected M                       displayedObject;
 
     /**
      * Flag to indicate if there are unsaved changes in this panel.
      */
-    private boolean           dirty;
+    private boolean                   dirty;
+
+    /**
+     * Map that holds all added observers for a panel. The corresponding
+     * observers will be removed bevor this panel is closed so the gc can
+     * collect all the dead references.
+     */
+    private Map<Observable, Observer> observerMap      = new HashMap<>();
 
     protected AbstractObservableObjectJPanel(M anObservableObject) {
         setDisplayedObject(anObservableObject);
@@ -61,12 +70,12 @@ public abstract class AbstractObservableObjectJPanel<M extends AbstractObservabl
         if (aNewDisplayedObject != displayedObject) {
             // delete observers for this old, not anymore displayed object
             if (displayedObject != null) {
-                displayedObject.deleteObserver(this);
+                deleteObserverForObservable(displayedObject);
             }
             displayedObject = aNewDisplayedObject;
             // add observers for new object
             if (displayedObject != null) {
-                displayedObject.addObserver(this);
+                addObserverForObservable(displayedObject, this);
             }
         }
         displayedObject = aNewDisplayedObject;
@@ -154,6 +163,28 @@ public abstract class AbstractObservableObjectJPanel<M extends AbstractObservabl
             getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
                     tempAction.getKey(), actionName);
             getActionMap().put(actionName, tempAction.getValue());
+        }
+    }
+
+    protected boolean addObserverForObservable(Observable anObservable,
+            Observer anObserver) {
+        anObservable.addObserver(anObserver);
+        return observerMap.put(anObservable, anObserver) != null;
+    }
+
+    protected boolean deleteObserverForObservable(Observable anObservable) {
+        if (anObservable != null) {
+            anObservable.deleteObserver(observerMap.remove(anObservable));
+            return true;
+        }
+        return false;
+    }
+
+    void removeAllListeners() {
+        for (Map.Entry<Observable, Observer> tempEntry : observerMap.entrySet()) {
+            if (tempEntry != null) {
+                tempEntry.getKey().deleteObserver(tempEntry.getValue());
+            }
         }
     }
 

@@ -212,6 +212,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
 
         addLoanAction = new AddLoanAction(addLoanButton.getText());
         addLoanButton.setAction(addLoanAction);
+        addLoanButton.setMnemonic('n');
 
         table.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
@@ -325,8 +326,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
             }
             loanDetailDialog.setVisible(true);
             loanDetailDialog.toFront();
-            // TODO enter new loan
-
+            loanDetailDialog.openCustomerLoanTab(null, library);
         }
     }
 

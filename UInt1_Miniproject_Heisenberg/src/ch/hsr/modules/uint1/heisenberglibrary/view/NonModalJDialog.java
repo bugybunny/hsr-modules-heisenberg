@@ -16,7 +16,13 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -36,7 +42,14 @@ import javax.swing.JFrame;
  * @see #setDefaultCloseOperation(int)
  */
 public abstract class NonModalJDialog extends JDialog {
-    private static final long serialVersionUID = 2551909774692437970L;
+    private static final long         serialVersionUID = 2551909774692437970L;
+
+    /**
+     * Map that holds all added observers for a panel. The corresponding
+     * observers will be removed bevor this panel is closed so the gc can
+     * collect all the dead references.
+     */
+    private Map<Observable, Observer> observerMap      = new HashMap<>();
 
     /**
      * Creates a new dialog and sets the owner and title. Initializes all
@@ -79,6 +92,12 @@ public abstract class NonModalJDialog extends JDialog {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         initComponents();
         initHandlers();
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent aWindowClosingEvent) {
+                removeAllListeners();
+            }
+        });
 
         setLocationByPlatform(true);
     }
@@ -94,6 +113,27 @@ public abstract class NonModalJDialog extends JDialog {
      * implemented.
      */
     protected void initHandlers() {
+    }
+
+    protected boolean addObserverForObservable(Observable anObservable,
+            Observer anObserver) {
+        return observerMap.put(anObservable, anObserver) != null;
+    }
+
+    protected boolean deleteObserverForObservable(Observable anObservable) {
+        if (anObservable != null) {
+            anObservable.deleteObserver(observerMap.remove(anObservable));
+            return true;
+        }
+        return false;
+    }
+
+    void removeAllListeners() {
+        for (Map.Entry<Observable, Observer> tempEntry : observerMap.entrySet()) {
+            if (tempEntry != null) {
+                tempEntry.getKey().deleteObserver(tempEntry.getValue());
+            }
+        }
     }
 
     @Override

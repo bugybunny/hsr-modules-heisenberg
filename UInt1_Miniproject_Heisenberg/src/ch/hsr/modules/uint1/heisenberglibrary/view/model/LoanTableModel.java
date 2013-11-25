@@ -38,8 +38,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
 public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
 
 
-
-
     private static final long         serialVersionUID               = 4449419618706874102L;
     private static List<String>       columnNames                    = new ArrayList<>(
                                                                              4);

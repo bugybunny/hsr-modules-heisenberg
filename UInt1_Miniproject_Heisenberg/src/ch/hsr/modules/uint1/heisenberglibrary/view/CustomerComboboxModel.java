@@ -39,7 +39,7 @@ public class CustomerComboboxModel extends
         ComboBoxModel<DisplayableCustomer>, Observer {
     private static final long         serialVersionUID = -5830729956015597480L;
     private Library                   library;
-    private Customer                  selectedCustomer;
+    private DisplayableCustomer       selectedCustomer;
     private List<DisplayableCustomer> customers;
 
     public CustomerComboboxModel(Library aLibrary) {
@@ -59,8 +59,8 @@ public class CustomerComboboxModel extends
         }
 
         for (Customer tempCustomer : someCustomers) {
-            int activeLoanCount = library.getActiveCustomerLoans(
-                    selectedCustomer).size();
+            int activeLoanCount = library.getActiveCustomerLoans(tempCustomer)
+                    .size();
             DisplayableCustomer customerToAdd = new DisplayableCustomer(
                     tempCustomer, activeLoanCount);
             customers.add(customerToAdd);
@@ -76,7 +76,7 @@ public class CustomerComboboxModel extends
     public void setSelectedItem(Object anObject) {
         if ((selectedCustomer != null && !selectedCustomer.equals(anObject))
                 || selectedCustomer == null && anObject != null) {
-            selectedCustomer = (Customer) anObject;
+            selectedCustomer = (DisplayableCustomer) anObject;
             fireContentsChanged(this, -1, -1);
         }
     }
@@ -86,20 +86,20 @@ public class CustomerComboboxModel extends
         return customers.get(anIndex);
     }
 
+    public DisplayableCustomer getDisplayableCustomerForCustomer(
+            Customer aCustomer) {
+        return getElementAt(library.getCustomers().indexOf(aCustomer));
+    }
+
+    public Customer getCustomerForDisplayableCustomer(
+            DisplayableCustomer aDisplayableCustomer) {
+        return library.getCustomers().get(
+                customers.indexOf(aDisplayableCustomer));
+    }
+
     @Override
     public Object getSelectedItem() {
-        StringBuilder customerString = new StringBuilder(60);
-        customerString.append(selectedCustomer.getName());
-        customerString.append(", ");
-        customerString.append(selectedCustomer.getSurname());
-        customerString.append(", ");
-        customerString.append(selectedCustomer.getZip());
-        customerString.append(" (");
-        customerString.append(library.getActiveCustomerLoans(selectedCustomer)
-                .size());
-        customerString.append(')');
-
-        return customerString.toString();
+        return selectedCustomer;
     }
 
     @Override
@@ -132,6 +132,34 @@ public class CustomerComboboxModel extends
         protected void setActiveLoanCount(int aActiveLoanCount) {
             activeLoanCount = aActiveLoanCount;
         }
-    }
 
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object anotherCustomer) {
+            if (this == anotherCustomer) {
+                return true;
+            }
+            return super.equals(anotherCustomer);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder customerString = new StringBuilder(60);
+            customerString.append(name);
+            customerString.append(", ");
+            customerString.append(surname);
+            customerString.append(", ");
+            customerString.append(zip);
+            customerString.append(" (");
+            customerString.append(activeLoanCount);
+            customerString.append(')');
+
+            return customerString.toString();
+        }
+
+    }
 }

@@ -34,7 +34,6 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
@@ -173,9 +172,9 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
     protected void addHandlersToTab(AbstractObservableObjectJPanel<M> aTab) {
         Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
         actionMapForBookTab.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                new DisposeAction<>("dispose", aTab)); //$NON-NLS-1$
+                new DisposeAction("dispose", aTab)); //$NON-NLS-1$
         actionMapForBookTab.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-                new SaveAction<>("save", aTab)); //$NON-NLS-1$
+                new SaveAction("save", aTab)); //$NON-NLS-1$
         aTab.addAncestorActions(actionMapForBookTab);
     }
 
@@ -196,13 +195,16 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
      * object so it can be reopened. If the closed tab was the last one, this
      * dialog is closed.
      * 
-     * @param anObjectTabTabToClose
+     * @param anObjectTabToClose
      *            the object tab to close
      */
-    protected void closeTab(JPanel anObjectTabTabToClose) {
-        if (anObjectTabTabToClose != null) {
-            tabbedPane.remove(anObjectTabTabToClose);
-            openObjectTabList.remove(anObjectTabTabToClose);
+    protected void closeTab(AbstractObservableObjectJPanel<M> anObjectTabToClose) {
+        if (anObjectTabToClose != null) {
+            // TODO joptionpane für Nachfrage
+            // remove all listeners in this panel
+            anObjectTabToClose.removeAllListeners();
+            tabbedPane.remove(anObjectTabToClose);
+            openObjectTabList.remove(anObjectTabToClose);
             // close this dialog if this was the last open tab
             if (openObjectTabList.isEmpty()) {
                 dispose();
@@ -216,8 +218,7 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
      * 
      * @author msyfrig
      */
-    protected class SaveAction<M extends AbstractObservable> extends
-            AbstractAction {
+    protected class SaveAction extends AbstractAction {
         private static final long                 serialVersionUID = -4275362945903839390L;
         private AbstractObservableObjectJPanel<M> objectTab;
 
@@ -243,8 +244,7 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
      * 
      * @author msyfrig
      */
-    protected class DisposeAction<M extends AbstractObservable> extends
-            AbstractAction {
+    protected class DisposeAction extends AbstractAction {
         private static final long                 serialVersionUID = 2752048542262499446L;
         private AbstractObservableObjectJPanel<M> objectTab;
 

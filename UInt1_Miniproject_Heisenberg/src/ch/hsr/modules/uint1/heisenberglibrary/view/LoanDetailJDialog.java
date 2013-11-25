@@ -55,9 +55,7 @@ public class LoanDetailJDialog extends AbstractTabbedPaneDialog<Customer>
 
             String tabTitle = "enter new loan";
             if (aCustomerToOpen != null) {
-                // add observer to this book so we notice when the title has
-                // changed
-                aCustomerToOpen.addObserver(this);
+                addObserverForObservable(aCustomerToOpen, this);
                 tabTitle = getTabTitleForObject(aCustomerToOpen, false);
 
                 tabbedPane.addTab(tabTitle, null, detailCustomerLoanPanel,
@@ -86,7 +84,7 @@ public class LoanDetailJDialog extends AbstractTabbedPaneDialog<Customer>
     }
 
     @Override
-    public void update(Observable aO, Object aArg) {
+    public void update(Observable anObservable, Object anArgument) {
         // TODO Auto-generated method stub
     }
 

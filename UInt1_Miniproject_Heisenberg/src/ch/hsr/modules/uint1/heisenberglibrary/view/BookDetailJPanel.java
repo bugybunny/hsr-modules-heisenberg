@@ -91,6 +91,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     private JLabel            numberOfCopiesLabel;
     private JLabel            numberOfAvailableCopiesLabel;
 
+    // actions
     private AddCopyAction     addCopyAction;
     private RemoveCopyAction  removeCopyAction;
     private SaveBookAction    saveBookAction;
@@ -102,7 +103,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         super(aBookDo);
         library = aLibrary;
         initEverything(aBookDo);
-        library.addObserver(this);
+        addObserverForObservable(library, this);
     }
 
     /**
@@ -254,12 +255,10 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         gbcBtnAddABook.gridy = 6;
         northPanel.add(addBookButton, gbcBtnAddABook);
 
-        JPanel southPanel = new JPanel();
+        JPanel southPanel = new JPanel(new BorderLayout());
         southPanel.setBorder(new TitledBorder(null, UiComponentStrings
                 .getString("BookDetailJDialog.border.inventory.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(southPanel);
-        southPanel.setLayout(new BorderLayout(0, 0));
 
         JPanel southInformationPanel = new JPanel();
         southPanel.add(southInformationPanel, BorderLayout.NORTH);
@@ -303,8 +302,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         addCopyButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
         southInformationPanel.add(addCopyButton);
 
-        JPanel southBookList = new JPanel();
-
         bookCopyTable = new JTable();
 
         bookCopyTable.getTableHeader().setReorderingAllowed(false);
@@ -315,8 +312,10 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         // TODO hier ist noch was komisch, jsp wird gar nicht angzeigt
         JScrollPane jsp = new JScrollPane(bookCopyTable);
-        southBookList.add(jsp, BorderLayout.CENTER);
-        southPanel.add(southBookList);
+        jsp.setPreferredSize(new Dimension((int) jsp.getPreferredSize()
+                .getWidth(), 200));
+        southPanel.add(jsp, BorderLayout.CENTER);
+        add(southPanel);
     }
 
     /**
@@ -432,6 +431,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         }
 
         if (isDirty()) {
+            // TODO joptionpane für Nachfrage
             displayedObject.set(titleTextfield.getText(),
                     authorTextfield.getText(), publisherTextfield.getText(),
                     displayedObject.getShelf());

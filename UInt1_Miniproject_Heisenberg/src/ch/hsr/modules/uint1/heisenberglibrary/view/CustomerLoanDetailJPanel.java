@@ -19,6 +19,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Observable;
 
 import javax.swing.BoxLayout;
@@ -34,6 +36,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
+import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
 
 /**
  * Panel to display a customer and his currently lent out books and to enter new
@@ -53,20 +56,60 @@ public class CustomerLoanDetailJPanel extends
     private JLabel                                               customerSurnameLabel;
     private JLabel                                               customerNameLabel;
     private JComboBox<CustomerComboboxModel.DisplayableCustomer> selectCustomerComboBox;
+    private JLabel                                               customerActiveLoansLabel;
 
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
         super(aCustomer);
         library = aLibrary;
         initComponents();
-        setCustomer(aCustomer);
+        // display existing loans for a customer
+        if (aCustomer != null) {
+            setCustomer(aCustomer);
+            selectCustomerComboBox.setEnabled(false);
+            initHandlersForExistingLoan();
+        }
+        // let the user select the customer to add a loan to
+        else {
+            /*
+             * selectCustomerComboBox.getSelectedItem and
+             * selectCustomerComboBox.getElementAt both return a
+             * DisplayableCustomer (because if I use a "normal" customer in the
+             * ComboBoxModel I would have many other problems. And setCustomer()
+             * would not find an equal customer in the library even after
+             * casting the DisplayableCustomer to a "normal" customer because
+             * the equals method fails for this.getClass() == other.getClass().
+             * So we need to use the library since the indices are the same.
+             * 
+             * If I use selectCustomerComboBox.setSelectedItem then the item is
+             * found and the correct index set (found via debugging but since
+             * JComboBox is generic I can’t see the code while debugging) but
+             * after setting the correct one, other methods are called that I
+             * cannot see that change the setIndex back to -1. So
+             * selectCustomerComboBox.setSelectedItem(aCustomer);
+             * selectCustomerComboBox.getSelectedIndex(); called immediately
+             * after each other return -1. So we need to do something else that
+             * does not seem the best way since I cannot find my or the Swing
+             * bug.
+             */
+            setCustomer(library.getCustomers().get(
+                    selectCustomerComboBox.getSelectedIndex()));
+            selectCustomerComboBox.setEnabled(true);
+            initHandlersForNewLoan();
+        }
         library.addObserver(this);
     }
 
     private void setCustomer(Customer aNewCustomer) {
         setDisplayedObject(aNewCustomer);
         if (displayedObject != null) {
-            selectCustomerComboBox.setSelectedItem(displayedObject);
-            selectCustomerComboBox.setEnabled(false);
+            // setSelectedItem does not work because we use a
+            // CustomerComboboxModel.DisplayableCustomer. I've overwritten the
+            // equals method there but it still does not work. so we get the
+            // index of this customer and set this as selected index. stupid
+            // comboboxmodel implementation with old methods without generics
+            // and so on
+            int indexOfCustomer = library.getCustomers().indexOf(aNewCustomer);
+            selectCustomerComboBox.setSelectedIndex(indexOfCustomer);
         }
         updateDisplay();
     }
@@ -89,18 +132,19 @@ public class CustomerLoanDetailJPanel extends
         add(customerDetailJpanel, BorderLayout.CENTER);
         GridBagLayout gblCustomerDetailJpanel = new GridBagLayout();
         gblCustomerDetailJpanel.columnWidths = new int[] { 10, 0, 10, 0, 0 };
-        gblCustomerDetailJpanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        gblCustomerDetailJpanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0 };
         gblCustomerDetailJpanel.columnWeights = new double[] { 0.0, 0.0, 0.0,
                 1.0, Double.MIN_VALUE };
         gblCustomerDetailJpanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, Double.MIN_VALUE };
+                0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         customerDetailJpanel.setLayout(gblCustomerDetailJpanel);
 
         selectCustomerComboBox = new JComboBox<>(new CustomerComboboxModel(
                 library));
         GridBagConstraints gbcSelectCustomerComboBox = new GridBagConstraints();
         gbcSelectCustomerComboBox.gridwidth = 3;
-        gbcSelectCustomerComboBox.insets = new Insets(0, 0, 5, 5);
+        gbcSelectCustomerComboBox.insets = new Insets(0, 0, 5, 0);
         gbcSelectCustomerComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbcSelectCustomerComboBox.gridx = 1;
         gbcSelectCustomerComboBox.gridy = 0;
@@ -115,7 +159,7 @@ public class CustomerLoanDetailJPanel extends
         gbcNameLabel.gridy = 2;
         customerDetailJpanel.add(nameLabel, gbcNameLabel);
 
-        customerNameLabel = new JLabel("Hans");
+        customerNameLabel = new JLabel(UiComponentStrings.getString("empty")); //$NON-NLS-1$
         GridBagConstraints gbcCustomerNameLabel = new GridBagConstraints();
         gbcCustomerNameLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerNameLabel.insets = new Insets(0, 0, 5, 0);
@@ -174,17 +218,37 @@ public class CustomerLoanDetailJPanel extends
         JLabel cityLabel = new JLabel("City:");
         GridBagConstraints gbcCityLabel = new GridBagConstraints();
         gbcCityLabel.anchor = GridBagConstraints.EAST;
-        gbcCityLabel.insets = new Insets(0, 0, 0, 5);
+        gbcCityLabel.insets = new Insets(0, 0, 5, 5);
         gbcCityLabel.gridx = 1;
         gbcCityLabel.gridy = 6;
         customerDetailJpanel.add(cityLabel, gbcCityLabel);
 
         cityNameLabel = new JLabel(UiComponentStrings.getString("empty"));
         GridBagConstraints gbcCityNameLabel = new GridBagConstraints();
+        gbcCityNameLabel.insets = new Insets(0, 0, 5, 0);
         gbcCityNameLabel.anchor = GridBagConstraints.WEST;
         gbcCityNameLabel.gridx = 3;
         gbcCityNameLabel.gridy = 6;
         customerDetailJpanel.add(cityNameLabel, gbcCityNameLabel);
+
+        JLabel activeLoansLabel = new JLabel(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.lblActiveLoans.text")); //$NON-NLS-1$
+        GridBagConstraints gbcAblActiveLoans = new GridBagConstraints();
+        gbcAblActiveLoans.insets = new Insets(0, 0, 5, 5);
+        gbcAblActiveLoans.gridx = 1;
+        gbcAblActiveLoans.gridy = 7;
+        customerDetailJpanel.add(activeLoansLabel, gbcAblActiveLoans);
+
+        customerActiveLoansLabel = new JLabel(
+                UiComponentStrings.getString("empty"));
+        GridBagConstraints gbcCustomerActiveLoansLabel = new GridBagConstraints();
+        gbcCustomerActiveLoansLabel.insets = new Insets(0, 0, 5, 0);
+        gbcCustomerActiveLoansLabel.anchor = GridBagConstraints.WEST;
+        gbcCustomerActiveLoansLabel.gridx = 3;
+        gbcCustomerActiveLoansLabel.gridy = 7;
+        customerDetailJpanel.add(customerActiveLoansLabel,
+                gbcCustomerActiveLoansLabel);
 
         JPanel loanDetailJpanel = new JPanel();
         loanDetailJpanel.setBorder(new TitledBorder(null, "Loan details",
@@ -212,7 +276,19 @@ public class CustomerLoanDetailJPanel extends
     }
 
     private void initHandlersForNewLoan() {
+        selectCustomerComboBox.addItemListener(new ItemListener() {
 
+            @Override
+            public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
+                if (anItemStateChangedEvent.getStateChange() == ItemEvent.SELECTED) {
+                    // System.out.println(selectCustomerComboBox.getSelectedItem());
+                    setCustomer(((CustomerComboboxModel) selectCustomerComboBox
+                            .getModel())
+                            .getCustomerForDisplayableCustomer((DisplayableCustomer) selectCustomerComboBox
+                                    .getSelectedItem()));
+                }
+            }
+        });
     }
 
     @Override
@@ -240,12 +316,17 @@ public class CustomerLoanDetailJPanel extends
             customerAddressLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
 
         } else {
+            DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
+                    .getModel())
+                    .getDisplayableCustomerForCustomer(displayedObject);
             customerSurnameLabel.setText(displayedObject.getSurname());
             customerNameLabel.setText(displayedObject.getName());
             customerZipLabel.setText(String.valueOf(displayedObject.getZip()));
             customerAddressLabel.setText(displayedObject.getStreet());
             cityNameLabel.setText(displayedObject.getCity());
-
+            customerActiveLoansLabel
+                    .setText(Integer.toString(selectedDisplayableCustomer
+                            .getActiveLoanCount()));
         }
     }
 }
