@@ -45,6 +45,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -95,6 +97,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     private AddCopyAction     addCopyAction;
     private RemoveCopyAction  removeCopyAction;
     private SaveBookAction    saveBookAction;
+    private JLabel            lblNewLabel;
 
     /**
      * Creates a new instance of this class and sets the models.
@@ -137,6 +140,16 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         }
         updateNumberOfCopiesLabel();
         updateNumberOfAvailableCopiesLabel();
+
+        titleTextfield.getDocument().addDocumentListener(
+                new SaveValidationListener());
+
+        authorTextfield.getDocument().addDocumentListener(
+                new SaveValidationListener());
+
+        publisherTextfield.getDocument().addDocumentListener(
+                new SaveValidationListener());
+
     }
 
     /**
@@ -154,9 +167,9 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(northPanel);
         GridBagLayout gblPanel = new GridBagLayout();
-        gblPanel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
+        gblPanel.columnWidths = new int[] { 0, 0, 0, 396, 0, 0 };
         gblPanel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0, 0 };
-        gblPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0,
+        gblPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0,
                 Double.MIN_VALUE };
         gblPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 Double.MIN_VALUE };
@@ -174,6 +187,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         titleTextfield = new JTextField();
         GridBagConstraints gbcTitleTextfield = new GridBagConstraints();
+        gbcTitleTextfield.gridwidth = 2;
         gbcTitleTextfield.fill = GridBagConstraints.HORIZONTAL;
         gbcTitleTextfield.insets = new Insets(0, 0, 5, 0);
         gbcTitleTextfield.gridx = 3;
@@ -193,6 +207,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         authorTextfield = new JTextField();
         GridBagConstraints gbcAuthorTextfield = new GridBagConstraints();
+        gbcAuthorTextfield.gridwidth = 2;
         gbcAuthorTextfield.insets = new Insets(0, 0, 5, 0);
         gbcAuthorTextfield.fill = GridBagConstraints.HORIZONTAL;
         gbcAuthorTextfield.gridx = 3;
@@ -212,6 +227,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         publisherTextfield = new JTextField();
         GridBagConstraints gbcPublisherTextfield = new GridBagConstraints();
+        gbcPublisherTextfield.gridwidth = 2;
         gbcPublisherTextfield.insets = new Insets(0, 0, 5, 0);
         gbcPublisherTextfield.fill = GridBagConstraints.HORIZONTAL;
         gbcPublisherTextfield.gridx = 3;
@@ -234,6 +250,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             comboShelf.addItem(tempShelfValues);
         }
         GridBagConstraints gbcComboShelf = new GridBagConstraints();
+        gbcComboShelf.gridwidth = 2;
         gbcComboShelf.insets = new Insets(0, 0, 5, 0);
         gbcComboShelf.fill = GridBagConstraints.HORIZONTAL;
         gbcComboShelf.gridx = 3;
@@ -245,13 +262,22 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         String addBookButtonEnabledTooltip = UiComponentStrings
                 .getString("BookDetailJPanel.button.addbook.enabled.tooltip"); //$NON-NLS-1$
         String addBookButtonDisabledTooltip = UiComponentStrings
-                .getString("BookDetailJPanel.button.addbook.disabled.tooltip"); //$NON-NLS-1$
+                .getString("BookDetailJPanel.button.addbook.disabled.tooltip");
+
+        lblNewLabel = new JLabel(
+                UiComponentStrings
+                        .getString("BookDetailJPanel.lblNewLabel.text")); //$NON-NLS-1$
+        GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+        gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
+        gbc_lblNewLabel.gridx = 3;
+        gbc_lblNewLabel.gridy = 6;
+        northPanel.add(lblNewLabel, gbc_lblNewLabel);
         addBookButton = new ToolTipJButton(addBookButtonText,
                 addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
 
         GridBagConstraints gbcBtnAddABook = new GridBagConstraints();
         gbcBtnAddABook.anchor = GridBagConstraints.EAST;
-        gbcBtnAddABook.gridx = 3;
+        gbcBtnAddABook.gridx = 4;
         gbcBtnAddABook.gridy = 6;
         northPanel.add(addBookButton, gbcBtnAddABook);
 
@@ -329,7 +355,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
      */
     private void initHandlersForNewBook() {
         saveBookAction = new SaveBookAction(addBookButton.getText());
-        saveBookAction.setEnabled(true);
+        saveBookAction.setEnabled(false);
         addBookButton.setAction(saveBookAction);
 
         addCopyAction = new AddCopyAction(addCopyButton.getText());
@@ -358,7 +384,9 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             @Override
             public void stateChanged(ModelStateChangeEvent aModelStateChange) {
                 if (aModelStateChange.getState() == ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY) {
-                    saveBookAction.setEnabled(true);
+                    if (validateSaveAndLockButton()) {
+                        saveBookAction.setEnabled(true);
+                    }
                 } else if (aModelStateChange.getState() == ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED) {
                     saveBookAction.setEnabled(false);
                 }
@@ -377,7 +405,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         saveBookAction.setEnabled(false);
         addBookButton.setText(UiComponentStrings
                 .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
-
         comboShelf.setSelectedItem(displayedObject.getShelf());
         comboShelf.addItemListener(new ItemListener() {
 
@@ -416,29 +443,77 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
      */
     @Override
     protected boolean save() {
+        boolean saveSuccess = false;
         if (displayedObject == null) {
-            BookDO createdBook = library.createAndAddBook(titleTextfield
-                    .getText());
-            createdBook.set(titleTextfield.getText(),
-                    authorTextfield.getText(), publisherTextfield.getText(),
-                    (Shelf) comboShelf.getSelectedItem());
-            setBook(createdBook);
-            ModelStateChangeEvent newState = new ModelStateChangeEvent(this,
-                    ModelStateChangeEvent.NEW_ENTRY_ADDED);
-            notifyListenersAboutModelChange(newState);
-            initHandlersForSetBook();
-            saveBookAction.setEnabled(false);
+            if (validateSave()) {
+                BookDO createdBook = library.createAndAddBook(titleTextfield
+                        .getText());
+                createdBook.set(titleTextfield.getText(),
+                        authorTextfield.getText(),
+                        publisherTextfield.getText(),
+                        (Shelf) comboShelf.getSelectedItem());
+                setBook(createdBook);
+                ModelStateChangeEvent newState = new ModelStateChangeEvent(
+                        this, ModelStateChangeEvent.NEW_ENTRY_ADDED);
+                notifyListenersAboutModelChange(newState);
+                initHandlersForSetBook();
+                saveBookAction.setEnabled(false);
+                saveSuccess = true;
+            }
         }
-
         if (isDirty()) {
-            // TODO joptionpane für Nachfrage
-            displayedObject.set(titleTextfield.getText(),
-                    authorTextfield.getText(), publisherTextfield.getText(),
-                    displayedObject.getShelf());
-            setDirty(false);
-            return true;
+            if (validateSave()) {
+                displayedObject.set(titleTextfield.getText(),
+                        authorTextfield.getText(),
+                        publisherTextfield.getText(),
+                        displayedObject.getShelf());
+                setDirty(false);
+                saveSuccess = true;
+            }
         }
-        return false;
+        return saveSuccess;
+    }
+
+    /*
+     * //todo: check if works if (isDirty()) { // TODO joptionpane für Nachfrage
+     * displayedObject.set(titleTextfield.getText(), authorTextfield.getText(),
+     * publisherTextfield.getText(), displayedObject.getShelf());
+     * setDirty(false); return true;
+     */
+
+    protected boolean validateSave() {
+        boolean result = true;
+        String title = titleTextfield.getText();
+        String author = authorTextfield.getText();
+        String publisher = publisherTextfield.getText();
+        String shelf = comboShelf.getSelectedItem().toString();
+        // Check wheter all fields contain data
+        if ((title.length() <= 0) || (author.length() <= 0)
+                || (publisher.length() <= 0) || (shelf.length() <= 0)) {
+            result = false;
+        } else {
+            // Check if book-title + author already exist, but only if it is a
+            // new
+            // book we can't check this way when dealing with existing books.
+            if (displayedObject == null) {
+                ArrayList<BookDO> tempBooks = library
+                        .findAllBooksByTitle(title);
+                if (tempBooks.size() > 0) {
+                    for (BookDO b : tempBooks) {
+                        if (b.getAuthor().equals(author)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean validateSaveAndLockButton() {
+        boolean validation = validateSave();
+        saveBookAction.setEnabled(validation);
+        return validation;
     }
 
     @Override
@@ -560,4 +635,27 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             library.createAndAddCopy(displayedObject);
         }
     }
+
+    class SaveValidationListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent aE) {
+            // TODO Auto-generated method stub
+            validateSaveAndLockButton();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent aE) {
+            // TODO Auto-generated method stub
+            validateSaveAndLockButton();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent aE) {
+            // TODO Auto-generated method stub
+            validateSaveAndLockButton();
+        }
+
+    }
+
 }

@@ -233,10 +233,12 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            objectTab.save();
-            closeTab(objectTab);
+            if (objectTab.save()) {
+                closeTab(objectTab);
+            }
         }
     }
+
 
     /**
      * Action to handle the closing of a tab. Informs the user if there are

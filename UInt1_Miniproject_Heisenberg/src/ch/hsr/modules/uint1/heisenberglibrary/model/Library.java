@@ -124,13 +124,22 @@ public class Library extends AbstractObservable {
         return activeLoan;
     }
 
+    // Used by Stolzes LibraryTests - we never use it.
     public BookDO findByBookTitle(String title) {
         for (BookDO b : books) {
-            if (b.getTitle().equals(title)) {
-                return b;
-            }
+            return b;
         }
         return null;
+    }
+
+    public ArrayList<BookDO> findAllBooksByTitle(String title) {
+        ArrayList<BookDO> bookList = new ArrayList<BookDO>();
+        for (BookDO b : books) {
+            if (b.getTitle().equals(title)) {
+                bookList.add(b);
+            }
+        }
+        return bookList;
     }
 
     public boolean isCopyLent(Copy copy) {
