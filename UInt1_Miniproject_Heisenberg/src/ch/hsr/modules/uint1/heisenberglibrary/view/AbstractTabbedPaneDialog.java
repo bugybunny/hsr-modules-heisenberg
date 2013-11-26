@@ -38,7 +38,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.AbstractObservable;
-import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 
 /**
  * 
@@ -50,8 +49,9 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
     protected JTabbedPane                             tabbedPane;
 
     /**
-     * The list of all opened book detailviews. To check wheter a {@link BookDO}
-     * is already open an iteration over all items is necessary and then call
+     * The list of all opened book detailviews. To check wheter a
+     * {@link ch.hsr.modules.uint1.heisenberglibrary.model.BookDO} is already
+     * open an iteration over all items is necessary and then call
      * {@link BookDetailJPanel#getDisplayedBookDO()} and compare it is
      * necessary.
      * 

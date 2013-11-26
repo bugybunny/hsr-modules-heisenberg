@@ -15,10 +15,13 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Observable;
@@ -29,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 
@@ -37,6 +41,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.CustomerLoanTableModel;
 
 /**
  * Panel to display a customer and his currently lent out books and to enter new
@@ -110,6 +115,9 @@ public class CustomerLoanDetailJPanel extends
             // and so on
             int indexOfCustomer = library.getCustomers().indexOf(aNewCustomer);
             selectCustomerComboBox.setSelectedIndex(indexOfCustomer);
+            loanDetailTable.setModel(new CustomerLoanTableModel(
+                    displayedObject, library));
+            // ColumnsAutoSizer.sizeColumnsToFit(loanDetailTable);
         }
         updateDisplay();
     }
@@ -250,29 +258,41 @@ public class CustomerLoanDetailJPanel extends
         customerDetailJpanel.add(customerActiveLoansLabel,
                 gbcCustomerActiveLoansLabel);
 
-        JPanel loanDetailJpanel = new JPanel();
+        JPanel loanDetailJpanel = new JPanel(new BorderLayout());
         loanDetailJpanel.setBorder(new TitledBorder(null, "Loan details",
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(loanDetailJpanel, BorderLayout.SOUTH);
-        loanDetailJpanel.setLayout(new BorderLayout(0, 0));
 
-        JPanel loanButtonJpanel = new JPanel();
-        loanDetailJpanel.add(loanButtonJpanel, BorderLayout.NORTH);
-        loanButtonJpanel.setLayout(new BoxLayout(loanButtonJpanel,
+        JPanel loanButtonJPanel = new JPanel();
+        loanDetailJpanel.add(loanButtonJPanel, BorderLayout.NORTH);
+        loanButtonJPanel.setLayout(new BoxLayout(loanButtonJPanel,
                 BoxLayout.X_AXIS));
 
         JButton addNewLoanButton = new JButton("Add new loan");
-        loanButtonJpanel.add(addNewLoanButton);
+        loanButtonJPanel.add(addNewLoanButton);
 
         JButton removeLoanButton = new JButton("Remove loan");
-        loanButtonJpanel.add(removeLoanButton);
+        loanButtonJPanel.add(removeLoanButton);
 
         loanDetailTable = new JTable();
-        loanDetailJpanel.add(loanDetailTable);
+        loanDetailTable.getTableHeader().setReorderingAllowed(false);
+        loanDetailTable.setAutoCreateRowSorter(true);
+        loanDetailTable.setCellSelectionEnabled(true);
+        loanDetailTable.setFillsViewportHeight(true);
+        loanDetailTable.setColumnSelectionAllowed(false);
+        JScrollPane jsp = new JScrollPane(loanDetailTable);
+        jsp.setPreferredSize(new Dimension((int) jsp.getPreferredSize()
+                .getWidth(), 200));
+        loanDetailJpanel.add(jsp, BorderLayout.CENTER);
     }
 
     private void initHandlersForExistingLoan() {
-
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent aComponentShownEvent) {
+                loanDetailTable.requestFocus();
+            }
+        });
     }
 
     private void initHandlersForNewLoan() {
@@ -281,12 +301,19 @@ public class CustomerLoanDetailJPanel extends
             @Override
             public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
                 if (anItemStateChangedEvent.getStateChange() == ItemEvent.SELECTED) {
-                    // System.out.println(selectCustomerComboBox.getSelectedItem());
-                    setCustomer(((CustomerComboboxModel) selectCustomerComboBox
+                    DisplayableCustomer selectedDisplayableCustomer = (DisplayableCustomer) selectCustomerComboBox
+                            .getSelectedItem();
+                    Customer customerToSet = ((CustomerComboboxModel) selectCustomerComboBox
                             .getModel())
-                            .getCustomerForDisplayableCustomer((DisplayableCustomer) selectCustomerComboBox
-                                    .getSelectedItem()));
+                            .getCustomerForDisplayableCustomer(selectedDisplayableCustomer);
+                    setCustomer(customerToSet);
                 }
+            }
+        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent aComponentShownEvent) {
+                selectCustomerComboBox.requestFocus();
             }
         });
     }

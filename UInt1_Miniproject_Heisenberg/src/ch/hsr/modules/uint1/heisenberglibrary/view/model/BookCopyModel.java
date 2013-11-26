@@ -82,7 +82,8 @@ public class BookCopyModel extends AbstractExtendendedEventTableModel<Copy>
                 ret = borrowedUntil;
                 break;
             default:
-                ret = UiComponentStrings.getString("empty"); //$NON-NLS-1$ 
+                ret = UiComponentStrings.getString("empty"); //$NON-NLS-1$
+                break;
         }
         return ret;
     }

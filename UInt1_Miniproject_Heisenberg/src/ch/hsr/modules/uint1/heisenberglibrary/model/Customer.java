@@ -19,7 +19,8 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
  * @author mstolze
  * @author msyfrig
  */
-public class Customer extends AbstractObservable {
+public class Customer extends AbstractObservable implements
+        Comparable<Customer> {
 
     protected String name;
     protected String surname;
@@ -166,5 +167,24 @@ public class Customer extends AbstractObservable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(Customer anOtherCustomer) {
+        int ret = surname.compareToIgnoreCase(anOtherCustomer.surname);
+        if (ret == 0) {
+            ret = name.compareToIgnoreCase(anOtherCustomer.name);
+            if (ret == 0) {
+                ret = Integer.compare(zip, anOtherCustomer.zip);
+                if (ret == 0) {
+                    ret = city.compareToIgnoreCase(anOtherCustomer.city);
+                    if (ret == 0) {
+                        ret = street
+                                .compareToIgnoreCase(anOtherCustomer.street);
+                    }
+                }
+            }
+        }
+        return ret;
     }
 }

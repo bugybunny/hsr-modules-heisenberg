@@ -149,9 +149,9 @@ public class CustomerComboboxModel extends
         @Override
         public String toString() {
             StringBuilder customerString = new StringBuilder(60);
-            customerString.append(name);
-            customerString.append(", ");
             customerString.append(surname);
+            customerString.append(", ");
+            customerString.append(name);
             customerString.append(", ");
             customerString.append(zip);
             customerString.append(" (");

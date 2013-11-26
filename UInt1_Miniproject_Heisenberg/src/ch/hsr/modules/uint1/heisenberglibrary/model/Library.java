@@ -10,8 +10,6 @@ public class Library extends AbstractObservable {
     private List<Customer> customers;
     private List<Loan>     loans;
     private List<BookDO>   books;
-    // TODO daran denken, dass activeLoans-- gemacht wird, wenn ein Buch
-    // zurückgegeben wird!!!!!
     private int            activeLoanCount;
 
     public Library() {

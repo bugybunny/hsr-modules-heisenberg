@@ -2,6 +2,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 
 import javax.swing.UIManager;
@@ -52,6 +53,7 @@ public class LibraryApp {
                 .newDocumentBuilder();
 
         loadCustomersFromXml(library, builder, new File("data/customers.xml"));
+        Collections.sort(library.getCustomers());
 
         loadBooksFromXml(library, builder, new File("data/books.xml"));
 
@@ -135,8 +137,8 @@ public class LibraryApp {
             Node customer = customers.item(i);
 
             Customer c = library.createAndAddCustomer(
-                    getTextContentOf(customer, "name"),
-                    getTextContentOf(customer, "surname"));
+                    getTextContentOf(customer, "surname"),
+                    getTextContentOf(customer, "name"));
             c.setAdress(getTextContentOf(customer, "street"),
                     Integer.parseInt(getTextContentOf(customer, "zip")),
                     getTextContentOf(customer, "city"));
