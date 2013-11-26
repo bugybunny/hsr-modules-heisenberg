@@ -24,8 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -409,13 +407,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         addBookButton.setText(UiComponentStrings
                 .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
         comboShelf.setSelectedItem(displayedObject.getShelf());
-        comboShelf.addItemListener(new ItemListener() {
 
-            @Override
-            public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
-
-            }
-        });
         comboShelf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
