@@ -59,7 +59,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
-import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookCopyModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookCopyTableModel;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -121,7 +121,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         } else {
             addCopyAction.setEnabled(false);
         }
-        bookCopyTable.setModel(new BookCopyModel(displayedObject, library));
+        bookCopyTable.setModel(new BookCopyTableModel(displayedObject, library));
         updateDisplay();
     }
 
@@ -523,7 +523,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             ModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Copy.REMOVED
                     || type == ModelChangeTypeEnums.Copy.ADDED) {
-                ((BookCopyModel) bookCopyTable.getModel())
+                ((BookCopyTableModel) bookCopyTable.getModel())
                         .fireTableDataChanged();
             } else if (type == ModelChangeTypeEnums.Copy.NUMBER) {
                 updateNumberOfCopiesLabel();

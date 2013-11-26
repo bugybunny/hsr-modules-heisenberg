@@ -18,18 +18,18 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
  * @author twinter
  * @author msyfrig
  */
-public class BookCopyModel extends AbstractExtendendedEventTableModel<Copy>
+public class BookCopyTableModel extends AbstractExtendendedEventTableModel<Copy>
         implements Observer {
     private static final long   serialVersionUID = -1293482132910701521L;
     private static List<String> columnNames      = new ArrayList<>(3);
 
     static {
         columnNames.add(UiComponentStrings
-                .getString("BookCopyModel.copyTableColumn.id")); //$NON-NLS-1$
+                .getString("BookCopyTableModel.copyTableColumn.id")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
-                .getString("BookCopyModel.copyTableColumn.availability")); //$NON-NLS-1$
+                .getString("BookCopyTableModel.copyTableColumn.availability")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
-                .getString("BookCopyModel.copyTableColumn.borrowedUntil")); //$NON-NLS-1$
+                .getString("BookCopyTableModel.copyTableColumn.borrowedUntil")); //$NON-NLS-1$
     }
 
     private Library             library;
@@ -41,7 +41,7 @@ public class BookCopyModel extends AbstractExtendendedEventTableModel<Copy>
      * @param aDisplayedBookDO
      *            the specific book from the DetailPanel
      */
-    public BookCopyModel(BookDO aDisplayedBookDO, Library aLibrary) {
+    public BookCopyTableModel(BookDO aDisplayedBookDO, Library aLibrary) {
         super(aLibrary.getCopiesOfBook(aDisplayedBookDO));
         library = aLibrary;
         specificBook = aDisplayedBookDO;
@@ -62,7 +62,7 @@ public class BookCopyModel extends AbstractExtendendedEventTableModel<Copy>
         }
 
         Object borrowedUntil = UiComponentStrings
-                .getString("BookCopyModel.copy.date.isAvailable");
+                .getString("BookCopyTableModel.copy.date.isAvailable");
 
         Loan tempLoan = library.getActiveLoanForCopy(copyOfSpecificBook);
         if (tempLoan != null) {
