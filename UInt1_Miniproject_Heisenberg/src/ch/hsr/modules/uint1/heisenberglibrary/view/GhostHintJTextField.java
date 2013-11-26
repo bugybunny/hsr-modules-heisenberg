@@ -21,8 +21,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JTextField;
-
 //@formatter:off
 /**
  * Textfield with a so called ghost hint. If the content is empty, a greyed out
@@ -52,12 +50,11 @@ import javax.swing.JTextField;
  * @author msyfrig
  */
 //@formatter:on
-public class GhostHintJTextField extends JTextField implements FocusListener {
+public class GhostHintJTextField extends StatusBackgroundColorJTextField
+        implements FocusListener {
     private static final long serialVersionUID = 2764559471513955654L;
     private final String      hint;
     private boolean           showingHint;
-    public static final Color POSITIVE_COLOR   = new Color(130, 240, 130);
-    public static final Color NEGATIVE_COLOR   = new Color(240, 130, 130);
 
     /**
      * @return whether the hint is shown now
@@ -66,12 +63,14 @@ public class GhostHintJTextField extends JTextField implements FocusListener {
         return showingHint;
     }
 
+    @Override
     public void setPositiveBackground() {
         if (!showingHint) {
             setBackground(POSITIVE_COLOR);
         }
     }
 
+    @Override
     public void setNegativeBackground() {
         if (!showingHint) {
             setBackground(NEGATIVE_COLOR);

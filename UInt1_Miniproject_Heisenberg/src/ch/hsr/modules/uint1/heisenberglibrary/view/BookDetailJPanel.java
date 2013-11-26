@@ -41,7 +41,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -76,28 +75,28 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookCopyTableModel;
  */
 public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         implements Observer {
-    private static final long serialVersionUID = 3353323227207467624L;
+    private static final long               serialVersionUID = 3353323227207467624L;
 
-    private Library           library;
+    private Library                         library;
 
     // components
-    private JTextField        titleTextfield;
-    private JTextField        authorTextfield;
-    private JTextField        publisherTextfield;
-    private JComboBox<Shelf>  comboShelf;
-    private Component         rigidArea;
-    private JTable            bookCopyTable;
-    private JButton           addBookButton;
-    private JButton           addCopyButton;
-    private JButton           removeSelectedCopiesButton;
-    private JLabel            numberOfCopiesLabel;
-    private JLabel            numberOfAvailableCopiesLabel;
+    private StatusBackgroundColorJTextField titleTextfield;
+    private StatusBackgroundColorJTextField authorTextfield;
+    private StatusBackgroundColorJTextField publisherTextfield;
+    private JComboBox<Shelf>                comboShelf;
+    private Component                       rigidArea;
+    private JTable                          bookCopyTable;
+    private JButton                         addBookButton;
+    private JButton                         addCopyButton;
+    private JButton                         removeSelectedCopiesButton;
+    private JLabel                          numberOfCopiesLabel;
+    private JLabel                          numberOfAvailableCopiesLabel;
 
     // actions
-    private AddCopyAction     addCopyAction;
-    private RemoveCopyAction  removeCopyAction;
-    private SaveBookAction    saveBookAction;
-    private JLabel            lblNewLabel;
+    private AddCopyAction                   addCopyAction;
+    private RemoveCopyAction                removeCopyAction;
+    private SaveBookAction                  saveBookAction;
+    private JLabel                          errorLabel;
 
     /**
      * Creates a new instance of this class and sets the models.
@@ -121,7 +120,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         } else {
             addCopyAction.setEnabled(false);
         }
-        bookCopyTable.setModel(new BookCopyTableModel(displayedObject, library));
+        bookCopyTable
+                .setModel(new BookCopyTableModel(displayedObject, library));
         updateDisplay();
     }
 
@@ -185,7 +185,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         gbcTitleLabel.gridy = 1;
         northPanel.add(titleLabel, gbcTitleLabel);
 
-        titleTextfield = new JTextField();
+        titleTextfield = new StatusBackgroundColorJTextField();
+        titleTextfield.setNegativeBackground();
         GridBagConstraints gbcTitleTextfield = new GridBagConstraints();
         gbcTitleTextfield.gridwidth = 2;
         gbcTitleTextfield.fill = GridBagConstraints.HORIZONTAL;
@@ -205,7 +206,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         gbcAuthorLabel.gridy = 2;
         northPanel.add(authorLabel, gbcAuthorLabel);
 
-        authorTextfield = new JTextField();
+        authorTextfield = new StatusBackgroundColorJTextField();
         GridBagConstraints gbcAuthorTextfield = new GridBagConstraints();
         gbcAuthorTextfield.gridwidth = 2;
         gbcAuthorTextfield.insets = new Insets(0, 0, 5, 0);
@@ -225,7 +226,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         gbcPublisherLabel.gridy = 3;
         northPanel.add(publisherLabel, gbcPublisherLabel);
 
-        publisherTextfield = new JTextField();
+        publisherTextfield = new StatusBackgroundColorJTextField();
         GridBagConstraints gbcPublisherTextfield = new GridBagConstraints();
         gbcPublisherTextfield.gridwidth = 2;
         gbcPublisherTextfield.insets = new Insets(0, 0, 5, 0);
@@ -264,14 +265,12 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         String addBookButtonDisabledTooltip = UiComponentStrings
                 .getString("BookDetailJPanel.button.addbook.disabled.tooltip");
 
-        lblNewLabel = new JLabel(
-                UiComponentStrings
-                        .getString("BookDetailJPanel.lblNewLabel.text")); //$NON-NLS-1$
-        GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-        gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
-        gbc_lblNewLabel.gridx = 3;
-        gbc_lblNewLabel.gridy = 6;
-        northPanel.add(lblNewLabel, gbc_lblNewLabel);
+        errorLabel = new JLabel();
+        GridBagConstraints gbcErrorLabel = new GridBagConstraints();
+        gbcErrorLabel.insets = new Insets(0, 0, 0, 5);
+        gbcErrorLabel.gridx = 3;
+        gbcErrorLabel.gridy = 6;
+        northPanel.add(errorLabel, gbcErrorLabel);
         addBookButton = new ToolTipJButton(addBookButtonText,
                 addBookButtonEnabledTooltip, addBookButtonDisabledTooltip);
 
@@ -354,6 +353,10 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
      * @see ChangeToDirtyDocumentListener
      */
     private void initHandlersForNewBook() {
+        titleTextfield.setNegativeBackground();
+        authorTextfield.setNegativeBackground();
+        publisherTextfield.setNegativeBackground();
+
         saveBookAction = new SaveBookAction(addBookButton.getText());
         saveBookAction.setEnabled(false);
         addBookButton.setAction(saveBookAction);
@@ -488,21 +491,20 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         String publisher = publisherTextfield.getText();
         String shelf = comboShelf.getSelectedItem().toString();
         // Check wheter all fields contain data
-        if ((title.length() <= 0) || (author.length() <= 0)
-                || (publisher.length() <= 0) || (shelf.length() <= 0)) {
+        if (title.isEmpty() || author.isEmpty() || publisher.isEmpty()
+                || shelf.isEmpty()) {
             result = false;
         } else {
             // Check if book-title + author already exist, but only if it is a
-            // new
-            // book we can't check this way when dealing with existing books.
+            // new book we can't check this way when dealing with existing
+            // books.
             if (displayedObject == null) {
                 ArrayList<BookDO> tempBooks = library
                         .findAllBooksByTitle(title);
-                if (tempBooks.size() > 0) {
-                    for (BookDO b : tempBooks) {
-                        if (b.getAuthor().equals(author)) {
-                            result = false;
-                        }
+                for (BookDO b : tempBooks) {
+                    if (b.getAuthor().equals(author)) {
+                        result = false;
+                        break;
                     }
                 }
             }
@@ -640,19 +642,16 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         @Override
         public void insertUpdate(DocumentEvent aE) {
-            // TODO Auto-generated method stub
             validateSaveAndLockButton();
         }
 
         @Override
         public void removeUpdate(DocumentEvent aE) {
-            // TODO Auto-generated method stub
             validateSaveAndLockButton();
         }
 
         @Override
         public void changedUpdate(DocumentEvent aE) {
-            // TODO Auto-generated method stub
             validateSaveAndLockButton();
         }
 

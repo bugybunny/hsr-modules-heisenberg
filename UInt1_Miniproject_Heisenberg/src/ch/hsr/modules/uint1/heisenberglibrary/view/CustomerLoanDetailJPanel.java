@@ -131,9 +131,9 @@ public class CustomerLoanDetailJPanel extends
                 .getLayout();
         flCustomerPictureJPanel.setAlignment(FlowLayout.LEFT);
 
-        JLabel pokemonLabel = new JLabel("");
+        JLabel pokemonLabel = new JLabel();
         pokemonLabel.setIcon(new ImageIcon(CustomerLoanDetailJPanel.class
-                .getResource("/images/kuser.png")));
+                .getResource("/images/kuser.png"))); //$NON-NLS-1$
         customerPictureJPanel.add(pokemonLabel);
 
         JPanel customerDetailJpanel = new JPanel();
@@ -159,7 +159,9 @@ public class CustomerLoanDetailJPanel extends
         customerDetailJpanel.add(selectCustomerComboBox,
                 gbcSelectCustomerComboBox);
 
-        JLabel nameLabel = new JLabel("Name:");
+        JLabel nameLabel = new JLabel(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.label.name.text")); //$NON-NLS-1$
         GridBagConstraints gbcNameLabel = new GridBagConstraints();
         gbcNameLabel.anchor = GridBagConstraints.EAST;
         gbcNameLabel.insets = new Insets(0, 0, 5, 5);
@@ -175,7 +177,9 @@ public class CustomerLoanDetailJPanel extends
         gbcCustomerNameLabel.gridy = 2;
         customerDetailJpanel.add(customerNameLabel, gbcCustomerNameLabel);
 
-        JLabel surnameLabel = new JLabel("Surname:");
+        JLabel surnameLabel = new JLabel(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.label.surname.text")); //$NON-NLS-1$
         GridBagConstraints gbcSurnameLabel = new GridBagConstraints();
         gbcSurnameLabel.anchor = GridBagConstraints.EAST;
         gbcSurnameLabel.insets = new Insets(0, 0, 5, 5);
@@ -183,7 +187,7 @@ public class CustomerLoanDetailJPanel extends
         gbcSurnameLabel.gridy = 3;
         customerDetailJpanel.add(surnameLabel, gbcSurnameLabel);
 
-        customerSurnameLabel = new JLabel(UiComponentStrings.getString("empty"));
+        customerSurnameLabel = new JLabel(UiComponentStrings.getString("empty")); //$NON-NLS-1$
         GridBagConstraints gbcCustomerSurnameLabel = new GridBagConstraints();
         gbcCustomerSurnameLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerSurnameLabel.insets = new Insets(0, 0, 5, 0);
@@ -191,7 +195,9 @@ public class CustomerLoanDetailJPanel extends
         gbcCustomerSurnameLabel.gridy = 3;
         customerDetailJpanel.add(customerSurnameLabel, gbcCustomerSurnameLabel);
 
-        JLabel addressLabel = new JLabel("Address:");
+        JLabel addressLabel = new JLabel(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.label.address.text")); //$NON-NLS-1$
         GridBagConstraints gbcAddressLabel = new GridBagConstraints();
         gbcAddressLabel.anchor = GridBagConstraints.EAST;
         gbcAddressLabel.insets = new Insets(0, 0, 5, 5);
@@ -199,7 +205,7 @@ public class CustomerLoanDetailJPanel extends
         gbcAddressLabel.gridy = 4;
         customerDetailJpanel.add(addressLabel, gbcAddressLabel);
 
-        customerAddressLabel = new JLabel(UiComponentStrings.getString("empty"));
+        customerAddressLabel = new JLabel(UiComponentStrings.getString("empty")); //$NON-NLS-1$
         GridBagConstraints gbcCustomerAddressLabel = new GridBagConstraints();
         gbcCustomerAddressLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerAddressLabel.insets = new Insets(0, 0, 5, 0);
@@ -207,7 +213,9 @@ public class CustomerLoanDetailJPanel extends
         gbcCustomerAddressLabel.gridy = 4;
         customerDetailJpanel.add(customerAddressLabel, gbcCustomerAddressLabel);
 
-        JLabel zipLabel = new JLabel("Zip Code:");
+        JLabel zipLabel = new JLabel(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.label.zip.text")); //$NON-NLS-1$
         GridBagConstraints gbcZipLabel = new GridBagConstraints();
         gbcZipLabel.anchor = GridBagConstraints.EAST;
         gbcZipLabel.insets = new Insets(0, 0, 5, 5);
@@ -215,7 +223,7 @@ public class CustomerLoanDetailJPanel extends
         gbcZipLabel.gridy = 5;
         customerDetailJpanel.add(zipLabel, gbcZipLabel);
 
-        customerZipLabel = new JLabel(UiComponentStrings.getString("empty"));
+        customerZipLabel = new JLabel(UiComponentStrings.getString("empty")); //$NON-NLS-1$
         GridBagConstraints gbcCustomerZipLabel = new GridBagConstraints();
         gbcCustomerZipLabel.anchor = GridBagConstraints.WEST;
         gbcCustomerZipLabel.insets = new Insets(0, 0, 5, 0);
@@ -223,7 +231,9 @@ public class CustomerLoanDetailJPanel extends
         gbcCustomerZipLabel.gridy = 5;
         customerDetailJpanel.add(customerZipLabel, gbcCustomerZipLabel);
 
-        JLabel cityLabel = new JLabel("City:");
+        JLabel cityLabel = new JLabel(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.label.city.text")); //$NON-NLS-1$
         GridBagConstraints gbcCityLabel = new GridBagConstraints();
         gbcCityLabel.anchor = GridBagConstraints.EAST;
         gbcCityLabel.insets = new Insets(0, 0, 5, 5);
@@ -231,7 +241,7 @@ public class CustomerLoanDetailJPanel extends
         gbcCityLabel.gridy = 6;
         customerDetailJpanel.add(cityLabel, gbcCityLabel);
 
-        cityNameLabel = new JLabel(UiComponentStrings.getString("empty"));
+        cityNameLabel = new JLabel(UiComponentStrings.getString("empty")); //$NON-NLS-1$
         GridBagConstraints gbcCityNameLabel = new GridBagConstraints();
         gbcCityNameLabel.insets = new Insets(0, 0, 5, 0);
         gbcCityNameLabel.anchor = GridBagConstraints.WEST;
@@ -249,7 +259,7 @@ public class CustomerLoanDetailJPanel extends
         customerDetailJpanel.add(activeLoansLabel, gbcAblActiveLoans);
 
         customerActiveLoansLabel = new JLabel(
-                UiComponentStrings.getString("empty"));
+                UiComponentStrings.getString("empty")); //$NON-NLS-1$
         GridBagConstraints gbcCustomerActiveLoansLabel = new GridBagConstraints();
         gbcCustomerActiveLoansLabel.insets = new Insets(0, 0, 5, 0);
         gbcCustomerActiveLoansLabel.anchor = GridBagConstraints.WEST;
@@ -259,7 +269,8 @@ public class CustomerLoanDetailJPanel extends
                 gbcCustomerActiveLoansLabel);
 
         JPanel loanDetailJpanel = new JPanel(new BorderLayout());
-        loanDetailJpanel.setBorder(new TitledBorder(null, "Loan details",
+        loanDetailJpanel.setBorder(new TitledBorder(null, UiComponentStrings
+                .getString("CustomerLoanDetailJPanel.border.loandetails.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(loanDetailJpanel, BorderLayout.SOUTH);
 
@@ -268,10 +279,14 @@ public class CustomerLoanDetailJPanel extends
         loanButtonJPanel.setLayout(new BoxLayout(loanButtonJPanel,
                 BoxLayout.X_AXIS));
 
-        JButton addNewLoanButton = new JButton("Add new loan");
+        JButton addNewLoanButton = new JButton(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.button.addloan.text")); //$NON-NLS-1$
         loanButtonJPanel.add(addNewLoanButton);
 
-        JButton removeLoanButton = new JButton("Remove loan");
+        JButton removeLoanButton = new JButton(
+                UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.button.removeloan.text")); //$NON-NLS-1$
         loanButtonJPanel.add(removeLoanButton);
 
         loanDetailTable = new JTable();
