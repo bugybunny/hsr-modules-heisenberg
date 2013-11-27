@@ -22,8 +22,10 @@ import javax.swing.JButton;
  */
 public class ToolTipJButton extends JButton {
     private static final long serialVersionUID = -1655242008655609818L;
-    private String            enabledToolTip   = "";
-    private String            disabledToolTip  = "";
+    private String            enabledToolTip   = UiComponentStrings
+                                                       .getString("empty"); //$NON-NLS-1$
+    private String            disabledToolTip  = UiComponentStrings
+                                                       .getString("empty"); //$NON-NLS-1$
 
     public ToolTipJButton(String aText, String anEnabledToolTip,
             String aDisabledToolTip) {

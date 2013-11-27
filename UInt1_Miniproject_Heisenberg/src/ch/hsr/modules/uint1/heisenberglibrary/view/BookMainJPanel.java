@@ -18,25 +18,19 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -57,8 +51,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
  * 
  * @author msyfrig
  */
-public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
-        Observer {
+public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
+        implements Observer {
     private static final long                           serialVersionUID = 8186612854405487707L;
 
     private TableFilter<BookTableModel>                 tableFilter;
@@ -78,6 +72,10 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
     private BookDetailJDialog                           bookDetailDialog;
 
     private Library                                     library;
+
+    // actions
+    private AddBookAction                               addBookAction;
+    private ViewSelectedAction                          viewSelectedAction;
 
     public BookMainJPanel(Library aLibrary) {
         super(aLibrary.getBooks());
@@ -178,7 +176,6 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
                 .setToolTipText(UiComponentStrings
                         .getString("BookMainJPanel.button.viewselected.disabled.tooltip")); //$NON-NLS-1$
         viewSelectedButton.setEnabled(false);
-        viewSelectedButton.setMnemonic('v');
 
         centerPanel = new JPanel();
         bookInventoryPanel.add(centerPanel, BorderLayout.CENTER);
@@ -193,23 +190,18 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
     }
 
     private void initHandlers() {
-        viewSelectedButton.addActionListener(new ViewSelectedButtonListener());
-        AddBookAction addBookAction = new AddBookAction(addBookButton.getText());
-        addBookButton.setAction(addBookAction);
+        viewSelectedAction = new ViewSelectedAction(
+                viewSelectedButton.getText());
+        viewSelectedAction.setEnabled(false);
+        viewSelectedButton.setAction(viewSelectedAction);
         // needs to be set after setAction, setAction seems to reset the set
         // mnemonic
+        viewSelectedButton.setMnemonic('v');
+
+        addBookAction = new AddBookAction(addBookButton.getText());
+        addBookButton.setAction(addBookAction);
         // TODO googlen wieso zur Hölle das so ist
         addBookButton.setMnemonic('n');
-
-        // TODO sollte in LibraryMasterJFrame sein, damit Keystrokes auf der
-        // JTabbedPane auch noch erkannt werden, der Keystroke müsste irgendwie
-        // an den aktuell selektierten Tab delegiert werden
-        // ctrl+n: add book for Mac OS x users since they don't have mnemonics
-        KeyStroke ctrlN = KeyStroke.getKeyStroke(KeyEvent.VK_N,
-                InputEvent.CTRL_DOWN_MASK);
-        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ctrlN,
-                addBookAction.getValue(Action.NAME));
-        getActionMap().put(addBookAction.getValue(Action.NAME), addBookAction);
 
         table.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
@@ -259,7 +251,13 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
      * 
      * @author msyfrig
      */
-    private class ViewSelectedButtonListener implements ActionListener {
+    private class ViewSelectedAction extends AbstractAction {
+        private static final long serialVersionUID = -342270462951723690L;
+
+        private ViewSelectedAction(String anActionName) {
+            super(anActionName);
+        }
+
         /**
          * Opens all selected booksPanel and their detailview. If a dialog for a
          * detailview is already open and not on top of the z-order stack, it
@@ -267,19 +265,7 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // check first if the detaildialog is already opened, if so bring it
-            // to the front
-            if (bookDetailDialog == null) {
-                bookDetailDialog = new BookDetailJDialog(null);
-            }
-            bookDetailDialog.setVisible(true);
-            bookDetailDialog.toFront();
-
-            for (int tempBook : table.getSelectedRows()) {
-                BookDO selectedBook = dataList.get(table
-                        .convertRowIndexToModel(tempBook));
-                bookDetailDialog.openBookTab(selectedBook, library);
-            }
+            openSelected();
         }
     }
 
@@ -295,15 +281,7 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // check first if the detaildialog is already opened, if so bring it
-            // to the front
-            if (bookDetailDialog == null) {
-                bookDetailDialog = new BookDetailJDialog(null);
-            }
-            bookDetailDialog.setVisible(true);
-            bookDetailDialog.toFront();
-
-            bookDetailDialog.openBookTab(null, library);
+            openNew();
         }
     }
 
@@ -315,9 +293,9 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
         @Override
         public void valueChanged(ListSelectionEvent aSelectionEvent) {
             if (table.getSelectedRowCount() > 0) {
-                viewSelectedButton.setEnabled(true);
+                viewSelectedAction.setEnabled(true);
             } else {
-                viewSelectedButton.setEnabled(false);
+                viewSelectedAction.setEnabled(false);
             }
         }
     }
@@ -334,6 +312,43 @@ public class BookMainJPanel extends SearchableTableJPanel<BookDO> implements
                     ((Integer) anEntry.getIdentifier()).intValue(), 0))
                     .intValue();
             return copiesAvailable > 0;
+        }
+    }
+
+    @Override
+    public void setSelectedCheckBox() {
+        onlyAvailableCheckbox.setSelected(!onlyAvailableCheckbox.isSelected());
+    }
+
+    @Override
+    public void openNew() {
+        if (addBookAction.isEnabled()) {
+            // check first if the detaildialog is already opened, if so bring it
+            // to the front
+            if (bookDetailDialog == null) {
+                bookDetailDialog = new BookDetailJDialog(null);
+            }
+            bookDetailDialog.setVisible(true);
+            bookDetailDialog.toFront();
+
+            bookDetailDialog.openBookTab(null, library);
+        }
+    }
+
+    @Override
+    public void openSelected() {
+        if (viewSelectedAction.isEnabled()) {
+            if (bookDetailDialog == null) {
+                bookDetailDialog = new BookDetailJDialog(null);
+            }
+            bookDetailDialog.setVisible(true);
+            bookDetailDialog.toFront();
+
+            for (int tempBook : table.getSelectedRows()) {
+                BookDO selectedBook = dataList.get(table
+                        .convertRowIndexToModel(tempBook));
+                bookDetailDialog.openBookTab(selectedBook, library);
+            }
         }
     }
 }

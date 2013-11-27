@@ -55,8 +55,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
  * 
  * @author msyfrig
  */
-public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
-        Observer {
+public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
+        implements Observer {
     private static final long                         serialVersionUID = 8186612854405487707L;
 
     private TableFilter<LoanTableModel>               tableFilter;
@@ -74,7 +74,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
     private JPanel                                    panel;
     private JPanel                                    loanInventoryPanel;
     private JPanel                                    outerStatisticsPanel;
-    private CustomerLoanDetailJDialog                         loanDetailDialog;
+    private CustomerLoanDetailJDialog                 loanDetailDialog;
 
     private ViewSelectedCustomerLoansAction           viewSelectedCustomerLoansAction;
     private AddLoanAction                             addLoanAction;
@@ -180,9 +180,9 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
         String viewSelectedButtonText = UiComponentStrings
                 .getString("LoanMainJPanel.button.viewselected.text"); //$NON-NLS-1$
         String viewSelectedButtonEnabledToolTip = UiComponentStrings
-                .getString("LoanMainJPanel.button.viewselected.enabled.tooltip");
+                .getString("LoanMainJPanel.button.viewselected.enabled.tooltip"); //$NON-NLS-1$
         String viewSelectedButtonDisabledToolTip = UiComponentStrings
-                .getString("LoanMainJPanel.button.viewselected.disabled.tooltip");
+                .getString("LoanMainJPanel.button.viewselected.disabled.tooltip"); //$NON-NLS-1$
         viewSelectedButton = new ToolTipJButton(viewSelectedButtonText,
                 viewSelectedButtonEnabledToolTip,
                 viewSelectedButtonDisabledToolTip);
@@ -284,26 +284,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // check first if the detaildialog is already opened, if so bring it
-            // to the front
-            if (loanDetailDialog == null) {
-                loanDetailDialog = new CustomerLoanDetailJDialog(null);
-            }
-            loanDetailDialog.setVisible(true);
-            loanDetailDialog.toFront();
-
-            // add all unique customers to open to a set, faster than check if
-            // the tab is already open
-            Set<Customer> customersToOpenSet = new HashSet<>();
-
-            for (int tempLoan : table.getSelectedRows()) {
-                Customer selectedCustomerLoan = dataList.get(
-                        table.convertRowIndexToModel(tempLoan)).getCustomer();
-                customersToOpenSet.add(selectedCustomerLoan);
-            }
-            for (Customer tempCustomer : customersToOpenSet) {
-                loanDetailDialog.openCustomerLoanTab(tempCustomer, library);
-            }
+            openSelected();
         }
     }
 
@@ -319,14 +300,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            // check first if the detaildialog is already opened, if so bring it
-            // to the front
-            if (loanDetailDialog == null) {
-                loanDetailDialog = new CustomerLoanDetailJDialog(null);
-            }
-            loanDetailDialog.setVisible(true);
-            loanDetailDialog.toFront();
-            loanDetailDialog.openCustomerLoanTab(null, library);
+            openNew();
         }
     }
 
@@ -354,5 +328,47 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
                     ((Integer) anEntry.getIdentifier()).intValue(), 0);
             return loanStatus == LoanStatus.DUE;
         }
+    }
+
+    @Override
+    public void openNew() {
+        // check first if the detaildialog is already opened, if so bring it
+        // to the front
+        if (loanDetailDialog == null) {
+            loanDetailDialog = new CustomerLoanDetailJDialog(null);
+        }
+        loanDetailDialog.setVisible(true);
+        loanDetailDialog.toFront();
+        loanDetailDialog.openCustomerLoanTab(null, library);
+    }
+
+    @Override
+    public void openSelected() {
+        // check first if the detaildialog is already opened, if so bring it
+        // to the front
+        if (loanDetailDialog == null) {
+            loanDetailDialog = new CustomerLoanDetailJDialog(null);
+        }
+        loanDetailDialog.setVisible(true);
+        loanDetailDialog.toFront();
+
+        // add all unique customers to open to a set, faster than check if
+        // the tab is already open
+        Set<Customer> customersToOpenSet = new HashSet<>();
+
+        for (int tempLoan : table.getSelectedRows()) {
+            Customer selectedCustomerLoan = dataList.get(
+                    table.convertRowIndexToModel(tempLoan)).getCustomer();
+            customersToOpenSet.add(selectedCustomerLoan);
+        }
+        for (Customer tempCustomer : customersToOpenSet) {
+            loanDetailDialog.openCustomerLoanTab(tempCustomer, library);
+        }
+
+    }
+
+    @Override
+    public void setSelectedCheckBox() {
+        onlyOverdueCheckbox.setSelected(!onlyOverdueCheckbox.isSelected());
     }
 }

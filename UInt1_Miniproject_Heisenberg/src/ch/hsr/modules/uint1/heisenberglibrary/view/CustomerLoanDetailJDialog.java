@@ -55,7 +55,7 @@ public class CustomerLoanDetailJDialog extends
             detailCustomerLoanPanel = new CustomerLoanDetailJPanel(
                     aCustomerToOpen, aLibrary);
 
-            String tabTitle = "enter new loan";
+            String tabTitle = UiComponentStrings.getString("CustomerLoanDetailJDialog.tab.title.enteringnewloan.text"); //$NON-NLS-1$
             if (aCustomerToOpen != null) {
                 addObserverForObservable(aCustomerToOpen, this);
                 tabTitle = getTabTitleForObject(aCustomerToOpen, false);
@@ -64,7 +64,7 @@ public class CustomerLoanDetailJDialog extends
                         aCustomerToOpen.toString());
             } else {
                 tabbedPane.addTab(tabTitle, null, detailCustomerLoanPanel,
-                        "Entering new loan");
+                        UiComponentStrings.getString("CustomerLoanDetailJDialog.tab.title.enteringnewloan.tooltip")); //$NON-NLS-1$
             }
             addHandlersToTab(detailCustomerLoanPanel);
             openObjectTabList.add(detailCustomerLoanPanel);

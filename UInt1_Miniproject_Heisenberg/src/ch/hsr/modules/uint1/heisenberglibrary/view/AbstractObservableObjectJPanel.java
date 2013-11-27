@@ -104,6 +104,9 @@ public abstract class AbstractObservableObjectJPanel<M extends AbstractObservabl
             if (isDirty) {
                 newState = new ModelStateChangeEvent(this,
                         ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY);
+            } else {
+                newState = new ModelStateChangeEvent(this,
+                        ModelStateChangeEvent.MODEL_UPDATE_FROM_OTHER_SOURCE);
             }
         }
         dirty = isDirty;

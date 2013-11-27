@@ -29,13 +29,11 @@ import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListene
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.AbstractExtendendedEventTableModel;
 
 /**
- * TODO COMMENT ME!
  * 
  * @author msyfrig
  */
-// TODO ctrl+f für searchfieldfocus auch hier reinnehmen und allenfalls die
-// parentcomponent suchen und dann dort zur input-/actionmap hinzufügen
-public class SearchableTableJPanel<E extends Observable> extends JPanel {
+public abstract class AbstractSearchableTableJPanel<E extends Observable>
+        extends JPanel implements IPanelActions {
     private static final long     serialVersionUID = 3953982564280733109L;
     protected JTable              table;
     // protected TableFilter<? extends TableModel> tableFilter;
@@ -44,12 +42,12 @@ public class SearchableTableJPanel<E extends Observable> extends JPanel {
 
     protected List<E>             dataList;
 
-    public SearchableTableJPanel(List<E> aDataList) {
+    public AbstractSearchableTableJPanel(List<E> aDataList) {
         this(aDataList, new JTable(), new GhostHintJTextField(
                 UiComponentStrings.getString("empty")));//$NON-NLS-1$
     }
 
-    public SearchableTableJPanel(List<E> aDataList, JTable aTable,
+    public AbstractSearchableTableJPanel(List<E> aDataList, JTable aTable,
             GhostHintJTextField aSearchField) {
         dataList = aDataList;
         table = aTable;
@@ -68,7 +66,7 @@ public class SearchableTableJPanel<E extends Observable> extends JPanel {
         table.setCellSelectionEnabled(true);
         table.setFillsViewportHeight(true);
         table.setColumnSelectionAllowed(false);
-        table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
+        table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE); //$NON-NLS-1$
 
         table.getSelectionModel().setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -166,4 +164,13 @@ public class SearchableTableJPanel<E extends Observable> extends JPanel {
         return searchTextField;
     }
 
+    @Override
+    public void searchFieldRequestFocus() {
+        searchTextField.requestFocus();
+    }
+
+    @Override
+    public void tableRequestFocus() {
+        table.requestFocus();
+    }
 }

@@ -21,6 +21,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.swing.SwingUtilities;
+
 //@formatter:off
 /**
  * Textfield with a so called ghost hint. If the content is empty, a greyed out
@@ -122,19 +124,31 @@ public class GhostHintJTextField extends StatusBackgroundColorJTextField
 
     @Override
     public void focusGained(FocusEvent aFocusGainedEvent) {
-        if (getText().isEmpty()) {
-            setForeground(null);
-            showingHint = false;
-        }
+        super.focusGained(aFocusGainedEvent);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (getText().isEmpty()) {
+                    setForeground(null);
+                    showingHint = false;
+                }
+            }
+        });
     }
 
     @Override
     public void focusLost(FocusEvent aFocusLostEvent) {
-        if (getText().isEmpty()) {
-            setBackground(null);
-            setForeground(Color.LIGHT_GRAY);
-            showingHint = true;
-        }
+        super.focusLost(aFocusLostEvent);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (getText().isEmpty()) {
+                    setBackground(null);
+                    setForeground(Color.LIGHT_GRAY);
+                    showingHint = true;
+                }
+            }
+        });
     }
 
     //

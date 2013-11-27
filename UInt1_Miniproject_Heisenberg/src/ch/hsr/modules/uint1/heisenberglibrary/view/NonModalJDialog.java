@@ -87,7 +87,7 @@ public abstract class NonModalJDialog extends JDialog {
         if (aTitle.isEmpty()) {
             // TODO dient nur dazu, dass wir nicht ausversehen irgendwo den
             // titel vergessen
-            throw new InvalidParameterException("please set a title");
+            throw new InvalidParameterException("please set a title"); //$NON-NLS-1$
         }
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         initComponents();
@@ -138,6 +138,6 @@ public abstract class NonModalJDialog extends JDialog {
 
     @Override
     public void setModal(boolean aModal) {
-        throw new UnsupportedOperationException("cannot change modality");
+        throw new UnsupportedOperationException("cannot change modality"); //$NON-NLS-1$
     }
 }

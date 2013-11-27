@@ -24,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,14 +33,18 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -261,7 +267,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         String addBookButtonEnabledTooltip = UiComponentStrings
                 .getString("BookDetailJPanel.button.addbook.enabled.tooltip"); //$NON-NLS-1$
         String addBookButtonDisabledTooltip = UiComponentStrings
-                .getString("BookDetailJPanel.button.addbook.disabled.tooltip");
+                .getString("BookDetailJPanel.button.addbook.disabled.tooltip"); //$NON-NLS-1$
 
         errorLabel = new JLabel();
         GridBagConstraints gbcErrorLabel = new GridBagConstraints();
@@ -400,6 +406,13 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                 titleTextfield.requestFocus();
             }
         });
+
+        KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                InputEvent.CTRL_DOWN_MASK);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ctrlS,
+                saveBookAction.getValue(Action.NAME));
+        getActionMap()
+                .put(saveBookAction.getValue(Action.NAME), saveBookAction);
     }
 
     private void initHandlersForSetBook() {
@@ -413,21 +426,18 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (displayedObject != null) {
-                    setDirty(true);
+                    checkIfModified();
                 }
             }
         });
-        titleTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(titleTextfield,
-                        displayedObject.getTitle()));
 
-        authorTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(authorTextfield,
-                        displayedObject.getAuthor()));
+        ChangeToDirtyDocumentListener dirtyChangeListener = new ChangeToDirtyDocumentListener();
+        titleTextfield.getDocument().addDocumentListener(dirtyChangeListener);
+
+        authorTextfield.getDocument().addDocumentListener(dirtyChangeListener);
 
         publisherTextfield.getDocument().addDocumentListener(
-                new ChangeToDirtyDocumentListener(publisherTextfield,
-                        displayedObject.getPublisher()));
+                dirtyChangeListener);
         validateSave();
     }
 
@@ -453,7 +463,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                         this, ModelStateChangeEvent.NEW_ENTRY_ADDED);
                 notifyListenersAboutModelChange(newState);
                 initHandlersForSetBook();
-                saveBookAction.setEnabled(false);
+                // saveBookAction.setEnabled(false);
                 saveSuccess = true;
             }
         }
@@ -463,7 +473,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                         authorTextfield.getText(),
                         publisherTextfield.getText(),
                         (Shelf) comboShelf.getSelectedItem());
-                setDirty(false);
+                checkIfModified();
+                // setDirty(false);
                 saveSuccess = true;
             }
         }
@@ -500,13 +511,13 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         // Check if all fields contain text for validation
         if (title.isEmpty() || author.isEmpty() || publisher.isEmpty()
                 || shelf.isEmpty()) {
-            errorLabel.setText("Please fill in all fields.");
+            errorLabel.setText(UiComponentStrings.getString("BookDetailJPanel.label.error.text.emptyFields")); //$NON-NLS-1$
             result = false;
         } else {
             // Check if book-title + author already exist, but only if it is a
             // new book we can't check this way when dealing with existing
             // books.
-            errorLabel.setText("");
+            errorLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             if (displayedObject == null) {
                 ArrayList<BookDO> tempBooks = library
                         .findAllBooksByTitle(title);
@@ -516,13 +527,29 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                         authorTextfield.setNegativeBackground();
                         result = false;
                         errorLabel
-                                .setText("There is already a book with this title & author in the library.");
+                                .setText(UiComponentStrings.getString("BookDetailJPanel.label.error.text.duplicateBook")); //$NON-NLS-1$
                         break;
                     }
                 }
             }
         }
         return result;
+    }
+
+    private void checkIfModified() {
+        if (displayedObject != null) {
+            // check if text differs from the loaded book object, if
+            // not set this panel to dirty
+            BookDO tempBook = new BookDO(titleTextfield.getText());
+            tempBook.set(titleTextfield.getText(), authorTextfield.getText(),
+                    publisherTextfield.getText(),
+                    (Shelf) comboShelf.getSelectedItem());
+            if (displayedObject.equals(tempBook)) {
+                setDirty(false);
+            } else {
+                setDirty(true);
+            }
+        }
     }
 
     public boolean validateSaveAndLockButton() {
@@ -538,18 +565,33 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             ModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Copy.REMOVED
                     || type == ModelChangeTypeEnums.Copy.ADDED) {
-                ((BookCopyTableModel) bookCopyTable.getModel())
-                        .fireTableDataChanged();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((BookCopyTableModel) bookCopyTable.getModel())
+                                .fireTableDataChanged();
+                    }
+                });
             } else if (type == ModelChangeTypeEnums.Copy.NUMBER) {
-                updateNumberOfCopiesLabel();
-                updateNumberOfAvailableCopiesLabel();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateNumberOfCopiesLabel();
+                        updateNumberOfAvailableCopiesLabel();
+                    }
+                });
             } else if (type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED
                     || type == ModelChangeTypeEnums.Book.AUTHOR
                     || type == ModelChangeTypeEnums.Book.PUBLISHER
                     || type == ModelChangeTypeEnums.Book.SHELF
                     || type == ModelChangeTypeEnums.Book.TITLE) {
                 // just update everything, no need for premature optimization
-                updateDisplay();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateDisplay();
+                    }
+                });
             }
         }
     }
@@ -569,7 +611,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             // TODO save caret position
             titleTextfield.setText(displayedObject.getTitle());
             titleTextfield.setEnabled(true);
-            titleTextfield.setCaretPosition(0);
             authorTextfield.setText(displayedObject.getAuthor());
             authorTextfield.setEnabled(true);
             publisherTextfield.setText(displayedObject.getPublisher());
@@ -648,6 +689,30 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
             library.createAndAddCopy(displayedObject);
+        }
+    }
+
+    /**
+     * Checks if a value in a textfield has changed to its original content
+     * given in {@code aStringToCheck} and if so, set this panel to dirty (=has
+     * unsaved changes).
+     * 
+     * @author msyfrig
+     */
+    protected class ChangeToDirtyDocumentListener implements DocumentListener {
+        @Override
+        public void removeUpdate(DocumentEvent aDocumentRemoveEvent) {
+            checkIfModified();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent aDocumentInsertEvent) {
+            checkIfModified();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent aDocumentChangedEvent) {
+            checkIfModified();
         }
     }
 

@@ -15,8 +15,11 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.Color;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 
 /**
@@ -25,7 +28,8 @@ import javax.swing.text.Document;
  * 
  * @author msyfrig
  */
-public class StatusBackgroundColorJTextField extends JTextField {
+public class StatusBackgroundColorJTextField extends JTextField implements
+        FocusListener {
     private static final long serialVersionUID = 8944651872738119454L;
     public static final Color POSITIVE_COLOR   = new Color(240, 255, 240);
     public static final Color NEGATIVE_COLOR   = new Color(255, 205, 205);
@@ -36,31 +40,72 @@ public class StatusBackgroundColorJTextField extends JTextField {
      */
     public StatusBackgroundColorJTextField() {
         super();
+        addFocusListener(this);
     }
 
     public StatusBackgroundColorJTextField(Document aDoc, String aText,
             int aColumns) {
         super(aDoc, aText, aColumns);
+        addFocusListener(this);
     }
 
     public StatusBackgroundColorJTextField(int aColumns) {
         super(aColumns);
+        addFocusListener(this);
     }
 
     public StatusBackgroundColorJTextField(String aText, int aColumns) {
         super(aText, aColumns);
+        addFocusListener(this);
     }
 
     public StatusBackgroundColorJTextField(String aText) {
         super(aText);
+        addFocusListener(this);
     }
 
     public void setPositiveBackground() {
-        setBackground(POSITIVE_COLOR);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setBackground(POSITIVE_COLOR);
+            }
+        });
     }
 
     public void setNegativeBackground() {
-        setBackground(NEGATIVE_COLOR);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setBackground(NEGATIVE_COLOR);
+            }
+        });
     }
 
+    @Override
+    public void setText(String aText) {
+        int caretPosition = getCaretPosition();
+        super.setText(aText);
+        int textLength = aText.length();
+        if (caretPosition <= aText.length()) {
+            setCaretPosition(caretPosition);
+        } else {
+            setCaretPosition(aText.length());
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent aFocusGainedEvent) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                selectAll();
+            }
+        });
+    }
+
+    @Override
+    public void focusLost(FocusEvent aFocusLostEvent) {
+        // do nothing
+    }
 }

@@ -150,11 +150,11 @@ public class CustomerComboboxModel extends
         public String toString() {
             StringBuilder customerString = new StringBuilder(60);
             customerString.append(surname);
-            customerString.append(", ");
+            customerString.append(", "); //$NON-NLS-1$
             customerString.append(name);
-            customerString.append(", ");
+            customerString.append(", "); //$NON-NLS-1$
             customerString.append(zip);
-            customerString.append(" (");
+            customerString.append(" ("); //$NON-NLS-1$
             customerString.append(activeLoanCount);
             customerString.append(')');
 

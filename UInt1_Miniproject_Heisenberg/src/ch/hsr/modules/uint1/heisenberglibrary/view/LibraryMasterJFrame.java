@@ -31,18 +31,18 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 // TODO ctrl + f in librarymasterjframe, delegiert dann requestfocus an panel
 // weiter, welches momentan selektiert ist
 public class LibraryMasterJFrame extends JFrame {
-    private static final long             serialVersionUID = 8186612854405487707L;
+    private static final long                     serialVersionUID = 8186612854405487707L;
 
     /**
      * The table that displays all different booktypes in the library, not the
      * actual copies.
      */
-    private JPanel                        contentPanel;
-    private JTabbedPane                   tabbedPane;
-    private SearchableTableJPanel<BookDO> booksPanel;
-    private SearchableTableJPanel<Loan>   loanPanel;
+    private JPanel                                contentPanel;
+    private JTabbedPane                           tabbedPane;
+    private AbstractSearchableTableJPanel<BookDO> booksPanel;
+    private AbstractSearchableTableJPanel<Loan>   loanPanel;
 
-    private Library                       bookMasterlibrary;
+    private Library                               bookMasterlibrary;
 
     /**
      * Creates the frame.
@@ -60,7 +60,7 @@ public class LibraryMasterJFrame extends JFrame {
     private void initComponents() {
         setMinimumSize(new Dimension(650, 400));
         ImageIcon frameIcon = new ImageIcon(
-                LibraryMasterJFrame.class.getResource("/images/library.png"));
+                LibraryMasterJFrame.class.getResource(UiComponentStrings.getString("LibraryMasterJFrame.icon.user"))); //$NON-NLS-1$
         setIconImage(frameIcon.getImage());
         setTitle(UiComponentStrings.getString("LibraryMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -151,10 +151,12 @@ public class LibraryMasterJFrame extends JFrame {
                 navigateToPreviousTabAction);
 
         /*
-         * cltr+f for all subpanels is implemented here because after switching
-         * the tab for the first time, the focus is on the tabbedpane and ctrl+f
-         * does nothing when we add it just to the subpanels and all its
-         * ancestors
+         * cltr+f for all subpanels is implemented here (and also the following)
+         * because after switching the tab for the first time, the focus is on
+         * the tabbedpane and ctrl+f does nothing when we add it just to the
+         * subpanels and all its ancestors. and getting the parent components
+         * from both tabs and add all actions to that input/action map would be
+         * really bad code
          */
         // ctrl+f: switch focus to searchfield for table
         Action searchAction = new AbstractAction("search") { //$NON-NLS-1$
@@ -162,8 +164,7 @@ public class LibraryMasterJFrame extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
-                ((SearchableTableJPanel<?>) tabbedPane.getSelectedComponent())
-                        .getSearchTextField().requestFocus();
+                getSelectedTab().searchFieldRequestFocus();
             }
         };
 
@@ -175,5 +176,68 @@ public class LibraryMasterJFrame extends JFrame {
         getRootPane().getActionMap().put(searchAction.getValue(Action.NAME),
                 searchAction);
 
+        // ctrl+n: add book for Mac OS x users since they don't have mnemonics
+        Action newAction = new AbstractAction("new") { //$NON-NLS-1$
+            private static final long serialVersionUID = -3181581596036016373L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().openNew();
+            }
+        };
+
+        KeyStroke ctrlN = KeyStroke.getKeyStroke(KeyEvent.VK_N,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlN, newAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(newAction.getValue(Action.NAME),
+                newAction);
+
+        // ctrl+e/alt+e: set focus to table
+        Action focusTableAction = new AbstractAction("focusTableAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = -3181581596036016373L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().tableRequestFocus();
+            }
+        };
+
+        KeyStroke altE = KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                InputEvent.ALT_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(altE, focusTableAction.getValue(Action.NAME));
+        KeyStroke ctrlE = KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlE, focusTableAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                focusTableAction.getValue(Action.NAME), focusTableAction);
+
+        // ctrl+n: add book for Mac OS x users since they don't have mnemonics
+        Action focusCheckBoxAction = new AbstractAction("focusCheckBoxAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = -3181581596036016373L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().setSelectedCheckBox();
+            }
+        };
+
+        KeyStroke altC = KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                InputEvent.ALT_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(altC, focusCheckBoxAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                focusCheckBoxAction.getValue(Action.NAME), focusCheckBoxAction);
+    }
+
+    private AbstractSearchableTableJPanel<?> getSelectedTab() {
+        return ((AbstractSearchableTableJPanel<?>) tabbedPane
+                .getSelectedComponent());
     }
 }

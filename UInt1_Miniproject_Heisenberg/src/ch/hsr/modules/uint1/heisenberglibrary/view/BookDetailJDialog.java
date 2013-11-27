@@ -73,7 +73,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
         if (detailBookPanel == null) {
             detailBookPanel = new BookDetailJPanel(aBookToOpen, aLibrary);
 
-            String tabTitle = "add new book";
+            String tabTitle = UiComponentStrings.getString("BookDetailJDialog.tab.title.enternewbook.text"); //$NON-NLS-1$
             if (aBookToOpen != null) {
                 // add observer to this book so we notice when the title has
                 // changed
@@ -84,7 +84,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                         aBookToOpen.toString());
             } else {
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
-                        "Entering a new book");
+                        UiComponentStrings.getString("BookDetailJDialog.tab.title.enternewbook.tooltip")); //$NON-NLS-1$
             }
             addHandlersToTab(detailBookPanel);
             // add asteriks in tabtitle if tab has unsaved changes and listen
