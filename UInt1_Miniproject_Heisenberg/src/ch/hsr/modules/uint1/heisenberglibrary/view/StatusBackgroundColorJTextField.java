@@ -27,8 +27,8 @@ import javax.swing.text.Document;
  */
 public class StatusBackgroundColorJTextField extends JTextField {
     private static final long serialVersionUID = 8944651872738119454L;
-    public static final Color POSITIVE_COLOR   = new Color(130, 240, 130);
-    public static final Color NEGATIVE_COLOR   = new Color(240, 130, 130);
+    public static final Color POSITIVE_COLOR   = new Color(240, 255, 240);
+    public static final Color NEGATIVE_COLOR   = new Color(255, 205, 205);
 
     /**
      * Creates a new instance of this class.

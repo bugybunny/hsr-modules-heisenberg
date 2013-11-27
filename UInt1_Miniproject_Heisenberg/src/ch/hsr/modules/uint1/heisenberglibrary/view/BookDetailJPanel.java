@@ -265,6 +265,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         errorLabel = new JLabel();
         GridBagConstraints gbcErrorLabel = new GridBagConstraints();
+        gbcErrorLabel.anchor = GridBagConstraints.EAST;
         gbcErrorLabel.insets = new Insets(0, 0, 0, 5);
         gbcErrorLabel.gridx = 3;
         gbcErrorLabel.gridy = 6;
@@ -499,11 +500,13 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         // Check if all fields contain text for validation
         if (title.isEmpty() || author.isEmpty() || publisher.isEmpty()
                 || shelf.isEmpty()) {
+            errorLabel.setText("Please fill in all fields.");
             result = false;
         } else {
             // Check if book-title + author already exist, but only if it is a
             // new book we can't check this way when dealing with existing
             // books.
+            errorLabel.setText("");
             if (displayedObject == null) {
                 ArrayList<BookDO> tempBooks = library
                         .findAllBooksByTitle(title);
@@ -512,6 +515,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                         titleTextfield.setNegativeBackground();
                         authorTextfield.setNegativeBackground();
                         result = false;
+                        errorLabel
+                                .setText("There is already a book with this title & author in the library.");
                         break;
                     }
                 }
