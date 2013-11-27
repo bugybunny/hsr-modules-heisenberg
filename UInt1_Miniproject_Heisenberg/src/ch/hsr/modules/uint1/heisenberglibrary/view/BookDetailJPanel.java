@@ -333,7 +333,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         bookCopyTable.setFillsViewportHeight(true);
         bookCopyTable.setColumnSelectionAllowed(false);
 
-        // TODO hier ist noch was komisch, jsp wird gar nicht angzeigt
         JScrollPane jsp = new JScrollPane(bookCopyTable);
         jsp.setPreferredSize(new Dimension((int) jsp.getPreferredSize()
                 .getWidth(), 200));
@@ -413,8 +412,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (displayedObject != null) {
-                    // displayedObject.setShelf((Shelf) comboShelf
-                    // .getSelectedItem());
                     setDirty(true);
                 }
             }
@@ -430,6 +427,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         publisherTextfield.getDocument().addDocumentListener(
                 new ChangeToDirtyDocumentListener(publisherTextfield,
                         displayedObject.getPublisher()));
+        validateSave();
     }
 
     /**
@@ -477,7 +475,28 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         String author = authorTextfield.getText();
         String publisher = publisherTextfield.getText();
         String shelf = comboShelf.getSelectedItem().toString();
-        // Check wheter all fields contain data
+
+        {  // Set the color textfields by checking each
+            if (title.isEmpty()) {
+                titleTextfield.setNegativeBackground();
+            } else {
+                titleTextfield.setPositiveBackground();
+            }
+
+            if (author.isEmpty()) {
+                authorTextfield.setNegativeBackground();
+            } else {
+                authorTextfield.setPositiveBackground();
+            }
+
+            if (publisher.isEmpty()) {
+                publisherTextfield.setNegativeBackground();
+            } else {
+                publisherTextfield.setPositiveBackground();
+            }
+        }
+
+        // Check if all fields contain text for validation
         if (title.isEmpty() || author.isEmpty() || publisher.isEmpty()
                 || shelf.isEmpty()) {
             result = false;
@@ -490,6 +509,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                         .findAllBooksByTitle(title);
                 for (BookDO b : tempBooks) {
                     if (b.getAuthor().equals(author)) {
+                        titleTextfield.setNegativeBackground();
+                        authorTextfield.setNegativeBackground();
                         result = false;
                         break;
                     }
