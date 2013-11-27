@@ -1,6 +1,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.AWTKeyStroke;
+import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -57,6 +58,7 @@ public class LibraryMasterJFrame extends JFrame {
     }
 
     private void initComponents() {
+        setMinimumSize(new Dimension(650, 400));
         ImageIcon frameIcon = new ImageIcon(
                 LibraryMasterJFrame.class.getResource("/images/library.png"));
         setIconImage(frameIcon.getImage());

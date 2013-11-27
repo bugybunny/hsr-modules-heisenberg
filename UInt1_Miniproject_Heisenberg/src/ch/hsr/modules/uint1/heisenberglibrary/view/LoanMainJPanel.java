@@ -74,7 +74,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
     private JPanel                                    panel;
     private JPanel                                    loanInventoryPanel;
     private JPanel                                    outerStatisticsPanel;
-    private LoanDetailJDialog                         loanDetailDialog;
+    private CustomerLoanDetailJDialog                         loanDetailDialog;
 
     private ViewSelectedCustomerLoansAction           viewSelectedCustomerLoansAction;
     private AddLoanAction                             addLoanAction;
@@ -287,7 +287,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (loanDetailDialog == null) {
-                loanDetailDialog = new LoanDetailJDialog(null);
+                loanDetailDialog = new CustomerLoanDetailJDialog(null);
             }
             loanDetailDialog.setVisible(true);
             loanDetailDialog.toFront();
@@ -322,7 +322,7 @@ public class LoanMainJPanel extends SearchableTableJPanel<Loan> implements
             // check first if the detaildialog is already opened, if so bring it
             // to the front
             if (loanDetailDialog == null) {
-                loanDetailDialog = new LoanDetailJDialog(null);
+                loanDetailDialog = new CustomerLoanDetailJDialog(null);
             }
             loanDetailDialog.setVisible(true);
             loanDetailDialog.toFront();

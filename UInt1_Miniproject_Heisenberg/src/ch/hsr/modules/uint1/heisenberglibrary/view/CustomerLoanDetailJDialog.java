@@ -15,6 +15,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -27,18 +28,19 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
  * 
  * @author msyfrig
  */
-public class LoanDetailJDialog extends AbstractTabbedPaneDialog<Customer>
-        implements Observer {
+public class CustomerLoanDetailJDialog extends
+        AbstractTabbedPaneDialog<Customer> implements Observer {
     private static final long serialVersionUID = 1528185325072558131L;
 
-    public LoanDetailJDialog(JFrame anOwner) {
-        super(anOwner, UiComponentStrings.getString("LoanDetailJDialog.title")); //$NON-NLS-1$
+    public CustomerLoanDetailJDialog(JFrame anOwner) {
+        super(anOwner, UiComponentStrings
+                .getString("CustomerLoanDetailJDialog.title")); //$NON-NLS-1$
     }
 
     @Override
     protected void initComponents() {
+        setMinimumSize(new Dimension(370, 370));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setSize(100, 100);
         getContentPane().setLayout(new BorderLayout());
         initTabbedPane();
         getContentPane().add(tabbedPane, BorderLayout.CENTER);

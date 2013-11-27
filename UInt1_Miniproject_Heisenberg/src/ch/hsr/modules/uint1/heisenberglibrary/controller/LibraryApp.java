@@ -53,12 +53,11 @@ public class LibraryApp {
                 .newDocumentBuilder();
 
         loadCustomersFromXml(library, builder, new File("data/customers.xml"));
-        Collections.sort(library.getCustomers());
-
         loadBooksFromXml(library, builder, new File("data/books.xml"));
 
         // create pseudo random books and loans
         createBooksAndLoans(library);
+        Collections.sort(library.getCustomers());
 
         System.out.println("Initialisation of the library was successful!\n");
         System.out.println("Books in library: " + library.getBooks().size());

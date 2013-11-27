@@ -20,10 +20,10 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Observable;
 
 import javax.swing.BoxLayout;
@@ -117,16 +117,16 @@ public class CustomerLoanDetailJPanel extends
             selectCustomerComboBox.setSelectedIndex(indexOfCustomer);
             loanDetailTable.setModel(new CustomerLoanTableModel(
                     displayedObject, library));
-            // ColumnsAutoSizer.sizeColumnsToFit(loanDetailTable);
         }
         updateDisplay();
     }
 
     private void initComponents() {
-        setLayout(new BorderLayout(0, 0));
+        setLayout(new BorderLayout());
+
+        JPanel customerJPanel = new JPanel(new BorderLayout());
 
         JPanel customerPictureJPanel = new JPanel();
-        add(customerPictureJPanel, BorderLayout.WEST);
         FlowLayout flCustomerPictureJPanel = (FlowLayout) customerPictureJPanel
                 .getLayout();
         flCustomerPictureJPanel.setAlignment(FlowLayout.LEFT);
@@ -134,10 +134,9 @@ public class CustomerLoanDetailJPanel extends
         JLabel pokemonLabel = new JLabel();
         pokemonLabel.setIcon(new ImageIcon(CustomerLoanDetailJPanel.class
                 .getResource("/images/kuser.png"))); //$NON-NLS-1$
-        customerPictureJPanel.add(pokemonLabel);
+        customerJPanel.add(pokemonLabel, BorderLayout.WEST);
 
         JPanel customerDetailJpanel = new JPanel();
-        add(customerDetailJpanel, BorderLayout.CENTER);
         GridBagLayout gblCustomerDetailJpanel = new GridBagLayout();
         gblCustomerDetailJpanel.columnWidths = new int[] { 10, 0, 10, 0, 0 };
         gblCustomerDetailJpanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0,
@@ -267,12 +266,14 @@ public class CustomerLoanDetailJPanel extends
         gbcCustomerActiveLoansLabel.gridy = 7;
         customerDetailJpanel.add(customerActiveLoansLabel,
                 gbcCustomerActiveLoansLabel);
+        customerJPanel.add(customerDetailJpanel, BorderLayout.CENTER);
+        add(customerJPanel, BorderLayout.NORTH);
 
         JPanel loanDetailJpanel = new JPanel(new BorderLayout());
         loanDetailJpanel.setBorder(new TitledBorder(null, UiComponentStrings
                 .getString("CustomerLoanDetailJPanel.border.loandetails.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(loanDetailJpanel, BorderLayout.SOUTH);
+        add(loanDetailJpanel, BorderLayout.CENTER);
 
         JPanel loanButtonJPanel = new JPanel();
         loanDetailJpanel.add(loanButtonJPanel, BorderLayout.NORTH);
@@ -284,10 +285,10 @@ public class CustomerLoanDetailJPanel extends
                         .getString("CustomerLoanDetailJPanel.button.addloan.text")); //$NON-NLS-1$
         loanButtonJPanel.add(addNewLoanButton);
 
-        JButton removeLoanButton = new JButton(
+        JButton returnLoanButton = new JButton(
                 UiComponentStrings
-                        .getString("CustomerLoanDetailJPanel.button.removeloan.text")); //$NON-NLS-1$
-        loanButtonJPanel.add(removeLoanButton);
+                        .getString("CustomerLoanDetailJPanel.button.returnloan.text")); //$NON-NLS-1$
+        loanButtonJPanel.add(returnLoanButton);
 
         loanDetailTable = new JTable();
         loanDetailTable.getTableHeader().setReorderingAllowed(false);
@@ -311,20 +312,18 @@ public class CustomerLoanDetailJPanel extends
     }
 
     private void initHandlersForNewLoan() {
-        selectCustomerComboBox.addItemListener(new ItemListener() {
-
+        selectCustomerComboBox.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent anItemStateChangedEvent) {
-                if (anItemStateChangedEvent.getStateChange() == ItemEvent.SELECTED) {
-                    DisplayableCustomer selectedDisplayableCustomer = (DisplayableCustomer) selectCustomerComboBox
-                            .getSelectedItem();
-                    Customer customerToSet = ((CustomerComboboxModel) selectCustomerComboBox
-                            .getModel())
-                            .getCustomerForDisplayableCustomer(selectedDisplayableCustomer);
-                    setCustomer(customerToSet);
-                }
+            public void actionPerformed(ActionEvent anActionEvent) {
+                DisplayableCustomer selectedDisplayableCustomer = (DisplayableCustomer) selectCustomerComboBox
+                        .getSelectedItem();
+                Customer customerToSet = ((CustomerComboboxModel) selectCustomerComboBox
+                        .getModel())
+                        .getCustomerForDisplayableCustomer(selectedDisplayableCustomer);
+                setCustomer(customerToSet);
             }
         });
+
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent aComponentShownEvent) {
