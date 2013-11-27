@@ -15,6 +15,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -45,6 +46,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
 
     @Override
     protected void initComponents() {
+        setMinimumSize(new Dimension(500, 500));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         initTabbedPane();
         getContentPane().setLayout(new BorderLayout());
