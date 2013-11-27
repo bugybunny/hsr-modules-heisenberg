@@ -406,14 +406,16 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         saveBookAction.setEnabled(false);
         addBookButton.setText(UiComponentStrings
                 .getString("BookDetailJPanel.button.addBookButton.save.text")); //$NON-NLS-1$
+
         comboShelf.setSelectedItem(displayedObject.getShelf());
 
         comboShelf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (displayedObject != null) {
-                    displayedObject.setShelf((Shelf) comboShelf
-                            .getSelectedItem());
+                    // displayedObject.setShelf((Shelf) comboShelf
+                    // .getSelectedItem());
+                    setDirty(true);
                 }
             }
         });
@@ -461,20 +463,13 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                 displayedObject.set(titleTextfield.getText(),
                         authorTextfield.getText(),
                         publisherTextfield.getText(),
-                        displayedObject.getShelf());
+                        (Shelf) comboShelf.getSelectedItem());
                 setDirty(false);
                 saveSuccess = true;
             }
         }
         return saveSuccess;
     }
-
-    /*
-     * //todo: check if works if (isDirty()) { // TODO joptionpane für Nachfrage
-     * displayedObject.set(titleTextfield.getText(), authorTextfield.getText(),
-     * publisherTextfield.getText(), displayedObject.getShelf());
-     * setDirty(false); return true;
-     */
 
     protected boolean validateSave() {
         boolean result = true;
