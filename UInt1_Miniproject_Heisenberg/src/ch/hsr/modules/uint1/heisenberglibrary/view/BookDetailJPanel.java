@@ -155,7 +155,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
      */
     private void initComponents() {
         setBorder(new EmptyBorder(5, 5, 5, 5));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout(0, 0));
 
         JPanel northPanel = new JPanel();
         northPanel.setBorder(new TitledBorder(UIManager
@@ -163,7 +163,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                 UiComponentStrings
                         .getString("BookDetailJDialog.border.title.text"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(northPanel);
+        add(northPanel, BorderLayout.NORTH);
         GridBagLayout gblPanel = new GridBagLayout();
         gblPanel.columnWidths = new int[] { 0, 0, 0, 396, 0, 0 };
         gblPanel.rowHeights = new int[] { 30, 0, 0, 0, 0, 0, 0, 0 };
