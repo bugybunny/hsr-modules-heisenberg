@@ -14,6 +14,6 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
-public interface ModelChangeType {
+public interface IModelChangeType {
 
 }

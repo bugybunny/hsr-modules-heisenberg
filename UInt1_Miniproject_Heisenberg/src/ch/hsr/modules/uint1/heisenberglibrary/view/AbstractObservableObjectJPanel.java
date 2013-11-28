@@ -30,7 +30,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
-import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.AbstractObservable;
 
 /**
@@ -122,8 +122,8 @@ public abstract class AbstractObservableObjectJPanel<M extends AbstractObservabl
 
     protected void notifyListenersAboutModelChange(
             ModelStateChangeEvent aNewState) {
-        for (ModelStateChangeListener tempListener : listenerList
-                .getListeners(ModelStateChangeListener.class)) {
+        for (IModelStateChangeListener tempListener : listenerList
+                .getListeners(IModelStateChangeListener.class)) {
             tempListener.stateChanged(aNewState);
         }
     }
@@ -135,19 +135,19 @@ public abstract class AbstractObservableObjectJPanel<M extends AbstractObservabl
      * @param aListener
      *            the listener to add
      */
-    public void addModelStateChangeListener(ModelStateChangeListener aListener) {
-        listenerList.add(ModelStateChangeListener.class, aListener);
+    public void addModelStateChangeListener(IModelStateChangeListener aListener) {
+        listenerList.add(IModelStateChangeListener.class, aListener);
     }
 
     /**
-     * Removes a {@code ModelStateChangeListener} from this panel.
+     * Removes a {@code IModelStateChangeListener} from this panel.
      * 
      * @param aListener
      *            the listener to remove
      */
     public void removeModelStateChangeListener(
-            ModelStateChangeListener aListener) {
-        listenerList.remove(ModelStateChangeListener.class, aListener);
+            IModelStateChangeListener aListener) {
+        listenerList.remove(IModelStateChangeListener.class, aListener);
     }
 
     /**

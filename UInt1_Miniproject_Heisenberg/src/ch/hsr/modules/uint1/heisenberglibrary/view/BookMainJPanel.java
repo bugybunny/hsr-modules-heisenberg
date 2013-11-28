@@ -42,7 +42,7 @@ import javax.swing.table.AbstractTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookTableModel;
@@ -225,7 +225,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
-            ModelChangeType type = modelChange.getChangeType();
+            IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.ADDED
                     || type == ModelChangeTypeEnums.Book.REMOVED) {
                 ((AbstractTableModel) table.getModel()).fireTableDataChanged();

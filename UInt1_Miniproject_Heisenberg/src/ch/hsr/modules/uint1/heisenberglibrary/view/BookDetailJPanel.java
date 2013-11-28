@@ -54,11 +54,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
-import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
@@ -387,7 +387,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                     }
                 });
 
-        addModelStateChangeListener(new ModelStateChangeListener() {
+        addModelStateChangeListener(new IModelStateChangeListener() {
             @Override
             public void stateChanged(ModelStateChangeEvent aModelStateChange) {
                 if (validateSaveAndLockButton()) {
@@ -564,7 +564,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
-            ModelChangeType type = modelChange.getChangeType();
+            IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Copy.REMOVED
                     || type == ModelChangeTypeEnums.Copy.ADDED) {
                 SwingUtilities.invokeLater(new Runnable() {

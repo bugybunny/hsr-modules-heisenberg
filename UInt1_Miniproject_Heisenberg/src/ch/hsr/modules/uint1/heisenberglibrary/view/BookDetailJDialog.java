@@ -22,10 +22,10 @@ import java.util.Observer;
 import javax.swing.JFrame;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
-import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 
@@ -122,7 +122,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
-            ModelChangeType type = modelChange.getChangeType();
+            IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.TITLE
                     || type == ModelChangeTypeEnums.Book.AUTHOR
                     || type == ModelChangeTypeEnums.Book.PUBLISHER
@@ -156,7 +156,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
      * @author msyfrig
      */
     private class BookDetailModelChangeListener implements
-            ModelStateChangeListener {
+            IModelStateChangeListener {
         @Override
         public void stateChanged(ModelStateChangeEvent aModelStateChange) {
             if (aModelStateChange.getSource() instanceof BookDetailJPanel) {

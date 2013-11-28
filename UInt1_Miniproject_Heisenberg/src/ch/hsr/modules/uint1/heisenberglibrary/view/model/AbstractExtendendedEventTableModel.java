@@ -20,7 +20,7 @@ import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 
-import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 
 /**
  * TODO COMMENT ME!
@@ -58,19 +58,19 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
      * Adds a listener that listens for events when this model is about to fire
      * a {@link #fireTableDataChanged()} or any other table bookData updates.
      */
-    public void addTableModelChangeListener(TableModelChangeListener aListener) {
-        listenerList.add(TableModelChangeListener.class, aListener);
+    public void addTableModelChangeListener(ITableModelChangeListener aListener) {
+        listenerList.add(ITableModelChangeListener.class, aListener);
     }
 
     /**
-     * Removes a {@code TableModelChangeListener} from this table model.
+     * Removes a {@code ITableModelChangeListener} from this table model.
      * 
      * @param aListener
      *            the listener to remove
      */
     public void removeTableModelChangeListener(
-            TableModelChangeListener aListener) {
-        listenerList.remove(TableModelChangeListener.class, aListener);
+            ITableModelChangeListener aListener) {
+        listenerList.remove(ITableModelChangeListener.class, aListener);
     }
 
     /**
@@ -105,8 +105,8 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
      * Notifies all listeners that the model is about to change.
      */
     protected void notifyListenersBeforeUpdate() {
-        for (TableModelChangeListener tempListener : listenerList
-                .getListeners(TableModelChangeListener.class)) {
+        for (ITableModelChangeListener tempListener : listenerList
+                .getListeners(ITableModelChangeListener.class)) {
             tempListener.tableIsAboutToUpdate();
         }
     }
@@ -116,8 +116,8 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
      * updated.
      */
     protected void notifyListenersAfterUpdate() {
-        for (TableModelChangeListener tempListener : listenerList
-                .getListeners(TableModelChangeListener.class)) {
+        for (ITableModelChangeListener tempListener : listenerList
+                .getListeners(ITableModelChangeListener.class)) {
             tempListener.tableChanged();
         }
     }

@@ -38,7 +38,7 @@ import javax.swing.border.TitledBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
-import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.CustomerLoanTableModel;
@@ -336,7 +336,7 @@ public class CustomerLoanDetailJPanel extends
     public void update(Observable anObesrvable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
-            ModelChangeType type = modelChange.getChangeType();
+            IModelChangeType type = modelChange.getChangeType();
             // TODO implementieren
         }
     }

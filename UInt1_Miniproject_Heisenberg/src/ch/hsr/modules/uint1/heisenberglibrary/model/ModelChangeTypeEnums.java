@@ -21,19 +21,19 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
  * @author msyfrig
  */
 public class ModelChangeTypeEnums {
-    public enum Book implements ModelChangeType {
+    public enum Book implements IModelChangeType {
         ADDED, REMOVED, NUMBER, TITLE, AUTHOR, PUBLISHER, SHELF, EVERYTHING_CHANGED;
     }
 
-    public enum Copy implements ModelChangeType {
+    public enum Copy implements IModelChangeType {
         ADDED, REMOVED, NUMBER, CONDITION, EVERYTHING_CHANGED;
     }
 
-    public enum Loan implements ModelChangeType {
+    public enum Loan implements IModelChangeType {
         ADDED, REMOVED, NUMBER, ACTIVE_NUMBER, PICKUP_DATE, EVERYTHING_CHANGED, RETURNED;
     }
 
-    public enum Customer implements ModelChangeType {
+    public enum Customer implements IModelChangeType {
         ADDED, REMOVED, NUMBER, NAME, SURNAME, STREET, CITY, ZIP, ADDRESS, EVERYTHING_CHANGED;
     }
 }

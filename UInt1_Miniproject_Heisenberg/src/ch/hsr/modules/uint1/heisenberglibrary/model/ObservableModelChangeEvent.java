@@ -15,18 +15,18 @@
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 public class ObservableModelChangeEvent {
-    private ModelChangeType changeType;
+    private IModelChangeType changeType;
     private Object          oldValue;
     private Object          newValue;
 
-    public ObservableModelChangeEvent(ModelChangeType aChangeType, Object anOldValue,
+    public ObservableModelChangeEvent(IModelChangeType aChangeType, Object anOldValue,
             Object aNewValue) {
         changeType = aChangeType;
         oldValue = anOldValue;
         newValue = aNewValue;
     }
 
-    public ModelChangeType getChangeType() {
+    public IModelChangeType getChangeType() {
         return changeType;
     }
 

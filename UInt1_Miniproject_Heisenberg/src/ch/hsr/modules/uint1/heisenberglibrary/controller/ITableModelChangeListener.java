@@ -17,15 +17,18 @@ package ch.hsr.modules.uint1.heisenberglibrary.controller;
 import java.util.EventListener;
 
 /**
- * Defines a listener to listen for state changes in a model.
+ * Defines a listener to listen for state changes in a model. It is different
+ * from {@link javax.swing.event.TableModelListener} in the way, that this
+ * listener fires events before the table is updated.
+ * 
+ * <br>Still use {@link javax.swing.event.TableModelListener} to get a detailed
+ * event about what changed.
  * 
  * @author msyfrig
+ * @see javax.swing.event.TableModelListener
  */
-public interface ModelStateChangeListener extends EventListener {
-    /**
-     * Invoked when the target model of the listener has changed its state.
-     * 
-     * @param aModelStateChange
-     */
-    public void stateChanged(ModelStateChangeEvent aModelStateChange);
+public interface ITableModelChangeListener extends EventListener {
+    public void tableIsAboutToUpdate();
+
+    public void tableChanged();
 }

@@ -25,7 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
-import ch.hsr.modules.uint1.heisenberglibrary.controller.TableModelChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.AbstractExtendendedEventTableModel;
 
 /**
@@ -83,7 +83,7 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
             AbstractExtendendedEventTableModel<E> tableModel = (AbstractExtendendedEventTableModel<E>) table
                     .getModel();
             tableModel
-                    .addTableModelChangeListener(new TableModelChangeListener() {
+                    .addTableModelChangeListener(new ITableModelChangeListener() {
                         private Collection<E> previouslySelectedBooks;
 
                         @Override
