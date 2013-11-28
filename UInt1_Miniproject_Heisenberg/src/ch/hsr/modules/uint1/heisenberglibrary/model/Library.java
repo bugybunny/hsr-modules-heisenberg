@@ -131,9 +131,9 @@ public class Library extends AbstractObservable {
     }
 
     public ArrayList<BookDO> findAllBooksByTitle(String title) {
-        ArrayList<BookDO> bookList = new ArrayList<BookDO>();
+        ArrayList<BookDO> bookList = new ArrayList<>();
         for (BookDO b : books) {
-            if (b.getTitle().equals(title)) {
+            if (b.getTitle().equalsIgnoreCase(title)) {
                 bookList.add(b);
             }
         }

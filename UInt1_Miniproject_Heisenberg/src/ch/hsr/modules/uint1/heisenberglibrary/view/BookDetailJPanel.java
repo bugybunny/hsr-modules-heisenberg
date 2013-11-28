@@ -390,12 +390,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         addModelStateChangeListener(new ModelStateChangeListener() {
             @Override
             public void stateChanged(ModelStateChangeEvent aModelStateChange) {
-                if (aModelStateChange.getState() == ModelStateChangeEvent.MODEL_CHANGED_TO_DIRTY) {
-                    if (validateSaveAndLockButton()) {
-                        saveBookAction.setEnabled(true);
-                    }
-                } else if (aModelStateChange.getState() == ModelStateChangeEvent.MODEL_CHANGED_TO_SAVED) {
-                    saveBookAction.setEnabled(false);
+                if (validateSaveAndLockButton()) {
+                    saveBookAction.setEnabled(isDirty());
                 }
             }
         });
@@ -463,7 +459,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                         this, ModelStateChangeEvent.NEW_ENTRY_ADDED);
                 notifyListenersAboutModelChange(newState);
                 initHandlersForSetBook();
-                // saveBookAction.setEnabled(false);
+                saveBookAction.setEnabled(false);
                 saveSuccess = true;
             }
         }
@@ -482,58 +478,64 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     }
 
     protected boolean validateSave() {
-        boolean result = true;
+        boolean validationResult = true;
+        boolean hasEmptyFields = false;
         String title = titleTextfield.getText();
         String author = authorTextfield.getText();
         String publisher = publisherTextfield.getText();
-        String shelf = comboShelf.getSelectedItem().toString();
 
         {  // Set the color textfields by checking each
             if (title.isEmpty()) {
                 titleTextfield.setNegativeBackground();
+                hasEmptyFields = true;
             } else {
                 titleTextfield.setPositiveBackground();
             }
 
             if (author.isEmpty()) {
                 authorTextfield.setNegativeBackground();
+                hasEmptyFields = true;
             } else {
                 authorTextfield.setPositiveBackground();
             }
 
             if (publisher.isEmpty()) {
                 publisherTextfield.setNegativeBackground();
+                hasEmptyFields = true;
             } else {
                 publisherTextfield.setPositiveBackground();
             }
         }
 
         // Check if all fields contain text for validation
-        if (title.isEmpty() || author.isEmpty() || publisher.isEmpty()
-                || shelf.isEmpty()) {
-            errorLabel.setText(UiComponentStrings.getString("BookDetailJPanel.label.error.text.emptyFields")); //$NON-NLS-1$
-            result = false;
+        if (hasEmptyFields) {
+            errorLabel
+                    .setText(UiComponentStrings
+                            .getString("BookDetailJPanel.label.error.text.emptyFields")); //$NON-NLS-1$
+            validationResult = false;
         } else {
             // Check if book-title + author already exist, but only if it is a
             // new book we can't check this way when dealing with existing
             // books.
+            // TODO set book need to be checked too
             errorLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
-            if (displayedObject == null) {
-                ArrayList<BookDO> tempBooks = library
-                        .findAllBooksByTitle(title);
-                for (BookDO b : tempBooks) {
-                    if (b.getAuthor().equals(author)) {
-                        titleTextfield.setNegativeBackground();
-                        authorTextfield.setNegativeBackground();
-                        result = false;
-                        errorLabel
-                                .setText(UiComponentStrings.getString("BookDetailJPanel.label.error.text.duplicateBook")); //$NON-NLS-1$
-                        break;
-                    }
+            ArrayList<BookDO> tempBooks = library.findAllBooksByTitle(title);
+            for (BookDO b : tempBooks) {
+                // !b.equals(displayedObject) is for checking wheter it is
+                // actually a copy or we just found the displayedBook again
+                if (b.getAuthor().equalsIgnoreCase(author)
+                        && !b.equals(displayedObject)) {
+                    titleTextfield.setNegativeBackground();
+                    authorTextfield.setNegativeBackground();
+                    validationResult = false;
+                    errorLabel
+                            .setText(UiComponentStrings
+                                    .getString("BookDetailJPanel.label.error.text.duplicateBook")); //$NON-NLS-1$
+                    break;
                 }
             }
         }
-        return result;
+        return validationResult;
     }
 
     private void checkIfModified() {
