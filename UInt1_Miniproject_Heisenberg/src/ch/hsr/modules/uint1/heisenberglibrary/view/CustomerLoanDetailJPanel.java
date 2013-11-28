@@ -26,6 +26,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Observable;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,8 +35,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
@@ -62,6 +65,12 @@ public class CustomerLoanDetailJPanel extends
     private JLabel                                               customerNameLabel;
     private JComboBox<CustomerComboboxModel.DisplayableCustomer> selectCustomerComboBox;
     private JLabel                                               customerActiveLoansLabel;
+    private JTextField                                           addLoanIdTextfield;
+    private JButton                                              addNewLoanButton;
+    private JButton                                              returnLoanButton;
+
+    // actions
+    private AddLoanAction                                        addLoanAction;
 
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
         super(aCustomer);
@@ -280,12 +289,19 @@ public class CustomerLoanDetailJPanel extends
         loanButtonJPanel.setLayout(new BoxLayout(loanButtonJPanel,
                 BoxLayout.X_AXIS));
 
-        JButton addNewLoanButton = new JButton(
+        addLoanIdTextfield = new JTextField();
+        addLoanIdTextfield.setToolTipText(UiComponentStrings
+                .getString("CustomerLoanDetailJPanel.textField.toolTipText")); //$NON-NLS-1$
+        loanButtonJPanel.add(addLoanIdTextfield);
+        addLoanIdTextfield.setText("");
+        addLoanIdTextfield.setColumns(10);
+
+        addNewLoanButton = new JButton(
                 UiComponentStrings
                         .getString("CustomerLoanDetailJPanel.button.addloan.text")); //$NON-NLS-1$
         loanButtonJPanel.add(addNewLoanButton);
 
-        JButton returnLoanButton = new JButton(
+        returnLoanButton = new JButton(
                 UiComponentStrings
                         .getString("CustomerLoanDetailJPanel.button.returnloan.text")); //$NON-NLS-1$
         loanButtonJPanel.add(returnLoanButton);
@@ -300,6 +316,11 @@ public class CustomerLoanDetailJPanel extends
         jsp.setPreferredSize(new Dimension((int) jsp.getPreferredSize()
                 .getWidth(), 200));
         loanDetailJpanel.add(jsp, BorderLayout.CENTER);
+        initEverything();
+    }
+
+    private void initEverything() {
+        addLoanAction = new AddLoanAction(addNewLoanButton.getText());
     }
 
     private void initHandlersForExistingLoan() {
@@ -368,6 +389,25 @@ public class CustomerLoanDetailJPanel extends
             customerActiveLoansLabel
                     .setText(Integer.toString(selectedDisplayableCustomer
                             .getActiveLoanCount()));
+        }
+    }
+
+    private class AddLoanAction extends AbstractAction {
+        private static final long serialVersionUID = -4973712671800673981L;
+
+        private AddLoanAction(String anActionName) {
+            super(anActionName);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent anActionEvent) {
+            long loanID = Long.parseLong(addLoanIdTextfield.getText());
+
+            for (Copy tempCopy : library.getAvailableCopies()) {
+                if (tempCopy.getInventoryNumber() == loanID) {
+                    library.createAndAddLoan(displayedObject, tempCopy);
+                }
+            }
         }
     }
 }
