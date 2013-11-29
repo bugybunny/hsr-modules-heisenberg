@@ -28,8 +28,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
  * 
  * @author msyfrig
  */
-// TODO ctrl + f in librarymasterjframe, delegiert dann requestfocus an panel
-// weiter, welches momentan selektiert ist
 public class LibraryMasterJFrame extends JFrame {
     private static final long                     serialVersionUID = 8186612854405487707L;
 
@@ -60,7 +58,8 @@ public class LibraryMasterJFrame extends JFrame {
     private void initComponents() {
         setMinimumSize(new Dimension(650, 400));
         ImageIcon frameIcon = new ImageIcon(
-                LibraryMasterJFrame.class.getResource(UiComponentStrings.getString("LibraryMasterJFrame.icon.user"))); //$NON-NLS-1$
+                LibraryMasterJFrame.class.getResource(UiComponentStrings
+                        .getString("LibraryMasterJFrame.icon.user"))); //$NON-NLS-1$
         setIconImage(frameIcon.getImage());
         setTitle(UiComponentStrings.getString("LibraryMasterJFrame.title")); //$NON-NLS-1$
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

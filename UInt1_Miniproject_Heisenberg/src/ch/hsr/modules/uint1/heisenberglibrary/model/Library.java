@@ -123,9 +123,11 @@ public class Library extends AbstractObservable {
     }
 
     // Used by Stolzes LibraryTests - we never use it.
-    public BookDO findByBookTitle(String title) {
+    public BookDO findByBookTitle(String aTitle) {
         for (BookDO b : books) {
-            return b;
+            if (b.getTitle().equalsIgnoreCase(aTitle)) {
+                return b;
+            }
         }
         return null;
     }

@@ -36,7 +36,6 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         extends JPanel implements IPanelActions {
     private static final long     serialVersionUID = 3953982564280733109L;
     protected JTable              table;
-    // protected TableFilter<? extends TableModel> tableFilter;
     protected JScrollPane         tableScrollPane;
     protected GhostHintJTextField searchTextField;
 
@@ -60,7 +59,6 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
             table = new JTable();
         }
         table.setModel(aTableModel);
-        // aTableFilter = new TableFilter<>(table, searchTextField);
         table.getTableHeader().setReorderingAllowed(false);
         table.setAutoCreateRowSorter(true);
         table.setCellSelectionEnabled(true);
