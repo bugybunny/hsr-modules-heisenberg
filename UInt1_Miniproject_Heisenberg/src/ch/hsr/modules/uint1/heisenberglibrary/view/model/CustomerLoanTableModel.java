@@ -55,7 +55,7 @@ public class CustomerLoanTableModel extends
         super(aLibrary.getActiveCustomerLoans(aDisplayedCustomer));
         library = aLibrary;
         specificCustomer = aDisplayedCustomer;
-        library.addObserver(this);
+        addObserverForObservable(library, this);
     }
 
     @Override
@@ -109,16 +109,14 @@ public class CustomerLoanTableModel extends
 
     @Override
     public void update(Observable aAnObservable, Object anArgument) {
-        super.update(aAnObservable, anArgument);
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Loan.ADDED
                     || type == ModelChangeTypeEnums.Loan.RETURNED) {
                 data = library.getActiveCustomerLoans(specificCustomer);
-                fireTableDataChanged();
+                updateTableData();
             }
-
         }
     }
 }

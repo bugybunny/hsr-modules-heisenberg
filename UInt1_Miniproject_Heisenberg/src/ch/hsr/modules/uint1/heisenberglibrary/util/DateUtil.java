@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.hsr.modules.uint1.heisenberglibrary.view.util;
+package ch.hsr.modules.uint1.heisenberglibrary.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -68,14 +68,14 @@ public class GhostHintJTextField extends StatusBackgroundColorJTextField
     @Override
     public void setPositiveBackground() {
         if (!showingHint) {
-            setBackground(POSITIVE_COLOR);
+            setPositiveBackground();
         }
     }
 
     @Override
     public void setNegativeBackground() {
         if (!showingHint) {
-            setBackground(NEGATIVE_COLOR);
+            setNegativeBackground();
         }
     }
 

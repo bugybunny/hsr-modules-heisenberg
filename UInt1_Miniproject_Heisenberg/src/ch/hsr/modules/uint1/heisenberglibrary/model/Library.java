@@ -2,9 +2,10 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.List;
 
-public class Library extends AbstractObservable {
+public class Library extends ObservableObject {
 
     private List<Copy>     copies;
     private List<Customer> customers;
@@ -17,7 +18,6 @@ public class Library extends AbstractObservable {
         customers = new ArrayList<>();
         loans = new ArrayList<>();
         books = new ArrayList<>();
-        activeLoanCount = getActiveLoans().size();
     }
 
     public Loan createAndAddLoan(Customer customer, Copy copy) {
@@ -76,17 +76,13 @@ public class Library extends AbstractObservable {
         return c;
     }
 
-    public void removeCopy(Copy removeCopy) {
-        if (isCopyLent(removeCopy)) {
-            doNotify(new ObservableModelChangeEvent(
-                    ModelChangeTypeEnums.Loan.ACTIVE_NUMBER,
-                    Integer.valueOf(activeLoanCount),
-                    Integer.valueOf(--activeLoanCount)));
-        }
-        copies.remove(removeCopy);
+    public void removeCopy(Copy aCopyToRemove) {
+        // return the loan for the copy to delete so we have it in the history
+        returnCopy(aCopyToRemove);
+        copies.remove(aCopyToRemove);
 
         doNotify(new ObservableModelChangeEvent(
-                ModelChangeTypeEnums.Copy.REMOVED, removeCopy, null));
+                ModelChangeTypeEnums.Copy.REMOVED, aCopyToRemove, null));
         doNotify(new ObservableModelChangeEvent(
                 ModelChangeTypeEnums.Copy.NUMBER,
                 Integer.valueOf(copies.size() - 1), Integer.valueOf(copies
@@ -109,9 +105,30 @@ public class Library extends AbstractObservable {
      *         has been passed
      */
     public Loan returnCopy(Copy aCopyToReturn) {
+        return returnCopy(aCopyToReturn, new GregorianCalendar());
+    }
+
+    /**
+     * Returns a copy to the library and sets the return date as given. The copy
+     * will be available again and will be removed from the customer loan.
+     * 
+     * @param aCopyToReturn
+     *            the copy to return to the library
+     * @param aReturnDate
+     *            date when the copy has been returned
+     * 
+     * @return the changed loan object or {@code null} if a not lent out book
+     *         has been passed
+     */
+    public Loan returnCopy(Copy aCopyToReturn, GregorianCalendar aReturnDate) {
         Loan activeLoan = getActiveLoanForCopy(aCopyToReturn);
         if (activeLoan != null) {
-            activeLoan.returnCopy();
+            try {
+                activeLoan.returnCopy(aReturnDate);
+            }
+            catch (IllegalLoanOperationException anEx) {
+                // do nothing
+            }
             doNotify(new ObservableModelChangeEvent(
                     ModelChangeTypeEnums.Loan.RETURNED, activeLoan, activeLoan));
             doNotify(new ObservableModelChangeEvent(
@@ -132,19 +149,19 @@ public class Library extends AbstractObservable {
         return null;
     }
 
-    public ArrayList<BookDO> findAllBooksByTitle(String title) {
+    public ArrayList<BookDO> findAllBooksByTitle(String aTitle) {
         ArrayList<BookDO> bookList = new ArrayList<>();
         for (BookDO b : books) {
-            if (b.getTitle().equalsIgnoreCase(title)) {
+            if (b.getTitle().equalsIgnoreCase(aTitle)) {
                 bookList.add(b);
             }
         }
         return bookList;
     }
 
-    public boolean isCopyLent(Copy copy) {
+    public boolean isCopyLent(Copy aCopy) {
         for (Loan l : loans) {
-            if (l.getCopy().equals(copy) && l.isLent()) {
+            if (l.getCopy().equals(aCopy) && l.isLent()) {
                 return true;
             }
         }
@@ -213,6 +230,16 @@ public class Library extends AbstractObservable {
         return overdueLoans;
     }
 
+    public List<Loan> getOverdueLoansForCustomer(Customer aCustomer) {
+        List<Loan> overdueLoans = new ArrayList<>();
+        for (Loan l : getLoans()) {
+            if (l.isOverdue() && l.getCustomer().equals(aCustomer)) {
+                overdueLoans.add(l);
+            }
+        }
+        return overdueLoans;
+    }
+
     public List<Copy> getAvailableCopies() {
         return getCopies(false);
     }
@@ -250,7 +277,12 @@ public class Library extends AbstractObservable {
             }
         }
         return activeLoans;
+    }
 
+    public boolean isCustomerAllowedToLendOut(Customer aCustomerToCheck) {
+        int activeLoans = getActiveCustomerLoans(aCustomerToCheck).size();
+        return activeLoans < Customer.MAX_LENT_OUT_BOOKS
+                && getOverdueLoansForCustomer(aCustomerToCheck).isEmpty();
     }
 
     public List<Copy> getCopies() {
@@ -267,6 +299,10 @@ public class Library extends AbstractObservable {
 
     public List<Customer> getCustomers() {
         return customers;
+    }
+
+    public int getActiveLoanCount() {
+        return activeLoanCount;
     }
 
 }

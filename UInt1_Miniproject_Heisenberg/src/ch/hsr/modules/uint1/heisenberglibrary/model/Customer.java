@@ -19,14 +19,15 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
  * @author mstolze
  * @author msyfrig
  */
-public class Customer extends AbstractObservable implements
-        Comparable<Customer> {
+public class Customer extends ObservableObject implements Comparable<Customer> {
 
-    protected String name;
-    protected String surname;
-    protected String street;
-    protected String city;
-    protected int    zip;
+    public static final int MAX_LENT_OUT_BOOKS = 3;
+
+    protected String        name;
+    protected String        surname;
+    protected String        street;
+    protected String        city;
+    protected int           zip;
 
     public Customer(String aName, String aSurname) {
         name = aName;

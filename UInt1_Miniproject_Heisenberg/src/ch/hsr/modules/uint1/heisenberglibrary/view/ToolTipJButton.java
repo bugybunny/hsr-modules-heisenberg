@@ -55,6 +55,8 @@ public class ToolTipJButton extends JButton {
 
     public void setEnabledToolTip(String anEnabledToolTip) {
         enabledToolTip = anEnabledToolTip;
+        setToolTipText(enabledToolTip);
+        repaint();
     }
 
     public String getDisabledToolTip() {
@@ -63,5 +65,7 @@ public class ToolTipJButton extends JButton {
 
     public void setDisabledToolTip(String aDisabledToolTip) {
         disabledToolTip = aDisabledToolTip;
+        setToolTipText(disabledToolTip);
+        repaint();
     }
 }

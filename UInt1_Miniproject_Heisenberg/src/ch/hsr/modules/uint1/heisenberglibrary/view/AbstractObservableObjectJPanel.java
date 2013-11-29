@@ -29,16 +29,17 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
-import ch.hsr.modules.uint1.heisenberglibrary.model.AbstractObservable;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableObject;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
 /**
  * 
  * @author msyfrig
  */
-public abstract class AbstractObservableObjectJPanel<M extends AbstractObservable>
-        extends JPanel implements Observer {
+public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
+        extends JPanel implements Observer, IDisposable {
     private static final long         serialVersionUID = 5272145643378743929L;
     /**
      * The displayed data/model object that can be edited and is observed via
@@ -183,7 +184,7 @@ public abstract class AbstractObservableObjectJPanel<M extends AbstractObservabl
         return false;
     }
 
-    void removeAllListeners() {
+    void removeAllObservers() {
         for (Map.Entry<Observable, Observer> tempEntry : observerMap.entrySet()) {
             if (tempEntry != null) {
                 tempEntry.getKey().deleteObserver(tempEntry.getValue());

@@ -82,7 +82,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
         library = aLibrary;
         initComponents();
         initHandlers();
-        library.addObserver(this);
+        addObserverForObservable(library, this);
     }
 
     private void initComponents() {

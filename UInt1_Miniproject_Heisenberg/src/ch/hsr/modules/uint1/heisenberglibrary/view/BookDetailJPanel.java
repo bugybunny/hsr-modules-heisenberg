@@ -53,16 +53,17 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.BookCopyTableModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
 /**
  * This class shows a single {@link BookDO} with all its properties and
@@ -662,7 +663,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-
             List<Copy> copyList = library.getCopiesOfBook(displayedObject);
 
             // we need an extra list because we would need to update the
@@ -737,4 +737,11 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
     }
 
+    @Override
+    public void cleanUpBeforeDispose() {
+        removeAllObservers();
+        if (bookCopyTable.getModel() instanceof IDisposable) {
+            ((IDisposable) bookCopyTable.getModel()).cleanUpBeforeDispose();
+        }
+    }
 }

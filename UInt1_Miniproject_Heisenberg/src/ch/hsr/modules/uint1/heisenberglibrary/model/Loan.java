@@ -5,14 +5,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
+import ch.hsr.modules.uint1.heisenberglibrary.util.DateUtil;
 
-public class Loan extends AbstractObservable {
+public class Loan extends ObservableObject {
 
     private Copy     copy;
     private Customer customer;
     private GregorianCalendar pickupDate, returnDate, dueDate;
-    private final static int  DAYS_TO_RETURN_BOOK = 30;
+    public final static int   DAYS_TO_RETURN_BOOK = 30;
 
     public Loan(Customer aCustomer, Copy aCopy) {
         copy = aCopy;

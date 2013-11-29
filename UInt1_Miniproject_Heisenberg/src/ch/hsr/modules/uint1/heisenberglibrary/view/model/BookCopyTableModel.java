@@ -7,10 +7,13 @@ import java.util.Observer;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
+import ch.hsr.modules.uint1.heisenberglibrary.util.DateUtil;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
-import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
 
 /**
  * The table model for the JTable in BookDetailJPanel.
@@ -18,8 +21,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.util.DateUtil;
  * @author twinter
  * @author msyfrig
  */
-public class BookCopyTableModel extends AbstractExtendendedEventTableModel<Copy>
-        implements Observer {
+public class BookCopyTableModel extends
+        AbstractExtendendedEventTableModel<Copy> implements Observer {
     private static final long   serialVersionUID = -1293482132910701521L;
     private static List<String> columnNames      = new ArrayList<>(3);
 
@@ -44,6 +47,8 @@ public class BookCopyTableModel extends AbstractExtendendedEventTableModel<Copy>
     public BookCopyTableModel(BookDO aDisplayedBookDO, Library aLibrary) {
         super(aLibrary.getCopiesOfBook(aDisplayedBookDO));
         library = aLibrary;
+        addObserverForObservable(library, this);
+
         specificBook = aDisplayedBookDO;
     }
 
@@ -90,9 +95,14 @@ public class BookCopyTableModel extends AbstractExtendendedEventTableModel<Copy>
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        // TODO observer auf library und auf Buchrückgabe hören, das
-        // Rückgabedatum und availabilty muss aktualisiert werden oder wird das
-        // bereits über fireTableDataChanged gemacht? Prüfen!
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            IModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Loan.RETURNED
+                    || type == ModelChangeTypeEnums.Loan.ADDED) {
+                super.update(anObservable, anArgument);
+            }
+        }
     }
 
     @Override

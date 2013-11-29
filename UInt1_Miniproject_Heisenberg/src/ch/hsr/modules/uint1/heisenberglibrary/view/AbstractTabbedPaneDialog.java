@@ -37,13 +37,13 @@ import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
-import ch.hsr.modules.uint1.heisenberglibrary.model.AbstractObservable;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableObject;
 
 /**
  * 
  * @author msyfrig
  */
-public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
+public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         extends NonModalJDialog implements Observer {
     private static final long                         serialVersionUID  = 6510505636405014546L;
     protected JTabbedPane                             tabbedPane;
@@ -202,7 +202,7 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
         if (anObjectTabToClose != null) {
             // TODO joptionpane für Nachfrage
             // remove all listeners in this panel
-            anObjectTabToClose.removeAllListeners();
+            anObjectTabToClose.cleanUpBeforeDispose();
             tabbedPane.remove(anObjectTabToClose);
             openObjectTabList.remove(anObjectTabToClose);
             // close this dialog if this was the last open tab
@@ -238,7 +238,6 @@ public abstract class AbstractTabbedPaneDialog<M extends AbstractObservable>
             }
         }
     }
-
 
     /**
      * Action to handle the closing of a tab. Informs the user if there are

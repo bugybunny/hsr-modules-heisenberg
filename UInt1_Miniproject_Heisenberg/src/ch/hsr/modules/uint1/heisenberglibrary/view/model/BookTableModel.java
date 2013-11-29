@@ -34,7 +34,7 @@ public class BookTableModel extends AbstractExtendendedEventTableModel<BookDO>
     public BookTableModel(Library aLibrary) {
         super(aLibrary.getBooks());
         library = aLibrary;
-        library.addObserver(this);
+        addObserverForObservable(library, this);
     }
 
     @Override

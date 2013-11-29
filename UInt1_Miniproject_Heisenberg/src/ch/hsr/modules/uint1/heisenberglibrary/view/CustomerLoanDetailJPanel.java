@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -32,22 +33,23 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.CustomerLoanTableModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
 /**
  * Panel to display a customer and his currently lent out books and to enter new
@@ -68,9 +70,9 @@ public class CustomerLoanDetailJPanel extends
     private JLabel                                               customerNameLabel;
     private JComboBox<CustomerComboboxModel.DisplayableCustomer> selectCustomerComboBox;
     private JLabel                                               customerActiveLoansLabel;
-    private JTextField                                           addLoanIdTextfield;
-    private JButton                                              addNewLoanButton;
-    private JButton                                              returnLoanButton;
+    private GhostHintJTextField                                  addLoanIdTextfield;
+    private ToolTipJButton                                       addNewLoanButton;
+    private ToolTipJButton                                       returnLoanButton;
 
     // actions
     private AddLoanAction                                        addLoanAction;
@@ -83,6 +85,7 @@ public class CustomerLoanDetailJPanel extends
         super(aCustomer);
         library = aLibrary;
         initComponents();
+        initCommonHandlers();
         // display existing loans for a customer
         if (aCustomer != null) {
             setCustomer(aCustomer);
@@ -117,7 +120,8 @@ public class CustomerLoanDetailJPanel extends
             selectCustomerComboBox.setEnabled(true);
             initHandlersForNewLoan();
         }
-        library.addObserver(this);
+        checkCustomerLendabilty();
+        addObserverForObservable(library, this);
     }
 
     private void setCustomer(Customer aNewCustomer) {
@@ -133,6 +137,7 @@ public class CustomerLoanDetailJPanel extends
             selectCustomerComboBox.setSelectedIndex(indexOfCustomer);
             loanDetailTable.setModel(new CustomerLoanTableModel(
                     displayedObject, library));
+            checkCustomerLendabilty();
         }
         updateDisplay();
     }
@@ -296,21 +301,33 @@ public class CustomerLoanDetailJPanel extends
         loanButtonJPanel.setLayout(new BoxLayout(loanButtonJPanel,
                 BoxLayout.X_AXIS));
 
-        addLoanIdTextfield = new JTextField();
+        addLoanIdTextfield = new GhostHintJTextField(
+                "Enter Copy-Id to lend out");
         addLoanIdTextfield.setToolTipText(UiComponentStrings
                 .getString("CustomerLoanDetailJPanel.textField.toolTipText")); //$NON-NLS-1$
         loanButtonJPanel.add(addLoanIdTextfield);
         addLoanIdTextfield.setText("");
         addLoanIdTextfield.setColumns(10);
 
-        addNewLoanButton = new JButton(
-                UiComponentStrings
-                        .getString("CustomerLoanDetailJPanel.button.addloan.text")); //$NON-NLS-1$
+        String addNewLoanButtonText = MessageFormat
+                .format(UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.button.addloan.text"), Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); //$NON-NLS-1$
+        String addNewLoanButtonEnabledTooltip = UiComponentStrings
+                .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"); //$NON-NLS-1$;
+        addNewLoanButton = new ToolTipJButton(addNewLoanButtonText,
+                addNewLoanButtonEnabledTooltip,
+                UiComponentStrings.getString("empty")); //$NON-NLS-1$
+
         loanButtonJPanel.add(addNewLoanButton);
 
-        returnLoanButton = new JButton(
-                UiComponentStrings
-                        .getString("CustomerLoanDetailJPanel.button.returnloan.text")); //$NON-NLS-1$
+        String returnLoanButtonText = UiComponentStrings
+                .getString("CustomerLoanDetailJPanel.button.returnloan.text"); //$NON-NLS-1$
+        String returnLoanButtonEnabledTooltip = UiComponentStrings
+                .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"); //$NON-NLS-1$;
+        String returnLoanButtonDisabledTooltip = UiComponentStrings
+                .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip"); //$NON-NLS-1$;
+        returnLoanButton = new ToolTipJButton(returnLoanButtonText,
+                returnLoanButtonEnabledTooltip, returnLoanButtonDisabledTooltip);
         loanButtonJPanel.add(returnLoanButton);
 
         loanDetailTable = new JTable();
@@ -323,11 +340,9 @@ public class CustomerLoanDetailJPanel extends
         jsp.setPreferredSize(new Dimension((int) jsp.getPreferredSize()
                 .getWidth(), 200));
         loanDetailJpanel.add(jsp, BorderLayout.CENTER);
-        initEverything();
-
     }
 
-    private void initEverything() {
+    private void initCommonHandlers() {
         addLoanAction = new AddLoanAction(addNewLoanButton.getText());
         addNewLoanButton.setAction(addLoanAction);
 
@@ -366,11 +381,37 @@ public class CustomerLoanDetailJPanel extends
     }
 
     @Override
-    public void update(Observable anObesrvable, Object anArgument) {
+    public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
-            // TODO implementieren
+            if (type == ModelChangeTypeEnums.Loan.RETURNED
+                    || type == ModelChangeTypeEnums.Loan.ADDED) {
+                checkCustomerLendabilty();
+            }
+        }
+    }
+
+    private void checkCustomerLendabilty() {
+        if (!library.isCustomerAllowedToLendOut(displayedObject)) {
+            addLoanAction.setEnabled(false);
+            if (!library.getOverdueLoansForCustomer(displayedObject).isEmpty()) {
+                addNewLoanButton
+                        .setDisabledToolTip(UiComponentStrings
+                                .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans")); //$NON-NLS-1$
+            } else {
+                DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
+                        .getModel())
+                        .getDisplayableCustomerForCustomer(displayedObject);
+                String disabledToolTip = MessageFormat
+                        .format(UiComponentStrings
+                                .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.maxloans"),
+                                Integer.valueOf(selectedDisplayableCustomer
+                                        .getActiveLoanCount()));
+                addNewLoanButton.setDisabledToolTip(disabledToolTip);
+            }
+        } else {
+            addLoanAction.setEnabled(true);
         }
     }
 
@@ -401,6 +442,7 @@ public class CustomerLoanDetailJPanel extends
             customerActiveLoansLabel
                     .setText(Integer.toString(selectedDisplayableCustomer
                             .getActiveLoanCount()));
+
         }
     }
 
@@ -442,18 +484,31 @@ public class CustomerLoanDetailJPanel extends
         }
 
         @Override
-        public void actionPerformed(ActionEvent aE) {
-            List<Copy> returnedCopies = new ArrayList<>(loanDetailTable.getSelectedRowCount());
+        public void actionPerformed(ActionEvent anActionEvent) {
+            List<Copy> returnedCopies = new ArrayList<>(
+                    loanDetailTable.getSelectedRowCount());
             for (int tempLoan : loanDetailTable.getSelectedRows()) {
-            	returnedCopies.add(library
+                returnedCopies.add(library
                         .getActiveCustomerLoans(displayedObject)
                         .get(loanDetailTable.convertRowIndexToModel(tempLoan))
                         .getCopy());
             }
-            
+
             for (Copy returnLoan : returnedCopies) {
                 library.returnCopy(returnLoan);
             }
+        }
+    }
+
+    @Override
+    public void cleanUpBeforeDispose() {
+        removeAllObservers();
+        if (loanDetailTable.getModel() instanceof IDisposable) {
+            ((IDisposable) loanDetailTable.getModel()).cleanUpBeforeDispose();
+        }
+        if (selectCustomerComboBox.getModel() instanceof IDisposable) {
+            ((IDisposable) selectCustomerComboBox.getModel())
+                    .cleanUpBeforeDispose();
         }
     }
 }

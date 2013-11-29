@@ -14,7 +14,9 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,20 +25,26 @@ import javax.swing.table.AbstractTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 
 /**
- * TODO COMMENT ME!
- * 
  * @author msyfrig
  */
 public abstract class AbstractExtendendedEventTableModel<E extends Observable>
-        extends AbstractTableModel implements Observer {
-    private static final long serialVersionUID = 3180682000410891172L;
-    protected List<E>         data;
+        extends AbstractTableModel implements Observer, IDisposable {
+    private static final long         serialVersionUID = 3180682000410891172L;
+    protected List<E>                 data;
+
+    /**
+     * Map that holds all added observers for this table model. The
+     * corresponding observers will be removed bevor this table model will be
+     * disposed and never used again so the gc can collect all the dead
+     * references.
+     */
+    private Map<Observable, Observer> observerMap      = new HashMap<>();
 
     protected AbstractExtendendedEventTableModel(List<E> someData) {
         data = someData;
 
         for (E tempEntry : data) {
-            tempEntry.addObserver(this);
+            addObserverForObservable(tempEntry, this);
         }
     }
 
@@ -52,6 +60,29 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
 
     public List<E> getData() {
         return data;
+    }
+
+    protected boolean addObserverForObservable(Observable anObservable,
+            Observer anObserver) {
+        anObservable.addObserver(anObserver);
+        return observerMap.put(anObservable, anObserver) != null;
+    }
+
+    protected boolean deleteObserverForObservable(Observable anObservable) {
+        if (anObservable != null) {
+            anObservable.deleteObserver(observerMap.remove(anObservable));
+            return true;
+        }
+        return false;
+    }
+
+    void removeAllObservers() {
+        for (Map.Entry<Observable, Observer> tempEntry : observerMap.entrySet()) {
+            if (tempEntry != null) {
+                tempEntry.getKey().deleteObserver(tempEntry.getValue());
+            }
+        }
+        observerMap.clear();
     }
 
     /**
@@ -73,9 +104,6 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
         listenerList.remove(ITableModelChangeListener.class, aListener);
     }
 
-    /**
-     * Updates the whole table if a value for a book has changed.
-     */
     @Override
     public void update(Observable anObservable, Object anArgument) {
         updateTableData();
@@ -120,5 +148,10 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
                 .getListeners(ITableModelChangeListener.class)) {
             tempListener.tableChanged();
         }
+    }
+
+    @Override
+    public void cleanUpBeforeDispose() {
+        removeAllObservers();
     }
 }

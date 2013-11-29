@@ -27,6 +27,8 @@ import java.util.Observer;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
+
 /**
  * Superclass for all dialogs in this project. All dialogs need to be non-modal
  * and have a title.
@@ -41,7 +43,7 @@ import javax.swing.JFrame;
  * @author msyfrig
  * @see #setDefaultCloseOperation(int)
  */
-public abstract class NonModalJDialog extends JDialog {
+public abstract class NonModalJDialog extends JDialog implements IDisposable {
     private static final long         serialVersionUID = 2551909774692437970L;
 
     /**
@@ -95,7 +97,7 @@ public abstract class NonModalJDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent aWindowClosingEvent) {
-                removeAllListeners();
+                removeAllObservers();
             }
         });
 
@@ -117,6 +119,7 @@ public abstract class NonModalJDialog extends JDialog {
 
     protected boolean addObserverForObservable(Observable anObservable,
             Observer anObserver) {
+        anObservable.addObserver(anObserver);
         return observerMap.put(anObservable, anObserver) != null;
     }
 
@@ -128,16 +131,22 @@ public abstract class NonModalJDialog extends JDialog {
         return false;
     }
 
-    void removeAllListeners() {
+    void removeAllObservers() {
         for (Map.Entry<Observable, Observer> tempEntry : observerMap.entrySet()) {
             if (tempEntry != null) {
                 tempEntry.getKey().deleteObserver(tempEntry.getValue());
             }
         }
+        observerMap.clear();
     }
 
     @Override
     public void setModal(boolean aModal) {
         throw new UnsupportedOperationException("cannot change modality"); //$NON-NLS-1$
+    }
+
+    @Override
+    public void cleanUpBeforeDispose() {
+        removeAllObservers();
     }
 }

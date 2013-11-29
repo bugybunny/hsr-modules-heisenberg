@@ -17,32 +17,12 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
 import java.util.Observable;
 
 /**
- * TODO COMMENT ME!
+ * Superclass for all classes that implement observable for easier observer
+ * notification.
  * 
  * @author msyfrig
  */
-public abstract class AbstractObservable extends Observable implements
-        Cloneable {
-
-    /**
-     * Creates a new instance of this class.
-     * 
-     */
-    public AbstractObservable() {
-    }
-
-    /**
-     * Can be called after a field has been set to automatically notifiy all
-     * observers.
-     * 
-     * For future use if we wanna change something globally for all observable
-     * objects.
-     * 
-     * @see AbstractObservable#doNotify()
-     */
-    public void set() {
-        // TODO allenfalls entfernen
-    }
+public class ObservableObject extends Observable implements Cloneable {
 
     /**
      * Sets the state to changed and notifies all registered observers with

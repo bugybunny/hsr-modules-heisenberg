@@ -43,10 +43,10 @@ import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
-import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.LoanTableModel;
@@ -89,7 +89,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         library = aLibrary;
         initComponents();
         initHandlers();
-        library.addObserver(this);
+        addObserverForObservable(library, this);
     }
 
     private void initComponents() {
@@ -121,7 +121,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         String numberOfCurrentlyLoanedCopiesText = MessageFormat
                 .format(UiComponentStrings
                         .getString("LoanMainJPanel.label.currentlyloaned.text"), //$NON-NLS-1$
-                        Integer.valueOf(library.getLentOutBooks().size()));
+                        Integer.valueOf(library.getActiveLoanCount()));
         numberOfCurrentyLoanedCopiesLabel = new JLabel(
                 numberOfCurrentlyLoanedCopiesText);
         inventoryStatisticsPanel.add(numberOfCurrentyLoanedCopiesLabel);

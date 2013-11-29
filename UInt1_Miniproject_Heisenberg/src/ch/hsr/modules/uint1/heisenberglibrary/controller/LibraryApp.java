@@ -23,6 +23,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.IllegalLoanOperationExceptio
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Shelf;
+import ch.hsr.modules.uint1.heisenberglibrary.util.NimbusLookAndFeelInitalizer;
 import ch.hsr.modules.uint1.heisenberglibrary.view.LibraryMasterJFrame;
 
 public class LibraryApp {
@@ -41,8 +42,9 @@ public class LibraryApp {
         catch (Exception e) {
             // do nothing and just use the default look and feel for the os
         }
-
         new LibraryMasterJFrame(library);
+        // this somehow need to be after all components have been drawn, dafuq
+        NimbusLookAndFeelInitalizer.changeColors();
     }
 
     private static void initLibrary(Library library)
@@ -156,7 +158,7 @@ public class LibraryApp {
             l.setPickupDate(pickup);
             GregorianCalendar ret = (GregorianCalendar) pickup.clone();
             ret.add(GregorianCalendar.DAY_OF_YEAR, position % 10 + i * 2);
-            l.returnCopy(ret);
+            library.returnCopy(copy, ret);
         }
         // Create actual open loans
         if (position % 2 == 0) {

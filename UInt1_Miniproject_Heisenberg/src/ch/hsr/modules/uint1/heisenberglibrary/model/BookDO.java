@@ -20,7 +20,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.model;
  * @author mstolze
  * @author msyfrig
  */
-public class BookDO extends AbstractObservable {
+public class BookDO extends ObservableObject {
 
     private String title;
     private String author;

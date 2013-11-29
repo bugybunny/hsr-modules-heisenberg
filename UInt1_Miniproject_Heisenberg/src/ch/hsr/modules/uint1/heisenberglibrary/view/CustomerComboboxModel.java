@@ -23,11 +23,12 @@ import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
 /**
  * TODO COMMENT ME!
@@ -36,7 +37,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.Display
  */
 public class CustomerComboboxModel extends
         AbstractListModel<DisplayableCustomer> implements
-        ComboBoxModel<DisplayableCustomer>, Observer {
+        ComboBoxModel<DisplayableCustomer>, Observer, IDisposable {
     private static final long         serialVersionUID = -5830729956015597480L;
     private Library                   library;
     private DisplayableCustomer       selectedCustomer;
@@ -161,5 +162,10 @@ public class CustomerComboboxModel extends
             return customerString.toString();
         }
 
+    }
+
+    @Override
+    public void cleanUpBeforeDispose() {
+        library.deleteObserver(this);
     }
 }

@@ -15,9 +15,12 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -27,19 +30,27 @@ import javax.swing.ListSelectionModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.AbstractExtendendedEventTableModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
 /**
  * 
  * @author msyfrig
  */
 public abstract class AbstractSearchableTableJPanel<E extends Observable>
-        extends JPanel implements IPanelActions {
-    private static final long     serialVersionUID = 3953982564280733109L;
-    protected JTable              table;
-    protected JScrollPane         tableScrollPane;
-    protected GhostHintJTextField searchTextField;
+        extends JPanel implements IPanelActions, IDisposable {
+    private static final long         serialVersionUID = 3953982564280733109L;
+    protected JTable                  table;
+    protected JScrollPane             tableScrollPane;
+    protected GhostHintJTextField     searchTextField;
 
-    protected List<E>             dataList;
+    protected List<E>                 dataList;
+
+    /**
+     * Map that holds all added observers for a panel. The corresponding
+     * observers will be removed bevor this panel is closed so the gc can
+     * collect all the dead references.
+     */
+    private Map<Observable, Observer> observerMap      = new HashMap<>();
 
     public AbstractSearchableTableJPanel(List<E> aDataList) {
         this(aDataList, new JTable(), new GhostHintJTextField(
@@ -143,6 +154,29 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         }
     }
 
+    protected boolean addObserverForObservable(Observable anObservable,
+            Observer anObserver) {
+        anObservable.addObserver(anObserver);
+        return observerMap.put(anObservable, anObserver) != null;
+    }
+
+    protected boolean deleteObserverForObservable(Observable anObservable) {
+        if (anObservable != null) {
+            anObservable.deleteObserver(observerMap.remove(anObservable));
+            return true;
+        }
+        return false;
+    }
+
+    void removeAllObservers() {
+        for (Map.Entry<Observable, Observer> tempEntry : observerMap.entrySet()) {
+            if (tempEntry != null) {
+                tempEntry.getKey().deleteObserver(tempEntry.getValue());
+            }
+        }
+        observerMap.clear();
+    }
+
     protected void setTable(JTable aTable) {
         table = aTable;
         tableScrollPane.setViewportView(table);
@@ -170,5 +204,10 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
     @Override
     public void tableRequestFocus() {
         table.requestFocus();
+    }
+
+    @Override
+    public void cleanUpBeforeDispose() {
+        removeAllObservers();
     }
 }

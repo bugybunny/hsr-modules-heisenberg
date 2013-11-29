@@ -14,13 +14,14 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
-import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
+
+import ch.hsr.modules.uint1.heisenberglibrary.util.Colors;
 
 /**
  * JTextField to can show a positive or negative status via background color
@@ -31,8 +32,6 @@ import javax.swing.text.Document;
 public class StatusBackgroundColorJTextField extends JTextField implements
         FocusListener {
     private static final long serialVersionUID = 8944651872738119454L;
-    public static final Color POSITIVE_COLOR   = new Color(240, 255, 240);
-    public static final Color NEGATIVE_COLOR   = new Color(255, 205, 205);
 
     /**
      * Creates a new instance of this class.
@@ -68,7 +67,7 @@ public class StatusBackgroundColorJTextField extends JTextField implements
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                setBackground(POSITIVE_COLOR);
+                setBackground(Colors.GREEN_POSITIVE);
             }
         });
     }
@@ -77,7 +76,7 @@ public class StatusBackgroundColorJTextField extends JTextField implements
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                setBackground(NEGATIVE_COLOR);
+                setBackground(Colors.RED_NEGATIVE);
             }
         });
     }
