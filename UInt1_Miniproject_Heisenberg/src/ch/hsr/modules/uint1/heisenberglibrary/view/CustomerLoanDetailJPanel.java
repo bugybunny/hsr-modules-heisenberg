@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Observable;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -40,8 +41,8 @@ import javax.swing.border.TitledBorder;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.CustomerLoanTableModel;
@@ -71,6 +72,10 @@ public class CustomerLoanDetailJPanel extends
 
     // actions
     private AddLoanAction                                        addLoanAction;
+    private ReturnLoanAction                                     returnLoanAction;
+
+    private static final Pattern                                 MATCH_NUMBER     = Pattern
+                                                                                          .compile("^[0-9]+$");
 
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
         super(aCustomer);
@@ -317,10 +322,15 @@ public class CustomerLoanDetailJPanel extends
                 .getWidth(), 200));
         loanDetailJpanel.add(jsp, BorderLayout.CENTER);
         initEverything();
+
     }
 
     private void initEverything() {
         addLoanAction = new AddLoanAction(addNewLoanButton.getText());
+        addNewLoanButton.setAction(addLoanAction);
+
+        returnLoanAction = new ReturnLoanAction(returnLoanButton.getText());
+        returnLoanButton.setAction(returnLoanAction);
     }
 
     private void initHandlersForExistingLoan() {
@@ -401,12 +411,43 @@ public class CustomerLoanDetailJPanel extends
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            long loanID = Long.parseLong(addLoanIdTextfield.getText());
+            DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
+                    .getModel())
+                    .getDisplayableCustomerForCustomer(displayedObject);
 
-            for (Copy tempCopy : library.getAvailableCopies()) {
-                if (tempCopy.getInventoryNumber() == loanID) {
-                    library.createAndAddLoan(displayedObject, tempCopy);
+            if (selectedDisplayableCustomer.getActiveLoanCount() < 4) {
+                // Check valid number
+                if (MATCH_NUMBER.matcher(addLoanIdTextfield.getText())
+                        .matches()) {
+                    long loanID = Long.parseLong(addLoanIdTextfield.getText());
+                    for (Copy tempCopy : library.getAvailableCopies()) {
+                        if (tempCopy.getInventoryNumber() == loanID) {
+                            library.createAndAddLoan(displayedObject, tempCopy);
+
+                        }
+                    }
                 }
+            }
+
+        }
+    }
+
+    private class ReturnLoanAction extends AbstractAction {
+        private static final long serialVersionUID = -2413488724848750967L;
+
+        private ReturnLoanAction(String anActionName) {
+            super(anActionName);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent aE) {
+            System.out.println("removed");
+            for (int tempLoan : loanDetailTable.getSelectedRows()) {
+                // TODO: SHIIIIIIAAAAAT
+                library.returnCopy(library
+                        .getActiveCustomerLoans(displayedObject)
+                        .get(loanDetailTable.convertRowIndexToModel(tempLoan))
+                        .getCopy());
             }
         }
     }

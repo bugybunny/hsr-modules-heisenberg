@@ -17,10 +17,15 @@ package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -29,7 +34,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
  * @author msyfrig
  */
 public class CustomerLoanTableModel extends
-        AbstractExtendendedEventTableModel<Loan> {
+        AbstractExtendendedEventTableModel<Loan> implements Observer {
     private static final long   serialVersionUID = -5057169214989804460L;
     private static List<String> columnNames      = new ArrayList<>(3);
 
@@ -43,12 +48,14 @@ public class CustomerLoanTableModel extends
                 .getString("CustomerLoanTableModel.loanTableColumn.copyid")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
                 .getString("CustomerLoanTableModel.loanTableColumn.lentuntil")); //$NON-NLS-1$
+
     }
 
     public CustomerLoanTableModel(Customer aDisplayedCustomer, Library aLibrary) {
         super(aLibrary.getActiveCustomerLoans(aDisplayedCustomer));
         library = aLibrary;
         specificCustomer = aDisplayedCustomer;
+        library.addObserver(this);
     }
 
     @Override
@@ -100,4 +107,18 @@ public class CustomerLoanTableModel extends
         return ret;
     }
 
+    @Override
+    public void update(Observable aAnObservable, Object anArgument) {
+        super.update(aAnObservable, anArgument);
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            IModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Loan.ADDED
+                    || type == ModelChangeTypeEnums.Loan.RETURNED) {
+                data = library.getActiveCustomerLoans(specificCustomer);
+                fireTableDataChanged();
+            }
+
+        }
+    }
 }
