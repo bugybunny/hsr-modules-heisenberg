@@ -24,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.regex.Pattern;
 
@@ -101,7 +103,7 @@ public class CustomerLoanDetailJPanel extends
              * 
              * If I use selectCustomerComboBox.setSelectedItem then the item is
              * found and the correct index set (found via debugging but since
-             * JComboBox is generic I can’t see the code while debugging) but
+             * JComboBox is generic I can���t see the code while debugging) but
              * after setting the correct one, other methods are called that I
              * cannot see that change the setIndex back to -1. So
              * selectCustomerComboBox.setSelectedItem(aCustomer);
@@ -441,13 +443,16 @@ public class CustomerLoanDetailJPanel extends
 
         @Override
         public void actionPerformed(ActionEvent aE) {
-            System.out.println("removed");
+            List<Copy> returnedCopies = new ArrayList<>(loanDetailTable.getSelectedRowCount());
             for (int tempLoan : loanDetailTable.getSelectedRows()) {
-                // TODO: SHIIIIIIAAAAAT
-                library.returnCopy(library
+            	returnedCopies.add(library
                         .getActiveCustomerLoans(displayedObject)
                         .get(loanDetailTable.convertRowIndexToModel(tempLoan))
                         .getCopy());
+            }
+            
+            for (Copy returnLoan : returnedCopies) {
+                library.returnCopy(returnLoan);
             }
         }
     }
