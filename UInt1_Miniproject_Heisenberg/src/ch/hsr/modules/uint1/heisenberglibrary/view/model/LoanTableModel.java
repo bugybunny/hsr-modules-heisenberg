@@ -38,6 +38,12 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
 
 
+
+
+
+
+
+
     private static final long         serialVersionUID               = 4449419618706874102L;
     private static List<String>       columnNames                    = new ArrayList<>(
                                                                              4);
@@ -140,6 +146,8 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
         Class<?> ret = String.class;
         switch (aColumnIndex) {
             case 0:
+                // TODO days until hier anzeigen damit das Datum sortiert werden
+                // kann, Filter anpassen in LoanMainJPanel
                 ret = LoanStatus.class;
                 break;
             case 1:

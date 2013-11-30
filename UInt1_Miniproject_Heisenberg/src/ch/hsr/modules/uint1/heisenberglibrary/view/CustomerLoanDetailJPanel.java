@@ -70,7 +70,9 @@ public class CustomerLoanDetailJPanel extends
     private JLabel                                               customerNameLabel;
     private JComboBox<CustomerComboboxModel.DisplayableCustomer> selectCustomerComboBox;
     private JLabel                                               customerActiveLoansLabel;
+    // TODO ersetzen durch jlist welche alle verfügbaren copies anzeigt
     private GhostHintJTextField                                  addLoanIdTextfield;
+    // private JList<Integer> availableCopiesList;
     private ToolTipJButton                                       addNewLoanButton;
     private ToolTipJButton                                       returnLoanButton;
 
@@ -92,6 +94,8 @@ public class CustomerLoanDetailJPanel extends
             selectCustomerComboBox.setEnabled(false);
             initHandlersForExistingLoan();
         }
+        // TODO nur customer anzeigen, die auch noch ausleihen dürfen,
+        // verursacht aber einige änderungen in dieser klasse
         // let the user select the customer to add a loan to
         else {
             /*
