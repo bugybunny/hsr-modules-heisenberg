@@ -312,20 +312,23 @@ public class CustomerLoanDetailJPanel extends
         String addNewLoanButtonText = MessageFormat
                 .format(UiComponentStrings
                         .getString("CustomerLoanDetailJPanel.button.addloan.text"), Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); //$NON-NLS-1$
-        String addNewLoanButtonEnabledTooltip = UiComponentStrings
-                .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"); //$NON-NLS-1$;
+        String addNewLoanButtonEnabledTooltip = MessageFormat
+                .format(UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"),
+                        Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); // ;
         addNewLoanButton = new ToolTipJButton(addNewLoanButtonText,
                 addNewLoanButtonEnabledTooltip,
                 UiComponentStrings.getString("empty")); //$NON-NLS-1$
+        System.out.println(addNewLoanButtonEnabledTooltip);
 
         loanButtonJPanel.add(addNewLoanButton);
 
         String returnLoanButtonText = UiComponentStrings
                 .getString("CustomerLoanDetailJPanel.button.returnloan.text"); //$NON-NLS-1$
         String returnLoanButtonEnabledTooltip = UiComponentStrings
-                .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"); //$NON-NLS-1$;
+                .getString("CustomerLoanDetailJPanel.button.returnloan.enabled.tooltip"); //$NON-NLS-1$;
         String returnLoanButtonDisabledTooltip = UiComponentStrings
-                .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip"); //$NON-NLS-1$;
+                .getString("CustomerLoanDetailJPanel.button.returnloan.disabled.tooltip"); //$NON-NLS-1$;
         returnLoanButton = new ToolTipJButton(returnLoanButtonText,
                 returnLoanButtonEnabledTooltip, returnLoanButtonDisabledTooltip);
         loanButtonJPanel.add(returnLoanButton);
@@ -417,7 +420,23 @@ public class CustomerLoanDetailJPanel extends
 
     @Override
     protected boolean save() {
-        // nothing to do here since we cannot change customers
+        // misuse this method for adding a loan so we have default behavior with
+        // enter
+        DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
+                .getModel()).getDisplayableCustomerForCustomer(displayedObject);
+
+        if (selectedDisplayableCustomer.getActiveLoanCount() < 4) {
+            // Check valid number
+            if (MATCH_NUMBER.matcher(addLoanIdTextfield.getText()).matches()) {
+                long loanID = Long.parseLong(addLoanIdTextfield.getText());
+                for (Copy tempCopy : library.getAvailableCopies()) {
+                    if (tempCopy.getInventoryNumber() == loanID) {
+                        library.createAndAddLoan(displayedObject, tempCopy);
+
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -455,24 +474,7 @@ public class CustomerLoanDetailJPanel extends
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
-                    .getModel())
-                    .getDisplayableCustomerForCustomer(displayedObject);
-
-            if (selectedDisplayableCustomer.getActiveLoanCount() < 4) {
-                // Check valid number
-                if (MATCH_NUMBER.matcher(addLoanIdTextfield.getText())
-                        .matches()) {
-                    long loanID = Long.parseLong(addLoanIdTextfield.getText());
-                    for (Copy tempCopy : library.getAvailableCopies()) {
-                        if (tempCopy.getInventoryNumber() == loanID) {
-                            library.createAndAddLoan(displayedObject, tempCopy);
-
-                        }
-                    }
-                }
-            }
-
+            save();
         }
     }
 
