@@ -24,10 +24,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
@@ -92,7 +89,6 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
      */
     public void setDirty(boolean isDirty) {
         ModelStateChangeEvent newState = null;
-        // TODO nicht dirty setzen wenn update from other source
         if (dirty) {
             if (isDirty) {
                 newState = new ModelStateChangeEvent(this,
@@ -199,49 +195,6 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
      *         {@code dirty==false}
      */
     abstract protected boolean save();
-
-    /**
-     * Checks if a value in a textfield has changed to its original content
-     * given in {@code aStringToCheck} and if so, set this panel to dirty (=has
-     * unsaved changes).
-     * 
-     * @author msyfrig
-     */
-    protected class ChangeToDirtyDocumentListener implements DocumentListener {
-        private JTextField textFieldToCheck;
-        private String     stringToCheck;
-
-        protected ChangeToDirtyDocumentListener(JTextField aTextFieldToCheck,
-                String aStringToCheck) {
-            textFieldToCheck = aTextFieldToCheck;
-            stringToCheck = aStringToCheck;
-        }
-
-        private void checkIfModified() {
-            // check if text differs from the loaded book object, if
-            // not set this panel to dirty
-            if (!textFieldToCheck.getText().equals(stringToCheck)) {
-                setDirty(true);
-            }
-            // TODO allenfalls else implementieren und die anderen Felder
-            // prüfen, ob die geändert wurden
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent aDocumentRemoveEvent) {
-            checkIfModified();
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent aDocumentInsertEvent) {
-            checkIfModified();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent aDocumentChangedEvent) {
-            checkIfModified();
-        }
-    }
 
     protected class SaveObjectAction extends AbstractAction {
         private static final long serialVersionUID = -2974999148987189986L;

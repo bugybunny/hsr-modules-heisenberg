@@ -322,7 +322,6 @@ public class CustomerLoanDetailJPanel extends
         addNewLoanButton = new ToolTipJButton(addNewLoanButtonText,
                 addNewLoanButtonEnabledTooltip,
                 UiComponentStrings.getString("empty")); //$NON-NLS-1$
-        System.out.println(addNewLoanButtonEnabledTooltip);
 
         loanButtonJPanel.add(addNewLoanButton);
 

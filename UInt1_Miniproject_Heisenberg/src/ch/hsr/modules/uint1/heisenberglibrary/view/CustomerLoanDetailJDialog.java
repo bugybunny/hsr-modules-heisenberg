@@ -92,16 +92,11 @@ public class CustomerLoanDetailJDialog extends
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        // TODO Auto-generated method stub
+        // not used since customers cannot be changed
     }
 
     @Override
     protected void objectInTabUpdated(Customer anUpdatedCustomer) {
-        // TODO prüfen ob gebraucht
-        AbstractObservableObjectJPanel<Customer> detailCustomerPanel = getTabForObject(anUpdatedCustomer);
-        if (detailCustomerPanel != null) {
-            int tabIndex = tabbedPane.indexOfComponent(detailCustomerPanel);
-
-        }
+        // not used since customers cannot be changed
     }
 }

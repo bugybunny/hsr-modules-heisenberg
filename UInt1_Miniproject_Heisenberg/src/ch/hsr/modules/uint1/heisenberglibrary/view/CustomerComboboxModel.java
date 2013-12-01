@@ -75,8 +75,8 @@ public class CustomerComboboxModel extends
 
     @Override
     public void setSelectedItem(Object anObject) {
-        if ((selectedCustomer != null && !selectedCustomer.equals(anObject))
-                || selectedCustomer == null && anObject != null) {
+        if (selectedCustomer != null || selectedCustomer == null
+                && anObject != null) {
             selectedCustomer = (DisplayableCustomer) anObject;
             fireContentsChanged(this, -1, -1);
         }
@@ -109,9 +109,17 @@ public class CustomerComboboxModel extends
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
-                int selectedIndex = customers.indexOf(selectedCustomer);
                 initCustomers(library.getCustomers());
-                setSelectedItem(getElementAt(selectedIndex));
+                int indexOfOldSelectedCopy = customers
+                        .indexOf(selectedCustomer);
+                // this is needed to update the gui element for the currently
+                // selected item
+                if (indexOfOldSelectedCopy >= 0) {
+                    setSelectedItem(getElementAt(indexOfOldSelectedCopy));
+                } else {
+                    setSelectedItem(getElementAt(0));
+                }
+
             }
         }
     }
