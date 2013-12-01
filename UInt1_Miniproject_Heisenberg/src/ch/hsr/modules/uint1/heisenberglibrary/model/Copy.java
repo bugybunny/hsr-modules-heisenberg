@@ -55,4 +55,11 @@ public class Copy extends ObservableObject {
     public long getInventoryNumber() {
         return inventoryNumber;
     }
+
+    @Override
+    public String toString() {
+        return inventoryNumber + ": " + bookDO.toString() + " (" + condition
+                + ")";
+    }
+
 }

@@ -109,8 +109,9 @@ public class CustomerComboboxModel extends
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
+                int selectedIndex = customers.indexOf(selectedCustomer);
                 initCustomers(library.getCustomers());
-                fireContentsChanged(this, -1, -1);
+                setSelectedItem(getElementAt(selectedIndex));
             }
         }
     }

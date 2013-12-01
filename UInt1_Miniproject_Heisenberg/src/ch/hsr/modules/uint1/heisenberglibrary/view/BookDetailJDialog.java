@@ -21,11 +21,11 @@ import java.util.Observer;
 
 import javax.swing.JFrame;
 
-import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
-import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
+import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 
@@ -73,7 +73,8 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
         if (detailBookPanel == null) {
             detailBookPanel = new BookDetailJPanel(aBookToOpen, aLibrary);
 
-            String tabTitle = UiComponentStrings.getString("BookDetailJDialog.tab.title.enternewbook.text"); //$NON-NLS-1$
+            String tabTitle = UiComponentStrings
+                    .getString("BookDetailJDialog.tab.title.enternewbook.text"); //$NON-NLS-1$
             if (aBookToOpen != null) {
                 // add observer to this book so we notice when the title has
                 // changed
@@ -83,8 +84,12 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                 tabbedPane.addTab(tabTitle, null, detailBookPanel,
                         aBookToOpen.toString());
             } else {
-                tabbedPane.addTab(tabTitle, null, detailBookPanel,
-                        UiComponentStrings.getString("BookDetailJDialog.tab.title.enternewbook.tooltip")); //$NON-NLS-1$
+                tabbedPane
+                        .addTab(tabTitle,
+                                null,
+                                detailBookPanel,
+                                UiComponentStrings
+                                        .getString("BookDetailJDialog.tab.title.enternewbook.tooltip")); //$NON-NLS-1$
             }
             addHandlersToTab(detailBookPanel);
             // add asteriks in tabtitle if tab has unsaved changes and listen

@@ -39,7 +39,7 @@ public class CustomerLoanDetailJDialog extends
 
     @Override
     protected void initComponents() {
-        setMinimumSize(new Dimension(370, 370));
+        setMinimumSize(new Dimension(650, 370));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
         initTabbedPane();
