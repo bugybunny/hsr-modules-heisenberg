@@ -25,6 +25,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
@@ -85,19 +86,28 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
     @Override
     protected void initHandlers() {
-        // setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent aE) {
-                while (!openObjectTabList.isEmpty()) {
-                    closeTab(openObjectTabList.get(0));
+            public void windowClosing(WindowEvent aWindowClosingEvent) {
+                List<AbstractObservableObjectJPanel<M>> tabsToClose = new ArrayList<>(
+                        openObjectTabList.size());
+                for (int i = 0; i < openObjectTabList.size(); i++) {
+                    tabsToClose.add(openObjectTabList.get(i));
+                }
+
+                while (!tabsToClose.isEmpty()) {
+                    closeTab(tabsToClose.get(0));
+                    tabsToClose.remove(0);
                 }
             }
 
             @Override
-            public void windowClosed(WindowEvent aE) {
-                openObjectTabList.clear();
-                tabbedPane.removeAll();
+            public void windowClosed(WindowEvent aWindowClosedEvent) {
+                if (openObjectTabList.isEmpty()) {
+                    tabbedPane.removeAll();
+                    setVisible(false);
+                }
             }
         });
     }
@@ -221,43 +231,101 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
      * @param anObjectTabToClose
      *            the object tab to close
      */
-    protected void closeTab(AbstractObservableObjectJPanel<M> anObjectTabToClose) {
+    protected boolean closeTab(
+            AbstractObservableObjectJPanel<M> anObjectTabToClose) {
+        tabbedPane.setSelectedComponent(anObjectTabToClose);
+        boolean closed = false;
         if (anObjectTabToClose != null) {
             if (anObjectTabToClose.isDirty()) {
-                Object[] options = { "Save", "Discard", "Cancel" };
-                int chosenSaveOption = JOptionPane
-                        .showOptionDialog(new JFrame("Save Book"),
-                                "You have unsaved changes.", "Save Book",
-                                JOptionPane.YES_NO_CANCEL_OPTION,
-                                JOptionPane.QUESTION_MESSAGE, null, options,
-                                options[2]);
-
-                switch (chosenSaveOption) {
-                    case 0:
-                        anObjectTabToClose.save();
-                        closeTabNow(anObjectTabToClose);
-                        break;
-                    case 1:
-                        closeTabNow(anObjectTabToClose);
-                        break;
-                    default:
-                        break;
+                if (anObjectTabToClose.hasValidContent()) {
+                    handleDirtyValidTabClosing(anObjectTabToClose);
+                } else {
+                    handleDirtyInvalidTabClosing(anObjectTabToClose);
                 }
             } else {
-                closeTabNow(anObjectTabToClose);
+                closed = closeTabNow(anObjectTabToClose);
             }
         }
+        return closed;
     }
 
-    private void closeTabNow(
+    private boolean handleDirtyValidTabClosing(
+            AbstractObservableObjectJPanel<M> aDirtyValideTabToClose) {
+        boolean closed = false;
+        Object[] options = {
+                UiComponentStrings
+                        .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.option.save"), //$NON-NLS-1$
+                UiComponentStrings
+                        .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.option.discard"), //$NON-NLS-1$
+                UiComponentStrings
+                        .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.option.cancel") }; //$NON-NLS-1$
+
+        String message = MessageFormat
+                .format(UiComponentStrings
+                        .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.message"), //$NON-NLS-1$
+                        aDirtyValideTabToClose.getDisplayedObject());
+
+        int chosenSaveOption = JOptionPane
+                .showOptionDialog(
+                        this,
+                        message,
+                        UiComponentStrings
+                                .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.option.title"), //$NON-NLS-1$
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+
+        switch (chosenSaveOption) {
+            case 0:
+                aDirtyValideTabToClose.save();
+                closed = closeTabNow(aDirtyValideTabToClose);
+                break;
+            case 1:
+                closed = closeTabNow(aDirtyValideTabToClose);
+                break;
+            default:
+                // do nothing
+                break;
+        }
+        return closed;
+    }
+
+    private boolean handleDirtyInvalidTabClosing(
+            AbstractObservableObjectJPanel<M> aDirtyInvalidTabToClose) {
+        boolean closed = false;
+        Object[] options = {
+                UiComponentStrings
+                        .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.option.discard"), //$NON-NLS-1$
+                UiComponentStrings
+                        .getString("AbstractTabbedPaneDialog.optionpane.dirtypanel.option.cancel") }; //$NON-NLS-1$
+
+        int chosenSaveOption = JOptionPane
+                .showOptionDialog(
+                        this,
+                        UiComponentStrings
+                                .getString("AbstractTabbedPaneDialog.optionpane.dirtyinvalidpanel.message"), //$NON-NLS-1$
+                        UiComponentStrings
+                                .getString("AbstractTabbedPaneDialog.optionpane.dirtyinvalidpanel.option.title"), //$NON-NLS-1$
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+
+        if (chosenSaveOption == 0) {
+            closed = closeTabNow(aDirtyInvalidTabToClose);
+        }
+        return closed;
+    }
+
+    private boolean closeTabNow(
             AbstractObservableObjectJPanel<M> anObjectTabToClose) {
+        boolean closed = false;
         anObjectTabToClose.cleanUpBeforeDispose();
         tabbedPane.remove(anObjectTabToClose);
         openObjectTabList.remove(anObjectTabToClose);
+        closed = true;
         // close this dialog if this was the last open tab
         if (openObjectTabList.isEmpty()) {
             dispose();
         }
+        return closed;
     }
 
     /**

@@ -50,6 +50,13 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
     private boolean                   dirty;
 
     /**
+     * Flag to indicate if the data in this channel is valid.
+     * 
+     * <br>Subclasses are responsible to set this flag correctly.
+     */
+    protected boolean                 valid           = true;
+
+    /**
      * Map that holds all added observers for a panel. The corresponding
      * observers will be removed bevor this panel is closed so the gc can
      * collect all the dead references.
@@ -108,6 +115,10 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
         }
         dirty = isDirty;
         notifyListenersAboutModelChange(newState);
+    }
+
+    public boolean hasValidContent() {
+        return valid;
     }
 
     /**

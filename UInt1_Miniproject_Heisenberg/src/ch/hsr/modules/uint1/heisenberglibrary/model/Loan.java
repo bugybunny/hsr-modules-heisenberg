@@ -9,10 +9,11 @@ import ch.hsr.modules.uint1.heisenberglibrary.util.DateUtil;
 
 public class Loan extends ObservableObject {
 
-    private Copy     copy;
-    private Customer customer;
-    private GregorianCalendar pickupDate, returnDate, dueDate;
-    public final static int   DAYS_TO_RETURN_BOOK = 30;
+    private Copy               copy;
+    private Customer           customer;
+    private GregorianCalendar  pickupDate, returnDate, dueDate;
+    public static final int    DAYS_TO_RETURN_BOOK    = 30;
+    public static final double OVERDUE_FINES_PER_BOOK = 3.00;
 
     public Loan(Customer aCustomer, Copy aCopy) {
         copy = aCopy;

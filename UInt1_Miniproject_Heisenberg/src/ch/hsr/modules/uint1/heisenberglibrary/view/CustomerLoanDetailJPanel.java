@@ -34,6 +34,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -530,9 +531,28 @@ public class CustomerLoanDetailJPanel extends
                         .getCopy());
             }
 
-            for (Copy returnLoan : returnedCopies) {
-                // TODO mahnung bei overdue loans
-                Loan returnedLoan = library.returnCopy(returnLoan);
+            int numberOfOverdueLoans = 0;
+            for (Copy copyToReturn : returnedCopies) {
+                Loan loanToReturn = library.getActiveLoanForCopy(copyToReturn);
+                if (loanToReturn.isOverdue()) {
+                    numberOfOverdueLoans++;
+                }
+                library.returnCopy(copyToReturn);
+            }
+            if (numberOfOverdueLoans > 0) {
+                String customerName = displayedObject.getName() + " " //$NON-NLS-1$
+                        + displayedObject.getSurname();
+                String message = MessageFormat
+                        .format(UiComponentStrings
+                                .getString("CustomerLoanDetailJPanel.optionpane.overduefines.message"), //$NON-NLS-1$
+                                customerName, Double
+                                        .valueOf(Loan.OVERDUE_FINES_PER_BOOK
+                                                * numberOfOverdueLoans));
+
+                String title = UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.optionpane.overduefines.title"); //$NON-NLS-1$
+                JOptionPane.showMessageDialog(null, message, title,
+                        JOptionPane.WARNING_MESSAGE);
             }
         }
     }

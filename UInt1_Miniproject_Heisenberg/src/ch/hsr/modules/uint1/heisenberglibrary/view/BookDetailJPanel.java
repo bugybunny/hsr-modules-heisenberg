@@ -536,6 +536,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                 }
             }
         }
+        valid = validationResult;
         return validationResult;
     }
 
