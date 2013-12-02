@@ -48,7 +48,6 @@ public class BookCopyTableModel extends
         super(aLibrary.getCopiesOfBook(aDisplayedBookDO));
         library = aLibrary;
         addObserverForObservable(library, this);
-
         specificBook = aDisplayedBookDO;
     }
 
@@ -61,9 +60,11 @@ public class BookCopyTableModel extends
     public Object getValueAt(int aRowIndex, int aColumnIndex) {
         Copy copyOfSpecificBook = data.get(aRowIndex);
 
-        String availability = "available";
+        String availability = UiComponentStrings
+                .getString("BookCopyTableModel.copy.isAvailable"); //$NON-NLS-1$
         if (library.isCopyLent(copyOfSpecificBook)) {
-            availability = "unavailable";
+            availability = UiComponentStrings
+                    .getString("BookCopyTableModel.copy.notAvailable"); //$NON-NLS-1$
         }
 
         Object borrowedUntil = UiComponentStrings

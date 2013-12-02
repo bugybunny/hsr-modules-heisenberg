@@ -201,6 +201,8 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         initTable(new LoanTableModel(dataList));
         tableFilter = new TableFilter<>(table, searchTextField);
         centerPanel.add(tableScrollPane);
+        table.setDefaultRenderer(LoanStatus.class,
+                new OverdueLoanColorRenderer());
     }
 
     private void initHandlers() {
