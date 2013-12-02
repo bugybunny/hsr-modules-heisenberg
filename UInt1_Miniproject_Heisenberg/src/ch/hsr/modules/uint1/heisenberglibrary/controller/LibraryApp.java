@@ -28,6 +28,8 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.LibraryMasterJFrame;
 
 public class LibraryApp {
     public static void main(String[] args) throws Exception {
+        // WANNA SPEAK GERMAN O_O
+        // Locale.setDefault(new Locale("de_ch"));
         Library library = new Library();
         initLibrary(library);
 
