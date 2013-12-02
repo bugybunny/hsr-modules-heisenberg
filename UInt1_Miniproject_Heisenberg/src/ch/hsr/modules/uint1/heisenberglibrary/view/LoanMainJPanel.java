@@ -20,6 +20,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Observable;
@@ -218,6 +220,15 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
 
         table.getSelectionModel().addListSelectionListener(
                 new BookTableSelectionListener());
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent aMouseClickedEvent) {
+                if (aMouseClickedEvent.getClickCount() == 2) {
+                    openSelected();
+                }
+            }
+        });
 
         onlyOverdueFilter = new OnlyOverdueFilter<>();
         onlyOverdueCheckbox.addItemListener(new ItemListener() {
