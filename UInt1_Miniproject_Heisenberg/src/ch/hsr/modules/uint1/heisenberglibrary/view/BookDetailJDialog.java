@@ -36,6 +36,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
  * 
  * @author msyfrig
  */
+
 public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
         implements Observer {
     private static final long serialVersionUID = 439819991326389792L;
@@ -52,10 +53,6 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         // TOOD fixed size for dialog
-    }
-
-    @Override
-    protected void initHandlers() {
     }
 
     /**

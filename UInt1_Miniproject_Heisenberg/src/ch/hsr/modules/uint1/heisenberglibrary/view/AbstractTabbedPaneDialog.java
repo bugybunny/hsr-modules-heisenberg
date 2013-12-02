@@ -23,6 +23,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +36,8 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
@@ -67,6 +71,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
     public AbstractTabbedPaneDialog(Frame anOwner, String aTitle) {
         super(anOwner, aTitle);
+        System.out.println("blubb 1");
     }
 
     public AbstractTabbedPaneDialog(Dialog anOwner, String aTitle) {
@@ -79,6 +84,26 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         addTabbedPaneHandlers();
     }
 
+    @Override
+    protected void initHandlers() {
+        System.out.println("blubb");
+        // setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent aE) {
+                while (!openObjectTabList.isEmpty()) {
+                    closeTab(openObjectTabList.get(0));
+                }
+            }
+
+            @Override
+            public void windowClosed(WindowEvent aE) {
+                openObjectTabList.clear();
+                tabbedPane.removeAll();
+            }
+        });
+    }
+
     private void addTabbedPaneHandlers() {
         addComponentListener(new ComponentAdapter() {
             /**
@@ -88,9 +113,9 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
              */
             @Override
             public void componentHidden(ComponentEvent aComponentHiddenEvent) {
-                openObjectTabList.clear();
-                tabbedPane.removeAll();
+
             }
+
         });
 
         KeyStroke ctrlTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
@@ -202,13 +227,41 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         if (anObjectTabToClose != null) {
             // TODO joptionpane für Nachfrage
             // remove all listeners in this panel
-            anObjectTabToClose.cleanUpBeforeDispose();
-            tabbedPane.remove(anObjectTabToClose);
-            openObjectTabList.remove(anObjectTabToClose);
-            // close this dialog if this was the last open tab
-            if (openObjectTabList.isEmpty()) {
-                dispose();
+            if (anObjectTabToClose.isDirty()) {
+                // Custom button text
+                Object[] options = { "Save", "Discard", "Cancel" };
+                int chosenSaveOption = JOptionPane
+                        .showOptionDialog(new JFrame("Save Book"),
+                                "You have unsaved changes.", "Save Book",
+                                JOptionPane.YES_NO_CANCEL_OPTION,
+                                JOptionPane.QUESTION_MESSAGE, null, options,
+                                options[2]);
+
+                switch (chosenSaveOption) {
+                    case 0:
+                        anObjectTabToClose.save();
+                        closeTabNow(anObjectTabToClose);
+                        break;
+                    case 1:
+                        closeTabNow(anObjectTabToClose);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                closeTabNow(anObjectTabToClose);
             }
+        }
+    }
+
+    private void closeTabNow(
+            AbstractObservableObjectJPanel<M> anObjectTabToClose) {
+        anObjectTabToClose.cleanUpBeforeDispose();
+        tabbedPane.remove(anObjectTabToClose);
+        openObjectTabList.remove(anObjectTabToClose);
+        // close this dialog if this was the last open tab
+        if (openObjectTabList.isEmpty()) {
+            dispose();
         }
     }
 
