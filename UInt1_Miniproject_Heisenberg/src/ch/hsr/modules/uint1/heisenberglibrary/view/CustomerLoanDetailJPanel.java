@@ -355,7 +355,9 @@ public class CustomerLoanDetailJPanel extends
         availableCopiesComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
-                addLoanAction.setEnabled(true);
+                if (library.isCustomerAllowedToLendOut(displayedObject)) {
+                    addLoanAction.setEnabled(true);
+                }
             }
         });
     }

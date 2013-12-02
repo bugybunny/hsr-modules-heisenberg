@@ -77,7 +77,8 @@ public class AvailableCopiesComboBoxModel extends AbstractListModel<Copy>
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
-            if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
+            if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER
+                    || type == ModelChangeTypeEnums.Copy.NUMBER) {
                 data = library.getAvailableCopies();
                 int indexOfOldSelectedCopy = data.indexOf(selectedCopy);
                 // this is needed to update the gui element for the currently
