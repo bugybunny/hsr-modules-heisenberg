@@ -187,6 +187,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
         initTable(new BookTableModel(library));
         tableFilter = new TableFilter<>(table, searchTextField);
         centerPanel.add(tableScrollPane);
+        table.setDefaultRenderer(Integer.class, new AvailableCopyCellRenderer());
     }
 
     private void initHandlers() {

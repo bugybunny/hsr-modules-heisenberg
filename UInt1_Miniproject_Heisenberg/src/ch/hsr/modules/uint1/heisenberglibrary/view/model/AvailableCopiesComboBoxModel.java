@@ -85,8 +85,6 @@ public class AvailableCopiesComboBoxModel extends AbstractListModel<Copy>
                 // selected item
                 if (indexOfOldSelectedCopy >= 0) {
                     setSelectedItem(getElementAt(indexOfOldSelectedCopy));
-                } else {
-                    setSelectedItem(getElementAt(0));
                 }
             }
         }
