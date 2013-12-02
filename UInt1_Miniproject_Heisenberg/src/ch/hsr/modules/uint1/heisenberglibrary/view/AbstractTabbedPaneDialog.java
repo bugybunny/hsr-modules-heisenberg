@@ -71,7 +71,6 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
     public AbstractTabbedPaneDialog(Frame anOwner, String aTitle) {
         super(anOwner, aTitle);
-        System.out.println("blubb 1");
     }
 
     public AbstractTabbedPaneDialog(Dialog anOwner, String aTitle) {
@@ -86,7 +85,6 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
     @Override
     protected void initHandlers() {
-        System.out.println("blubb");
         // setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -225,10 +223,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
      */
     protected void closeTab(AbstractObservableObjectJPanel<M> anObjectTabToClose) {
         if (anObjectTabToClose != null) {
-            // TODO joptionpane für Nachfrage
-            // remove all listeners in this panel
             if (anObjectTabToClose.isDirty()) {
-                // Custom button text
                 Object[] options = { "Save", "Discard", "Cancel" };
                 int chosenSaveOption = JOptionPane
                         .showOptionDialog(new JFrame("Save Book"),
@@ -318,10 +313,6 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            if (objectTab.isDirty()) {
-                // TODO Warnung anzeigen, dass Änderungen verloren gehen und
-                // allenfalls Option geben, noch zu speichern oder abzubrechen
-            }
             closeTab(objectTab);
         }
     }
