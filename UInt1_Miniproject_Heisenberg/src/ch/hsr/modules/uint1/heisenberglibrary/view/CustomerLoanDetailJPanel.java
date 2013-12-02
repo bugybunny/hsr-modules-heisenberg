@@ -90,11 +90,7 @@ public class CustomerLoanDetailJPanel extends
             setCustomer(aCustomer);
             selectCustomerComboBox.setEnabled(false);
             initHandlersForExistingLoan();
-        }
-        // TODO nur customer anzeigen, die auch noch ausleihen dürfen,
-        // verursacht aber einige änderungen in dieser klasse
-        // let the user select the customer to add a loan to
-        else {
+        } else {
             /*
              * selectCustomerComboBox.getSelectedItem and
              * selectCustomerComboBox.getElementAt both return a
@@ -354,6 +350,13 @@ public class CustomerLoanDetailJPanel extends
 
         loanDetailTable.getSelectionModel().addListSelectionListener(
                 new LoanTableSelectionListener());
+
+        availableCopiesComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                addLoanAction.setEnabled(true);
+            }
+        });
     }
 
     private void initHandlersForExistingLoan() {
@@ -400,14 +403,13 @@ public class CustomerLoanDetailJPanel extends
 
     private void checkCustomerLendabilty() {
         if (!library.isCustomerAllowedToLendOut(displayedObject)) {
-            setAddLoanDisabled();
+            disableSelectAvailableCopies();
         } else {
-            setAddLoanEnabled();
+            enableSelectAvailableCopies();
         }
     }
 
-    private void setAddLoanDisabled() {
-        addLoanAction.setEnabled(false);
+    private void disableSelectAvailableCopies() {
         availableCopiesComboBox.setEnabled(false);
         if (!library.getOverdueLoansForCustomer(displayedObject).isEmpty()) {
             String disabledToolTip = UiComponentStrings
@@ -430,13 +432,16 @@ public class CustomerLoanDetailJPanel extends
         }
     }
 
-    private void setAddLoanEnabled() {
-        addLoanAction.setEnabled(true);
+    private void enableSelectAvailableCopies() {
         availableCopiesComboBox.setEnabled(true);
         availableCopiesComboBox
                 .setToolTipText(MessageFormat.format(
                         UiComponentStrings
-                                .getString("CustomerLoanDetailJPanel.combobox.availablecopies.enabled.tooltip"), displayedObject)); //$NON-NLS-1$        
+                                .getString("CustomerLoanDetailJPanel.combobox.availablecopies.enabled.tooltip"), //$NON-NLS-1$
+                        displayedObject));
+        addLoanButton
+                .setDisabledToolTip(UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.noneselected")); //$NON-NLS-1$
     }
 
     @Override
@@ -503,6 +508,7 @@ public class CustomerLoanDetailJPanel extends
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
             save();
+            addLoanAction.setEnabled(false);
         }
     }
 
@@ -525,7 +531,7 @@ public class CustomerLoanDetailJPanel extends
             }
 
             for (Copy returnLoan : returnedCopies) {
-                // if(library
+                // TODO mahnung bei overdue loans
                 Loan returnedLoan = library.returnCopy(returnLoan);
             }
         }
