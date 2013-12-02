@@ -29,7 +29,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import ch.hsr.modules.uint1.heisenberglibrary.view.GhostHintJTextField;
-import ch.hsr.modules.uint1.heisenberglibrary.view.TextBookTableFilter;
+import ch.hsr.modules.uint1.heisenberglibrary.view.TableTextFilter;
 
 //@formatter:off
 /**
@@ -114,7 +114,7 @@ public class TableFilter<M extends TableModel> {
     public void filterTable() {
         List<RowFilter<M, Object>> combiningRowFilterList = new ArrayList<>(
                 additionalFilters.size() + 1);
-        combiningRowFilterList.add(new TextBookTableFilter<M, Object>(
+        combiningRowFilterList.add(new TableTextFilter<M, Object>(
                 searchField.getText()));
         combiningRowFilterList.addAll(additionalFilters);
         @SuppressWarnings("unchecked")

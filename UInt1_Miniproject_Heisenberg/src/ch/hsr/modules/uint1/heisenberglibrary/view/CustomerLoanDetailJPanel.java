@@ -28,7 +28,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -50,7 +49,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.DisplayableCustomer;
-import ch.hsr.modules.uint1.heisenberglibrary.view.model.AvailableCopiesListModel;
+import ch.hsr.modules.uint1.heisenberglibrary.view.model.AvailableCopiesComboBoxModel;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.CustomerLoanTableModel;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
@@ -74,15 +73,12 @@ public class CustomerLoanDetailJPanel extends
     private JComboBox<CustomerComboboxModel.DisplayableCustomer> selectCustomerComboBox;
     private JLabel                                               customerActiveLoansLabel;
     private JComboBox<Copy>                                      availableCopiesComboBox;
-    private ToolTipJButton                                       addNewLoanButton;
+    private ToolTipJButton                                       addLoanButton;
     private ToolTipJButton                                       returnLoanButton;
 
     // actions
     private AddLoanAction                                        addLoanAction;
     private ReturnLoanAction                                     returnLoanAction;
-
-    private static final Pattern                                 MATCH_NUMBER     = Pattern
-                                                                                          .compile("^[0-9]+$"); //$NON-NLS-1$
 
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
         super(aCustomer);
@@ -306,24 +302,24 @@ public class CustomerLoanDetailJPanel extends
         loanButtonJPanel.setLayout(new BoxLayout(loanButtonJPanel,
                 BoxLayout.X_AXIS));
 
-        availableCopiesComboBox = new JComboBox<>(new AvailableCopiesListModel(
-                library));
+        availableCopiesComboBox = new JComboBox<>(
+                new AvailableCopiesComboBoxModel(library));
         availableCopiesComboBox.setPreferredSize(new Dimension(400,
                 availableCopiesComboBox.getPreferredSize().height));
-        loanButtonJPanel.add(new JScrollPane(availableCopiesComboBox));
+        loanButtonJPanel.add(availableCopiesComboBox);
 
-        String addNewLoanButtonText = MessageFormat
+        String addLoanButtonText = MessageFormat
                 .format(UiComponentStrings
                         .getString("CustomerLoanDetailJPanel.button.addloan.text"), Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); //$NON-NLS-1$
         String addNewLoanButtonEnabledTooltip = MessageFormat
                 .format(UiComponentStrings
                         .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"), //$NON-NLS-1$
                         Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); // ;
-        addNewLoanButton = new ToolTipJButton(addNewLoanButtonText,
+        addLoanButton = new ToolTipJButton(addLoanButtonText,
                 addNewLoanButtonEnabledTooltip,
                 UiComponentStrings.getString("empty")); //$NON-NLS-1$
 
-        loanButtonJPanel.add(addNewLoanButton);
+        loanButtonJPanel.add(addLoanButton);
 
         String returnLoanButtonText = UiComponentStrings
                 .getString("CustomerLoanDetailJPanel.button.returnloan.text"); //$NON-NLS-1$
@@ -348,9 +344,9 @@ public class CustomerLoanDetailJPanel extends
     }
 
     private void initCommonHandlers() {
-        addLoanAction = new AddLoanAction(addNewLoanButton.getText());
+        addLoanAction = new AddLoanAction(addLoanButton.getText());
         addLoanAction.setEnabled(false);
-        addNewLoanButton.setAction(addLoanAction);
+        addLoanButton.setAction(addLoanAction);
 
         returnLoanAction = new ReturnLoanAction(returnLoanButton.getText());
         returnLoanAction.setEnabled(false);
@@ -404,36 +400,43 @@ public class CustomerLoanDetailJPanel extends
 
     private void checkCustomerLendabilty() {
         if (!library.isCustomerAllowedToLendOut(displayedObject)) {
-            addLoanAction.setEnabled(false);
-            availableCopiesComboBox.setEnabled(false);
-            if (!library.getOverdueLoansForCustomer(displayedObject).isEmpty()) {
-                String disabledToolTip = UiComponentStrings
-                        .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans"); //$NON-NLS-1$
-                addNewLoanButton.setDisabledToolTip(disabledToolTip);
-                availableCopiesComboBox
-                        .setToolTipText(UiComponentStrings
-                                .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans")); //$NON-NLS-1$
-            } else {
-                DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
-                        .getModel())
-                        .getDisplayableCustomerForCustomer(displayedObject);
-                String disabledToolTip = MessageFormat
-                        .format(UiComponentStrings
-                                .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.maxloans"), //$NON-NLS-1$
-                                Integer.valueOf(selectedDisplayableCustomer
-                                        .getActiveLoanCount()));
-                addNewLoanButton.setDisabledToolTip(disabledToolTip);
-                availableCopiesComboBox.setToolTipText(disabledToolTip);
-
-            }
+            setAddLoanDisabled();
         } else {
-            addLoanAction.setEnabled(true);
-            availableCopiesComboBox.setEnabled(true);
-            availableCopiesComboBox
-                    .setToolTipText(MessageFormat.format(
-                            UiComponentStrings
-                                    .getString("CustomerLoanDetailJPanel.combobox.availablecopies.enabled.tooltip"), displayedObject)); //$NON-NLS-1$
+            setAddLoanEnabled();
         }
+    }
+
+    private void setAddLoanDisabled() {
+        addLoanAction.setEnabled(false);
+        availableCopiesComboBox.setEnabled(false);
+        if (!library.getOverdueLoansForCustomer(displayedObject).isEmpty()) {
+            String disabledToolTip = UiComponentStrings
+                    .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans"); //$NON-NLS-1$
+            addLoanButton.setDisabledToolTip(disabledToolTip);
+            availableCopiesComboBox
+                    .setToolTipText(UiComponentStrings
+                            .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans")); //$NON-NLS-1$
+        } else {
+            DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
+                    .getModel())
+                    .getDisplayableCustomerForCustomer(displayedObject);
+            String disabledToolTip = MessageFormat
+                    .format(UiComponentStrings
+                            .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.maxloans"), //$NON-NLS-1$
+                            Integer.valueOf(selectedDisplayableCustomer
+                                    .getActiveLoanCount()));
+            addLoanButton.setDisabledToolTip(disabledToolTip);
+            availableCopiesComboBox.setToolTipText(disabledToolTip);
+        }
+    }
+
+    private void setAddLoanEnabled() {
+        addLoanAction.setEnabled(true);
+        availableCopiesComboBox.setEnabled(true);
+        availableCopiesComboBox
+                .setToolTipText(MessageFormat.format(
+                        UiComponentStrings
+                                .getString("CustomerLoanDetailJPanel.combobox.availablecopies.enabled.tooltip"), displayedObject)); //$NON-NLS-1$        
     }
 
     @Override
@@ -442,24 +445,8 @@ public class CustomerLoanDetailJPanel extends
         // enter
         library.createAndAddLoan(displayedObject,
                 (Copy) availableCopiesComboBox.getSelectedItem());
-        availableCopiesComboBox.setModel(new AvailableCopiesListModel(library));
-
-        // DisplayableCustomer selectedDisplayableCustomer =
-        // ((CustomerComboboxModel) selectCustomerComboBox
-        // .getModel()).getDisplayableCustomerForCustomer(displayedObject);
-        //
-        // if (selectedDisplayableCustomer.getActiveLoanCount() < 4) {
-        // // Check valid number
-        // if (MATCH_NUMBER.matcher(addLoanIdTextfield.getText()).matches()) {
-        // long loanID = Long.parseLong(addLoanIdTextfield.getText());
-        // for (Copy tempCopy : library.getAvailableCopies()) {
-        // if (tempCopy.getInventoryNumber() == loanID) {
-        // library.createAndAddLoan(displayedObject, tempCopy);
-        // return true;
-        // }
-        // }
-        // }
-        // }
+        availableCopiesComboBox.setModel(new AvailableCopiesComboBoxModel(
+                library));
         return false;
     }
 
@@ -471,6 +458,8 @@ public class CustomerLoanDetailJPanel extends
             customerNameLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             customerZipLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             customerAddressLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
+            customerActiveLoansLabel.setText(UiComponentStrings
+                    .getString("empty")); //$NON-NLS-1$
 
         } else {
             DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
@@ -485,6 +474,22 @@ public class CustomerLoanDetailJPanel extends
                     .setText(Integer.toString(selectedDisplayableCustomer
                             .getActiveLoanCount()));
 
+        }
+    }
+
+    @Override
+    public void cleanUpBeforeDispose() {
+        removeAllObservers();
+        if (loanDetailTable.getModel() instanceof IDisposable) {
+            ((IDisposable) loanDetailTable.getModel()).cleanUpBeforeDispose();
+        }
+        if (selectCustomerComboBox.getModel() instanceof IDisposable) {
+            ((IDisposable) selectCustomerComboBox.getModel())
+                    .cleanUpBeforeDispose();
+        }
+        if (availableCopiesComboBox.getModel() instanceof IDisposable) {
+            ((IDisposable) availableCopiesComboBox.getModel())
+                    .cleanUpBeforeDispose();
         }
     }
 
@@ -520,24 +525,9 @@ public class CustomerLoanDetailJPanel extends
             }
 
             for (Copy returnLoan : returnedCopies) {
-                library.returnCopy(returnLoan);
+                // if(library
+                Loan returnedLoan = library.returnCopy(returnLoan);
             }
-        }
-    }
-
-    @Override
-    public void cleanUpBeforeDispose() {
-        removeAllObservers();
-        if (loanDetailTable.getModel() instanceof IDisposable) {
-            ((IDisposable) loanDetailTable.getModel()).cleanUpBeforeDispose();
-        }
-        if (selectCustomerComboBox.getModel() instanceof IDisposable) {
-            ((IDisposable) selectCustomerComboBox.getModel())
-                    .cleanUpBeforeDispose();
-        }
-        if (availableCopiesComboBox.getModel() instanceof IDisposable) {
-            ((IDisposable) availableCopiesComboBox.getModel())
-                    .cleanUpBeforeDispose();
         }
     }
 

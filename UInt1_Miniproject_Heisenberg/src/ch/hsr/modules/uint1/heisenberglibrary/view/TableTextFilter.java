@@ -28,7 +28,7 @@ import javax.swing.RowFilter;
  * 
  * @author msyfrig
  */
-public class TextBookTableFilter<M, I> extends RowFilter<M, I> {
+public class TableTextFilter<M, I> extends RowFilter<M, I> {
     private final String searchText;
 
     /**
@@ -37,7 +37,7 @@ public class TextBookTableFilter<M, I> extends RowFilter<M, I> {
      * 
      * @param aSearchText
      */
-    public TextBookTableFilter(String aSearchText) {
+    public TableTextFilter(String aSearchText) {
         searchText = aSearchText;
     }
 
@@ -59,12 +59,11 @@ public class TextBookTableFilter<M, I> extends RowFilter<M, I> {
         }
         boolean ret = false;
         for (int i = 0; i < anEntry.getValueCount(); i++) {
-            if (anEntry.getStringValue(i) != null) {
-                if (anEntry.getStringValue(i).toLowerCase()
-                        .contains(searchText.toLowerCase())) {
-                    ret = true;
-                    break;
-                }
+            if (anEntry.getStringValue(i) != null
+                    && anEntry.getStringValue(i).toLowerCase()
+                            .contains(searchText.toLowerCase())) {
+                ret = true;
+                break;
             }
         }
         return ret;
