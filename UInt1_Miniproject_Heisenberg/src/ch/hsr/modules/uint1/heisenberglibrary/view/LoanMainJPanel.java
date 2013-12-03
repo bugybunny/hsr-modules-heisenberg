@@ -205,7 +205,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         tableFilter = new TableFilter<>(table, searchTextField);
         centerPanel.add(tableScrollPane);
         table.setDefaultRenderer(LoanStatus.class,
-                new OverdueLoanColorRenderer());
+                new OverdueLoanColorCellRenderer());
     }
 
     private void initHandlers() {
@@ -314,7 +314,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            openNew();
+            createNew();
         }
     }
 
@@ -345,7 +345,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
     }
 
     @Override
-    public void openNew() {
+    public void createNew() {
         // check first if the detaildialog is already opened, if so bring it
         // to the front
         if (loanDetailDialog == null) {
