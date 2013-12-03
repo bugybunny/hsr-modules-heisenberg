@@ -14,6 +14,7 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,9 +24,12 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
@@ -85,9 +89,26 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         autoSizeTableColumns();
     }
 
-    // well we have checked, no way to tell the compiler we did
     @SuppressWarnings("unchecked")
     private void addTableHandlers() {
+        // delete default jtable behavior with enter (default=selecting next
+        // row) so default action will be invoked
+        Action openSelectedAction = new AbstractAction(
+                "openSelectedActionWithEnter") {
+            private static final long serialVersionUID = 3744924877943386680L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getDefaultButton().getAction().actionPerformed(anActionEvent);
+            }
+        };
+
+        Object enterKey = table.getInputMap(
+                JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(
+                KeyStroke.getKeyStroke("ENTER"));
+        table.getActionMap().put(enterKey, openSelectedAction);
+
+        // well we have checked, no way to tell the compiler we did
         if (table.getModel() instanceof AbstractExtendendedEventTableModel) {
             AbstractExtendendedEventTableModel<E> tableModel = (AbstractExtendendedEventTableModel<E>) table
                     .getModel();

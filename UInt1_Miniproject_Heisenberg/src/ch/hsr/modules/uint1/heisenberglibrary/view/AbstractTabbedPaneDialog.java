@@ -19,8 +19,6 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -183,19 +181,6 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
     }
 
     private void addTabbedPaneHandlers() {
-        addComponentListener(new ComponentAdapter() {
-            /**
-             * All opened book tabs are closed before hiding this dialog so they
-             * are not still open if the user selects a new book and expects to
-             * open a completely new dialog.
-             */
-            @Override
-            public void componentHidden(ComponentEvent aComponentHiddenEvent) {
-
-            }
-
-        });
-
         KeyStroke ctrlTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
                 InputEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,

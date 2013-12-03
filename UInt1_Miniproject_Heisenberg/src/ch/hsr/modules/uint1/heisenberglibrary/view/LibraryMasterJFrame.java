@@ -19,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -84,6 +86,18 @@ public class LibraryMasterJFrame extends JFrame {
     }
 
     private void initHandlers() {
+        getRootPane().setDefaultButton(
+                ((AbstractSearchableTableJPanel<?>) tabbedPane
+                        .getSelectedComponent()).getDefaultButton());
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent aStateChangedEvent) {
+                getRootPane().setDefaultButton(
+                        ((AbstractSearchableTableJPanel<?>) tabbedPane
+                                .getSelectedComponent()).getDefaultButton());
+            }
+        });
+
         KeyStroke ctrlTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
                 InputEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB,

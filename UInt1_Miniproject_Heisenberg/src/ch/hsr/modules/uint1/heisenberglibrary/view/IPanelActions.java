@@ -14,6 +14,8 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import javax.swing.JButton;
+
 /**
  * @author msyfrig
  */
@@ -29,4 +31,6 @@ public interface IPanelActions {
     public void tableRequestFocus();
 
     public void removeSelected();
+
+    public JButton getDefaultButton();
 }

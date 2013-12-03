@@ -145,8 +145,8 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
         onlyAvailableCheckbox = new JCheckBox(
                 UiComponentStrings
                         .getString("BookMainJPanel.checkbox.onlyavailable.text")); //$NON-NLS-1$
-        onlyAvailableCheckbox
-                .setToolTipText(UiComponentStrings.getString("BookMainJPanel.checkbox.onlyavailable.tooltip")); //$NON-NLS-1$
+        onlyAvailableCheckbox.setToolTipText(UiComponentStrings
+                .getString("BookMainJPanel.checkbox.onlyavailable.tooltip")); //$NON-NLS-1$
         inventoryPanel.add(onlyAvailableCheckbox);
 
         horizontalStrut = Box.createHorizontalStrut(50);
@@ -354,4 +354,10 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
             }
         }
     }
+
+    @Override
+    public JButton getDefaultButton() {
+        return viewSelectedButton;
+    }
+
 }

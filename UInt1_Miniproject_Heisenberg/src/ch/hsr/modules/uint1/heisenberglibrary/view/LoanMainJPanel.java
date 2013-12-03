@@ -378,11 +378,15 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         for (Customer tempCustomer : customersToOpenSet) {
             loanDetailDialog.openCustomerLoanTab(tempCustomer, library);
         }
-
     }
 
     @Override
     public void setSelectedCheckBox() {
         onlyOverdueCheckbox.setSelected(!onlyOverdueCheckbox.isSelected());
+    }
+
+    @Override
+    public JButton getDefaultButton() {
+        return viewSelectedButton;
     }
 }

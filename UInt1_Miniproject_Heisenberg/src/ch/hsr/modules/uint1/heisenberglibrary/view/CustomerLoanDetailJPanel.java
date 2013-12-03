@@ -32,6 +32,7 @@ import java.util.Observable;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -596,5 +597,10 @@ public class CustomerLoanDetailJPanel extends
     @Override
     public void removeSelected() {
         returnSelectedLoans();
+    }
+
+    @Override
+    public JButton getDefaultButton() {
+        return addLoanButton;
     }
 }

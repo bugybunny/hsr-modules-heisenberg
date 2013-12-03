@@ -767,4 +767,9 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     public void removeSelected() {
         removeSelectedCopies();
     }
+
+    @Override
+    public JButton getDefaultButton() {
+        return addBookButton;
+    }
 }
