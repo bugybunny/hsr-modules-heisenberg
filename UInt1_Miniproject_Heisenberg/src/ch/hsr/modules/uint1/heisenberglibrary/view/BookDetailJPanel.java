@@ -645,22 +645,30 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         numberOfAvailableCopiesLabel.setText(numberOfAvailableCopiesString);
     }
 
-    private void removeSelectedCopies() {
-        List<Copy> copyList = library.getCopiesOfBook(displayedObject);
+    private void removeSelectedCopiesIfAllowed() {
+        if (removeCopyAction.isEnabled()) {
+            List<Copy> copyList = library.getCopiesOfBook(displayedObject);
 
-        // we need an extra list because we would need to update the
-        // copyList each time we deleted one copy with the new list in the
-        // library with copyList = library.getCopiesOfBook(displayedObject)
-        // because the indexes changes
-        List<Copy> copiesToDelete = new ArrayList<>(
-                bookCopyTable.getSelectedRowCount());
-        for (int tempCopy : bookCopyTable.getSelectedRows()) {
-            copiesToDelete.add(copyList.get(bookCopyTable
-                    .convertRowIndexToModel(tempCopy)));
+            // we need an extra list because we would need to update the
+            // copyList each time we deleted one copy with the new list in the
+            // library with copyList = library.getCopiesOfBook(displayedObject)
+            // because the indexes changes
+            List<Copy> copiesToDelete = new ArrayList<>(
+                    bookCopyTable.getSelectedRowCount());
+            for (int tempCopy : bookCopyTable.getSelectedRows()) {
+                copiesToDelete.add(copyList.get(bookCopyTable
+                        .convertRowIndexToModel(tempCopy)));
 
+            }
+            library.removeCopies(copiesToDelete);
+            copyList = library.getCopiesOfBook(displayedObject);
         }
-        library.removeCopies(copiesToDelete);
-        copyList = library.getCopiesOfBook(displayedObject);
+    }
+
+    private void createCopyIfAllowed() {
+        if (addCopyAction.isEnabled()) {
+            library.createAndAddCopy(displayedObject);
+        }
     }
 
     private class SaveBookAction extends AbstractAction {
@@ -685,7 +693,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            removeSelectedCopies();
+            removeSelectedCopiesIfAllowed();
         }
     }
 
@@ -698,7 +706,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            library.createAndAddCopy(displayedObject);
+            createCopyIfAllowed();
         }
     }
 
@@ -755,17 +763,19 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
     @Override
     public void createNew() {
-        library.createAndAddCopy(displayedObject);
+        createCopyIfAllowed();
     }
 
     @Override
     public void tableRequestFocus() {
-        bookCopyTable.requestFocus();
+        if (bookCopyTable != null) {
+            bookCopyTable.requestFocus();
+        }
     }
 
     @Override
     public void removeSelected() {
-        removeSelectedCopies();
+        removeSelectedCopiesIfAllowed();
     }
 
     @Override

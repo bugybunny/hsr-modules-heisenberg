@@ -303,9 +303,9 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
         }
     }
 
-    // TODO folgendes verwenden, habe aber noch Probleme mit Generics
     // combiningRowFilterList.add(RowFilter.numberFilter(
-    // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0));
+    // RowFilter.ComparisonType.AFTER, Integer.valueOf(0), 0)) generates
+    // problems with generics
     private class OnlyAvailableFilter<M extends BookTableModel, I extends Object>
             extends RowFilter<M, I> {
         @Override

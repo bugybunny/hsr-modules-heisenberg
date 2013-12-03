@@ -219,12 +219,16 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
 
     @Override
     public void searchFieldRequestFocus() {
-        searchTextField.requestFocus();
+        if (searchTextField != null) {
+            searchTextField.requestFocus();
+        }
     }
 
     @Override
     public void tableRequestFocus() {
-        table.requestFocus();
+        if (table != null) {
+            table.requestFocus();
+        }
     }
 
     @Override

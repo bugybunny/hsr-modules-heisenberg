@@ -77,19 +77,21 @@ public class BookTableModel extends AbstractExtendendedEventTableModel<BookDO>
 
     @Override
     public void setValueAt(Object value, int aRowIndex, int aColumnIndex) {
-        BookDO book = data.get(aRowIndex);
-        switch (aColumnIndex) {
-            case 1:
-                book.setTitle((String) value);
-                break;
-            case 2:
-                book.setAuthor((String) value);
-                break;
-            case 3:
-                book.setPublisher((String) value);
-                break;
-            default:
-                // do nothing
+        if (!value.toString().isEmpty()) {
+            BookDO book = data.get(aRowIndex);
+            switch (aColumnIndex) {
+                case 1:
+                    book.setTitle((String) value);
+                    break;
+                case 2:
+                    book.setAuthor((String) value);
+                    break;
+                case 3:
+                    book.setPublisher((String) value);
+                    break;
+                default:
+                    // do nothing
+            }
         }
         updateTableData();
     }

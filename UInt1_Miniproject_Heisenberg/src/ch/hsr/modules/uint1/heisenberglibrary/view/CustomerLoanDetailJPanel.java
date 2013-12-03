@@ -488,42 +488,47 @@ public class CustomerLoanDetailJPanel extends
         }
     }
 
-    private void addLoan() {
-        save();
-        addLoanAction.setEnabled(false);
+    private void addLoanIfAllowed() {
+        if (addLoanAction.isEnabled()) {
+            save();
+            addLoanAction.setEnabled(false);
+        }
     }
 
-    private void returnSelectedLoans() {
-        List<Copy> returnedCopies = new ArrayList<>(
-                loanDetailTable.getSelectedRowCount());
-        for (int tempLoan : loanDetailTable.getSelectedRows()) {
-            returnedCopies.add(library.getActiveCustomerLoans(displayedObject)
-                    .get(loanDetailTable.convertRowIndexToModel(tempLoan))
-                    .getCopy());
-        }
-
-        int numberOfOverdueLoans = 0;
-        for (Copy copyToReturn : returnedCopies) {
-            Loan loanToReturn = library.getActiveLoanForCopy(copyToReturn);
-            if (loanToReturn.isOverdue()) {
-                numberOfOverdueLoans++;
+    private void returnSelectedLoansIfAllowed() {
+        if (returnLoanAction.isEnabled()) {
+            List<Copy> returnedCopies = new ArrayList<>(
+                    loanDetailTable.getSelectedRowCount());
+            for (int tempLoan : loanDetailTable.getSelectedRows()) {
+                returnedCopies.add(library
+                        .getActiveCustomerLoans(displayedObject)
+                        .get(loanDetailTable.convertRowIndexToModel(tempLoan))
+                        .getCopy());
             }
-            library.returnCopy(copyToReturn);
-        }
-        if (numberOfOverdueLoans > 0) {
-            String customerName = displayedObject.getName() + " " //$NON-NLS-1$
-                    + displayedObject.getSurname();
-            String message = MessageFormat
-                    .format(UiComponentStrings
-                            .getString("CustomerLoanDetailJPanel.optionpane.overduefines.message"), //$NON-NLS-1$
-                            customerName, Double
-                                    .valueOf(Loan.OVERDUE_FINES_PER_BOOK
-                                            * numberOfOverdueLoans));
 
-            String title = UiComponentStrings
-                    .getString("CustomerLoanDetailJPanel.optionpane.overduefines.title"); //$NON-NLS-1$
-            JOptionPane.showMessageDialog(null, message, title,
-                    JOptionPane.WARNING_MESSAGE);
+            int numberOfOverdueLoans = 0;
+            for (Copy copyToReturn : returnedCopies) {
+                Loan loanToReturn = library.getActiveLoanForCopy(copyToReturn);
+                if (loanToReturn.isOverdue()) {
+                    numberOfOverdueLoans++;
+                }
+                library.returnCopy(copyToReturn);
+            }
+            if (numberOfOverdueLoans > 0) {
+                String customerName = displayedObject.getName() + " " //$NON-NLS-1$
+                        + displayedObject.getSurname();
+                String message = MessageFormat
+                        .format(UiComponentStrings
+                                .getString("CustomerLoanDetailJPanel.optionpane.overduefines.message"), //$NON-NLS-1$
+                                customerName, Double
+                                        .valueOf(Loan.OVERDUE_FINES_PER_BOOK
+                                                * numberOfOverdueLoans));
+
+                String title = UiComponentStrings
+                        .getString("CustomerLoanDetailJPanel.optionpane.overduefines.title"); //$NON-NLS-1$
+                JOptionPane.showMessageDialog(null, message, title,
+                        JOptionPane.WARNING_MESSAGE);
+            }
         }
     }
 
@@ -552,7 +557,7 @@ public class CustomerLoanDetailJPanel extends
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            addLoan();
+            addLoanIfAllowed();
         }
     }
 
@@ -565,7 +570,7 @@ public class CustomerLoanDetailJPanel extends
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            returnSelectedLoans();
+            returnSelectedLoansIfAllowed();
         }
     }
 
@@ -586,17 +591,19 @@ public class CustomerLoanDetailJPanel extends
 
     @Override
     public void createNew() {
-        addLoan();
+        addLoanIfAllowed();
     }
 
     @Override
     public void tableRequestFocus() {
-        loanDetailTable.requestFocus();
+        if (loanDetailTable != null) {
+            loanDetailTable.requestFocus();
+        }
     }
 
     @Override
     public void removeSelected() {
-        returnSelectedLoans();
+        returnSelectedLoansIfAllowed();
     }
 
     @Override

@@ -33,4 +33,6 @@ public interface IPanelActions {
     public void removeSelected();
 
     public JButton getDefaultButton();
+
+    // public void closeComponent();
 }
