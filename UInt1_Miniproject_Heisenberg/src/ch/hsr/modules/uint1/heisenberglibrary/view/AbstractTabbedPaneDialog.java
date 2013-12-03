@@ -88,16 +88,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent aWindowClosingEvent) {
-                List<AbstractObservableObjectJPanel<M>> tabsToClose = new ArrayList<>(
-                        openObjectTabList.size());
-                for (int i = 0; i < openObjectTabList.size(); i++) {
-                    tabsToClose.add(openObjectTabList.get(i));
-                }
-
-                while (!tabsToClose.isEmpty()) {
-                    closeTab(tabsToClose.get(0));
-                    tabsToClose.remove(0);
-                }
+                closeAllTabs();
             }
 
             @Override
@@ -159,7 +150,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         getRootPane().getActionMap().put(
                 focusTableAction.getValue(Action.NAME), focusTableAction);
 
-        // ctrl+r: check/uncheck combobox
+        // ctrl+r: remove selected
         Action removeSelectedAction = new AbstractAction("removeSelectedAction") { //$NON-NLS-1$
             private static final long serialVersionUID = -3181581596036016373L;
 
@@ -178,6 +169,48 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                 removeSelectedAction.getValue(Action.NAME),
                 removeSelectedAction);
 
+        // ctrl+f4/ctrl+w: close currently selected tab
+        Action closeComponentAction = new AbstractAction("closeComponent") { //$NON-NLS-1$
+            private static final long serialVersionUID = 8711166878995899516L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                closeTab(getSelectedTab());
+            }
+        };
+
+        KeyStroke ctrlF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlF4, closeComponentAction.getValue(Action.NAME));
+
+        KeyStroke ctrlW = KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlW, closeComponentAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                closeComponentAction.getValue(Action.NAME),
+                closeComponentAction);
+
+        // ctrl+shift+w: close all possible tabs
+        Action closeAllTabsAction = new AbstractAction("closeAllTabsAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = 1457978064983357787L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                closeAllTabs();
+            }
+        };
+
+        KeyStroke ctrlShiftW = KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlShiftW, closeAllTabsAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                closeAllTabsAction.getValue(Action.NAME), closeAllTabsAction);
     }
 
     private void addTabbedPaneHandlers() {
@@ -276,6 +309,19 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
             }
         }
         return detailBookPanel;
+    }
+
+    protected void closeAllTabs() {
+        List<AbstractObservableObjectJPanel<M>> tabsToClose = new ArrayList<>(
+                openObjectTabList.size());
+        for (int i = 0; i < openObjectTabList.size(); i++) {
+            tabsToClose.add(openObjectTabList.get(i));
+        }
+
+        while (!tabsToClose.isEmpty()) {
+            closeTab(tabsToClose.get(0));
+            tabsToClose.remove(0);
+        }
     }
 
     /**
@@ -383,8 +429,9 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         return closed;
     }
 
-    private AbstractObservableObjectJPanel<?> getSelectedTab() {
-        return (AbstractObservableObjectJPanel<?>) tabbedPane
+    @SuppressWarnings("unchecked")
+    private AbstractObservableObjectJPanel<M> getSelectedTab() {
+        return (AbstractObservableObjectJPanel<M>) tabbedPane
                 .getSelectedComponent();
     }
 
