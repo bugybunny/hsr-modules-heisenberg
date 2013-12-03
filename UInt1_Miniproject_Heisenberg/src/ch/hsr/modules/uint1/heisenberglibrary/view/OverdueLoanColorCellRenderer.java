@@ -14,6 +14,8 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.awt.Color;
+
 import javax.swing.table.DefaultTableCellRenderer;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
@@ -39,6 +41,7 @@ public class OverdueLoanColorCellRenderer extends DefaultTableCellRenderer {
             } else {
                 setBackground(Colors.GREEN_POSITIVE);
             }
+            setForeground(Color.BLACK);
         }
     }
 
