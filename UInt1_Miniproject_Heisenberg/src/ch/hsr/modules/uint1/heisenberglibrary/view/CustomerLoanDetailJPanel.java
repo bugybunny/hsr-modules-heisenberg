@@ -344,10 +344,12 @@ public class CustomerLoanDetailJPanel extends
         addLoanAction = new AddLoanAction(addLoanButton.getText());
         addLoanAction.setEnabled(false);
         addLoanButton.setAction(addLoanAction);
+        addLoanButton.setMnemonic('n');
 
         returnLoanAction = new ReturnLoanAction(returnLoanButton.getText());
         returnLoanAction.setEnabled(false);
         returnLoanButton.setAction(returnLoanAction);
+        returnLoanButton.setMnemonic('r');
 
         loanDetailTable.getSelectionModel().addListSelectionListener(
                 new LoanTableSelectionListener());

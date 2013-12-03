@@ -163,6 +163,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         onlyOverdueCheckbox = new JCheckBox(
                 UiComponentStrings
                         .getString("LoanMainJPanel.checkbox.onlyoverdue.text")); //$NON-NLS-1$
+        onlyOverdueCheckbox.setToolTipText("Show only overdue loans");
         inventoryPanel.add(onlyOverdueCheckbox);
 
         horizontalStrut = Box.createHorizontalStrut(50);

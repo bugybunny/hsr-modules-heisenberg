@@ -365,15 +365,18 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         saveBookAction = new SaveBookAction(addBookButton.getText());
         saveBookAction.setEnabled(false);
         addBookButton.setAction(saveBookAction);
+        addBookButton.setMnemonic('s');
 
         addCopyAction = new AddCopyAction(addCopyButton.getText());
         addCopyButton.setAction(addCopyAction);
         addCopyAction.setEnabled(false);
+        addCopyButton.setMnemonic('n');
 
         removeCopyAction = new RemoveCopyAction(
                 removeSelectedCopiesButton.getText());
         removeSelectedCopiesButton.setAction(removeCopyAction);
         removeCopyAction.setEnabled(false);
+        removeSelectedCopiesButton.setMnemonic('r');
 
         bookCopyTable.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
