@@ -284,7 +284,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            openNew();
+            createNew();
         }
     }
 
@@ -324,7 +324,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
     }
 
     @Override
-    public void openNew() {
+    public void createNew() {
         if (addBookAction.isEnabled()) {
             // check first if the detaildialog is already opened, if so bring it
             // to the front

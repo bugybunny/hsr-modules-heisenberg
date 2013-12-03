@@ -14,6 +14,8 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
+import java.awt.Color;
+
 import javax.swing.table.DefaultTableCellRenderer;
 
 import ch.hsr.modules.uint1.heisenberglibrary.util.Colors;
@@ -30,12 +32,15 @@ public class AvailableCopyCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     protected void setValue(Object aValue) {
-        int value = Integer.parseInt(aValue.toString());
-        setText(aValue.toString());
-        if (value > 0) {
-            setBackground(Colors.GREEN_POSITIVE);
-        } else {
-            setBackground(Colors.RED_NEGATIVE);
+        if (aValue != null) {
+            int value = Integer.parseInt(aValue.toString());
+            setText(aValue.toString());
+            if (value > 0) {
+                setBackground(Colors.GREEN_POSITIVE);
+            } else {
+                setBackground(Colors.RED_NEGATIVE);
+            }
+            setForeground(Color.BLACK);
         }
     }
 

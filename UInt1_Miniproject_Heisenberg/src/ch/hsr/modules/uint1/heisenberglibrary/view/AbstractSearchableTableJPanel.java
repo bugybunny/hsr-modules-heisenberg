@@ -207,6 +207,11 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
     }
 
     @Override
+    public void removeSelected() {
+        // optional
+    }
+
+    @Override
     public void cleanUpBeforeDispose() {
         removeAllObservers();
     }

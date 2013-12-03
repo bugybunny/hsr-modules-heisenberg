@@ -181,7 +181,7 @@ public class LibraryMasterJFrame extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
-                getSelectedTab().openNew();
+                getSelectedTab().createNew();
             }
         };
 
@@ -216,7 +216,7 @@ public class LibraryMasterJFrame extends JFrame {
         getRootPane().getActionMap().put(
                 focusTableAction.getValue(Action.NAME), focusTableAction);
 
-        // ctrl+n: add book for Mac OS x users since they don't have mnemonics
+        // alt+c: check/uncheck combobox
         Action focusCheckBoxAction = new AbstractAction("focusCheckBoxAction") { //$NON-NLS-1$
             private static final long serialVersionUID = -3181581596036016373L;
 

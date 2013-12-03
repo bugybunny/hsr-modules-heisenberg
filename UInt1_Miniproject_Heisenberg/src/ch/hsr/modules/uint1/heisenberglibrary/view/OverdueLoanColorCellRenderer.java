@@ -22,21 +22,23 @@ import ch.hsr.modules.uint1.heisenberglibrary.util.Colors;
 /**
  * @author msyfrig
  */
-public class OverdueLoanColorRenderer extends DefaultTableCellRenderer {
+public class OverdueLoanColorCellRenderer extends DefaultTableCellRenderer {
     private static final long serialVersionUID = -8797711834779300652L;
 
-    public OverdueLoanColorRenderer() {
+    public OverdueLoanColorCellRenderer() {
         setOpaque(true);
     }
 
     @Override
     protected void setValue(Object aValue) {
-        setText(aValue.toString());
-        if (aValue == LoanStatus.DUE) {
-            setBackground(Colors.RED_NEGATIVE);
+        if (aValue != null) {
+            setText(aValue.toString());
+            if (aValue == LoanStatus.DUE) {
+                setBackground(Colors.RED_NEGATIVE);
 
-        } else {
-            setBackground(Colors.GREEN_POSITIVE);
+            } else {
+                setBackground(Colors.GREEN_POSITIVE);
+            }
         }
     }
 

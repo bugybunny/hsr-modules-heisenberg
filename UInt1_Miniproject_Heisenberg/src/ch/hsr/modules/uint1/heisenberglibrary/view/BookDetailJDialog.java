@@ -52,7 +52,6 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
         initTabbedPane();
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
-        // TOOD fixed size for dialog
     }
 
     /**

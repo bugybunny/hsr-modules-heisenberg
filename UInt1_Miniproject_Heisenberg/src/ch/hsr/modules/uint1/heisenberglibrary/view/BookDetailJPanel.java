@@ -645,6 +645,24 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         numberOfAvailableCopiesLabel.setText(numberOfAvailableCopiesString);
     }
 
+    private void removeSelectedCopies() {
+        List<Copy> copyList = library.getCopiesOfBook(displayedObject);
+
+        // we need an extra list because we would need to update the
+        // copyList each time we deleted one copy with the new list in the
+        // library with copyList = library.getCopiesOfBook(displayedObject)
+        // because the indexes changes
+        List<Copy> copiesToDelete = new ArrayList<>(
+                bookCopyTable.getSelectedRowCount());
+        for (int tempCopy : bookCopyTable.getSelectedRows()) {
+            copiesToDelete.add(copyList.get(bookCopyTable
+                    .convertRowIndexToModel(tempCopy)));
+
+        }
+        library.removeCopies(copiesToDelete);
+        copyList = library.getCopiesOfBook(displayedObject);
+    }
+
     private class SaveBookAction extends AbstractAction {
         private static final long serialVersionUID = -2974999148987189986L;
 
@@ -667,21 +685,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
 
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            List<Copy> copyList = library.getCopiesOfBook(displayedObject);
-
-            // we need an extra list because we would need to update the
-            // copyList each time we deleted one copy with the new list in the
-            // library with copyList = library.getCopiesOfBook(displayedObject)
-            // because the indexes changes
-            List<Copy> copiesToDelete = new ArrayList<>(
-                    bookCopyTable.getSelectedRowCount());
-            for (int tempCopy : bookCopyTable.getSelectedRows()) {
-                copiesToDelete.add(copyList.get(bookCopyTable
-                        .convertRowIndexToModel(tempCopy)));
-
-            }
-            library.removeCopies(copiesToDelete);
-            copyList = library.getCopiesOfBook(displayedObject);
+            removeSelectedCopies();
         }
     }
 
@@ -725,17 +729,17 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     class SaveValidationListener implements DocumentListener {
 
         @Override
-        public void insertUpdate(DocumentEvent aE) {
+        public void insertUpdate(DocumentEvent anInsertEvent) {
             validateSaveAndLockButton();
         }
 
         @Override
-        public void removeUpdate(DocumentEvent aE) {
+        public void removeUpdate(DocumentEvent aRemoveEvent) {
             validateSaveAndLockButton();
         }
 
         @Override
-        public void changedUpdate(DocumentEvent aE) {
+        public void changedUpdate(DocumentEvent aChangedEvent) {
             validateSaveAndLockButton();
         }
 
@@ -747,5 +751,20 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         if (bookCopyTable.getModel() instanceof IDisposable) {
             ((IDisposable) bookCopyTable.getModel()).cleanUpBeforeDispose();
         }
+    }
+
+    @Override
+    public void createNew() {
+        library.createAndAddCopy(displayedObject);
+    }
+
+    @Override
+    public void tableRequestFocus() {
+        bookCopyTable.requestFocus();
+    }
+
+    @Override
+    public void removeSelected() {
+        removeSelectedCopies();
     }
 }

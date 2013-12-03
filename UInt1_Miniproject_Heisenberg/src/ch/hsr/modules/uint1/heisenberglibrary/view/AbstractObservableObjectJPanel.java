@@ -36,7 +36,7 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
  * @author msyfrig
  */
 public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
-        extends JPanel implements Observer, IDisposable {
+        extends JPanel implements Observer, IDisposable, IPanelActions {
     private static final long         serialVersionUID = 5272145643378743929L;
     /**
      * The displayed data/model object that can be edited and is observed via
@@ -54,7 +54,7 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
      * 
      * <br>Subclasses are responsible to set this flag correctly.
      */
-    protected boolean                 valid           = true;
+    protected boolean                 valid            = true;
 
     /**
      * Map that holds all added observers for a panel. The corresponding
@@ -197,6 +197,21 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
                 tempEntry.getKey().deleteObserver(tempEntry.getValue());
             }
         }
+    }
+
+    @Override
+    public void openSelected() {
+        // not supported, but do not throw NotSupportedException just do nothing
+    }
+
+    @Override
+    public void searchFieldRequestFocus() {
+        // not supported, but do not throw NotSupportedException just do nothing
+    }
+
+    @Override
+    public void setSelectedCheckBox() {
+        // not supported, but do not throw NotSupportedException just do nothing
     }
 
     /**

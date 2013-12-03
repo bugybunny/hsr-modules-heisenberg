@@ -18,7 +18,7 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
  * @author msyfrig
  */
 public interface IPanelActions {
-    public void openNew();
+    public void createNew();
 
     public void openSelected();
 
@@ -27,4 +27,6 @@ public interface IPanelActions {
     public void setSelectedCheckBox();
 
     public void tableRequestFocus();
+
+    public void removeSelected();
 }

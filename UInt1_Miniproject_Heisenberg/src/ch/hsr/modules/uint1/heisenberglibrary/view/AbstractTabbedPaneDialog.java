@@ -110,6 +110,76 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                 }
             }
         });
+
+        /*
+         * cltr+e for all subpanels is implemented here (and also the following)
+         * because after switching the tab for the first time, the focus is on
+         * the tabbedpane and ctrl+e does nothing when we add it just to the
+         * subpanels and all its ancestors. and getting the parent components
+         * from both tabs and add all actions to that input/action map would be
+         * really bad code
+         */
+
+        // ctrl+n: add book for Mac OS x users since they don't have mnemonics
+        Action newAction = new AbstractAction("new") { //$NON-NLS-1$
+            private static final long serialVersionUID = -3181581596036016373L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().createNew();
+            }
+        };
+
+        KeyStroke ctrlN = KeyStroke.getKeyStroke(KeyEvent.VK_N,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlN, newAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(newAction.getValue(Action.NAME),
+                newAction);
+
+        // ctrl+e/alt+e: set focus to table
+        Action focusTableAction = new AbstractAction("focusTableAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = -3181581596036016373L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().tableRequestFocus();
+            }
+        };
+
+        KeyStroke altE = KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                InputEvent.ALT_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(altE, focusTableAction.getValue(Action.NAME));
+        KeyStroke ctrlE = KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlE, focusTableAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                focusTableAction.getValue(Action.NAME), focusTableAction);
+
+        // ctrl+r: check/uncheck combobox
+        Action removeSelectedAction = new AbstractAction("removeSelectedAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = -3181581596036016373L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().removeSelected();
+            }
+        };
+
+        KeyStroke ctrlR = KeyStroke.getKeyStroke(KeyEvent.VK_R,
+                InputEvent.CTRL_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(ctrlR, removeSelectedAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                removeSelectedAction.getValue(Action.NAME),
+                removeSelectedAction);
+
     }
 
     private void addTabbedPaneHandlers() {
@@ -326,6 +396,11 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
             dispose();
         }
         return closed;
+    }
+
+    private AbstractObservableObjectJPanel<?> getSelectedTab() {
+        return (AbstractObservableObjectJPanel<?>) tabbedPane
+                .getSelectedComponent();
     }
 
     /**
