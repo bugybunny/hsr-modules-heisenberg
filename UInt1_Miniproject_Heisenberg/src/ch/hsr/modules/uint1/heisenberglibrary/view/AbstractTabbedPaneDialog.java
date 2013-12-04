@@ -16,9 +16,11 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -32,9 +34,13 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
@@ -77,6 +83,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         tabbedPane = new JTabbedPane(JTabbedPane.TOP,
                 JTabbedPane.SCROLL_TAB_LAYOUT);
         addTabbedPaneHandlers();
+
     }
 
     @Override
@@ -113,6 +120,8 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
                 getSelectedTab().createNew();
+                System.out.println("test");
+                new CloseTabButton(tabbedPane, 0);
             }
         };
 
@@ -223,6 +232,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                 InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
         removeExistingSwitchingBehaviour(ctrlTab, ctrlShiftTab);
         addTabSwitchingInputBehaviour(ctrlTab, ctrlShiftTab);
+
     }
 
     private void removeExistingSwitchingBehaviour(
@@ -254,11 +264,13 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
+
                 int newSelectedTabIndex = tabbedPane.getSelectedIndex() + 1;
+
                 if (newSelectedTabIndex > tabbedPane.getTabCount() - 1) {
                     newSelectedTabIndex = 0;
+
                 }
-                tabbedPane.setSelectedIndex(newSelectedTabIndex);
             }
         };
 
@@ -478,4 +490,33 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
             closeTab(getSelectedTab());
         }
     }
+
+    protected class CloseTabButton extends JPanel implements ActionListener {
+        private static final long serialVersionUID = -7102985642411917503L;
+
+        public CloseTabButton(JTabbedPane pane, int index) {
+            setOpaque(false);
+
+            add(new JLabel(pane.getTitleAt(index), pane.getIconAt(index),
+                    JLabel.LEFT));
+            ImageIcon closeImage = new ImageIcon(
+                    CloseTabButton.class.getResource("/images/close.gif"));
+            JButton btClose = new JButton(closeImage);
+            btClose.setPreferredSize(new Dimension(closeImage.getIconWidth(),
+                    closeImage.getIconHeight()));
+            add(btClose);
+            btClose.setOpaque(false);
+            btClose.setContentAreaFilled(false);
+            btClose.setBorderPainted(false);
+            btClose.addActionListener(this);
+            pane.setTabComponentAt(index, this);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            closeTab(getSelectedTab());
+            System.out.println("close");
+        }
+    }
+
 }
