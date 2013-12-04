@@ -59,6 +59,7 @@ public class DueDateCellRenderer extends DefaultTableCellRenderer {
 
     public DueDateCellRenderer() {
         setOpaque(true);
+
     }
 
     @Override
