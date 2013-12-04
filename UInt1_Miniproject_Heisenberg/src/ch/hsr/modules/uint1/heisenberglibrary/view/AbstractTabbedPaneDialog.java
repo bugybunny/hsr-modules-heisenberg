@@ -519,6 +519,8 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                     java.awt.Image.SCALE_SMOOTH);
             ImageIcon closeIcon = new ImageIcon(newimg);
 
+            // blubb
+
             ImageIcon closeImageRollover = new ImageIcon(
                     CloseTabButton.class.getResource("/images/icon_roll.png"));
             Image imgRoll = closeImageRollover.getImage();
