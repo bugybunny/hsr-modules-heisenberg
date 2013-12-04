@@ -18,6 +18,7 @@ import java.awt.AWTKeyStroke;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Image;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -512,14 +514,20 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                     pane.getIconAt(pane.indexOfComponent(aDetailPanel)),
                     JLabel.LEFT));
             ImageIcon closeImage = new ImageIcon(
-                    CloseTabButton.class.getResource("/images/close.gif"));
-            JButton btClose = new JButton(closeImage);
+                    CloseTabButton.class.getResource("/images/close15.png"));
+
+            Image grayImage = GrayFilter.createDisabledImage(closeImage
+                    .getImage());
+            JButton btClose = new JButton(new ImageIcon(grayImage));
             btClose.setPreferredSize(new Dimension(closeImage.getIconWidth(),
                     closeImage.getIconHeight()));
+
             add(btClose);
             btClose.setOpaque(false);
             btClose.setContentAreaFilled(false);
             btClose.setBorderPainted(false);
+
+            btClose.setRolloverIcon(closeImage);
             btClose.addActionListener(new ActionListener() {
 
                 @Override

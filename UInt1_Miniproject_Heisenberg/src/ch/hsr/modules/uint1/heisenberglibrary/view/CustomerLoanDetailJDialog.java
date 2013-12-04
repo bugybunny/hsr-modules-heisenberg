@@ -61,15 +61,15 @@ public class CustomerLoanDetailJDialog extends
                 addObserverForObservable(aCustomerToOpen, this);
                 tabTitle = getTabTitleForObject(aCustomerToOpen, false);
 
-                tabbedPane.addTab(tabTitle, null, detailCustomerLoanPanel,
+                addTab(tabTitle, null, detailCustomerLoanPanel,
                         aCustomerToOpen.toString());
+
             } else {
-                tabbedPane
-                        .addTab(tabTitle,
-                                null,
-                                detailCustomerLoanPanel,
-                                UiComponentStrings
-                                        .getString("CustomerLoanDetailJDialog.tab.title.enteringnewloan.tooltip")); //$NON-NLS-1$
+                addTab(tabTitle,
+                        null,
+                        detailCustomerLoanPanel,
+                        UiComponentStrings
+                                .getString("CustomerLoanDetailJDialog.tab.title.enteringnewloan.tooltip"));
             }
             openObjectTabList.add(detailCustomerLoanPanel);
         }
