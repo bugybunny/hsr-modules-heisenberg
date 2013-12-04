@@ -87,7 +87,6 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                                 UiComponentStrings
                                         .getString("BookDetailJDialog.tab.title.enternewbook.tooltip")); //$NON-NLS-1$
             }
-            addHandlersToTab(detailBookPanel);
             // add asteriks in tabtitle if tab has unsaved changes and listen
             // for added books to set the title
             detailBookPanel

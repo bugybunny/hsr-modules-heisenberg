@@ -71,7 +71,6 @@ public class CustomerLoanDetailJDialog extends
                                 UiComponentStrings
                                         .getString("CustomerLoanDetailJDialog.tab.title.enteringnewloan.tooltip")); //$NON-NLS-1$
             }
-            addHandlersToTab(detailCustomerLoanPanel);
             openObjectTabList.add(detailCustomerLoanPanel);
         }
         tabbedPane.setSelectedComponent(detailCustomerLoanPanel);

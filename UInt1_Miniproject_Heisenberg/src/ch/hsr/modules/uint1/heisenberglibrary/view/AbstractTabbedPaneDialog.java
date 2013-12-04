@@ -25,10 +25,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Observer;
 import java.util.Set;
 
@@ -52,14 +50,13 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
     protected JTabbedPane                             tabbedPane;
 
     /**
-     * The list of all opened book detailviews. To check wheter a
-     * {@link ch.hsr.modules.uint1.heisenberglibrary.model.BookDO} is already
-     * open an iteration over all items is necessary and then call
-     * {@link BookDetailJPanel#getDisplayedBookDO()} and compare it is
-     * necessary.
+     * The list of all opened object detailviews. To check wheter an object is
+     * already open an iteration over all items is necessary and then call
+     * {@link AbstractObservableObjectJPanel#getDisplayedObject()} and compare
+     * it is necessary.
      * 
      * <br> And if you ask yourself why this is not implemented as a map with
-     * the book as key and the opened tab as value: the behavior for mutated
+     * the object as key and the opened tab as value: the behavior for mutated
      * keys is undefined and since we can modify the book it would not be
      * possible to ever delete this book instance. See javadoc of map for
      * undefined behavior for mutable objects as keys.
@@ -169,30 +166,27 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                 removeSelectedAction.getValue(Action.NAME),
                 removeSelectedAction);
 
-        // ctrl+f4/ctrl+w: close currently selected tab
-        Action closeComponentAction = new AbstractAction("closeComponent") { //$NON-NLS-1$
-            private static final long serialVersionUID = 8711166878995899516L;
-
-            @Override
-            public void actionPerformed(ActionEvent anActionEvent) {
-                closeTab(getSelectedTab());
-            }
-        };
-
+        // ctrl+f4/ctrl+w/escape: close currently selected tab
+        Action disposeAction = new DisposeAction("disposeAction"); //$NON-NLS-1$
         KeyStroke ctrlF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4,
                 InputEvent.CTRL_DOWN_MASK);
         getRootPane()
                 .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(ctrlF4, closeComponentAction.getValue(Action.NAME));
+                .put(ctrlF4, disposeAction.getValue(Action.NAME));
 
         KeyStroke ctrlW = KeyStroke.getKeyStroke(KeyEvent.VK_W,
                 InputEvent.CTRL_DOWN_MASK);
         getRootPane()
                 .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(ctrlW, closeComponentAction.getValue(Action.NAME));
-        getRootPane().getActionMap().put(
-                closeComponentAction.getValue(Action.NAME),
-                closeComponentAction);
+                .put(ctrlW, disposeAction.getValue(Action.NAME));
+
+        KeyStroke escape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(escape, disposeAction.getValue(Action.NAME));
+
+        getRootPane().getActionMap().put(disposeAction.getValue(Action.NAME),
+                disposeAction);
 
         // ctrl+shift+w: close all possible tabs
         Action closeAllTabsAction = new AbstractAction("closeAllTabsAction") { //$NON-NLS-1$
@@ -211,6 +205,15 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                 .put(ctrlShiftW, closeAllTabsAction.getValue(Action.NAME));
         getRootPane().getActionMap().put(
                 closeAllTabsAction.getValue(Action.NAME), closeAllTabsAction);
+
+        Action saveDisposeAction = new SaveAction("saveDisposeAction"); //$NON-NLS-1$
+        KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(enter, saveDisposeAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                saveDisposeAction.getValue(Action.NAME), saveDisposeAction);
+
     }
 
     private void addTabbedPaneHandlers() {
@@ -289,15 +292,6 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
     protected abstract String getTabTitleForObject(M anObject, boolean isDirty);
 
     protected abstract void objectInTabUpdated(M anUpdatedObject);
-
-    protected void addHandlersToTab(AbstractObservableObjectJPanel<M> aTab) {
-        Map<KeyStroke, Action> actionMapForBookTab = new HashMap<>(2);
-        actionMapForBookTab.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                new DisposeAction("dispose", aTab)); //$NON-NLS-1$
-        actionMapForBookTab.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-                new SaveAction("save", aTab)); //$NON-NLS-1$
-        aTab.addAncestorActions(actionMapForBookTab);
-    }
 
     protected AbstractObservableObjectJPanel<M> getTabForObject(M anObject) {
         AbstractObservableObjectJPanel<M> detailBookPanel = null;
@@ -442,22 +436,19 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
      * @author msyfrig
      */
     protected class SaveAction extends AbstractAction {
-        private static final long                 serialVersionUID = -4275362945903839390L;
-        private AbstractObservableObjectJPanel<M> objectTab;
+        private static final long serialVersionUID = -4275362945903839390L;
 
-        protected SaveAction(String anActionName,
-                AbstractObservableObjectJPanel<M> anAssociatedTab) {
+        protected SaveAction(String anActionName) {
             super(anActionName);
-            objectTab = anAssociatedTab;
         }
 
         /**
-         * Call {@link #save()} and close the tab.
+         * Call {@link #save()} and close the tab currently selected tab.
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            if (objectTab.save()) {
-                closeTab(objectTab);
+            if (getSelectedTab().save()) {
+                closeTab(getSelectedTab());
             }
         }
     }
@@ -469,26 +460,22 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
      * @author msyfrig
      */
     protected class DisposeAction extends AbstractAction {
-        private static final long                 serialVersionUID = 2752048542262499446L;
-        private AbstractObservableObjectJPanel<M> objectTab;
+        private static final long serialVersionUID = 2752048542262499446L;
 
         /**
-         * Creates a new action with the given name and the associated book tab
-         * in which this
+         * Creates a new action with the given name.
          */
-        protected DisposeAction(String anActionName,
-                AbstractObservableObjectJPanel<M> anAssociatedTab) {
+        protected DisposeAction(String anActionName) {
             super(anActionName);
-            objectTab = anAssociatedTab;
         }
 
         /**
-         * Checks if the tab has unsaved changes and informs the user if so and
-         * closes the tab.
+         * Checks if the currently selected tab has unsaved changes and informs
+         * the user if so and closes the tab.
          */
         @Override
         public void actionPerformed(ActionEvent anActionEvent) {
-            closeTab(objectTab);
+            closeTab(getSelectedTab());
         }
     }
 }
