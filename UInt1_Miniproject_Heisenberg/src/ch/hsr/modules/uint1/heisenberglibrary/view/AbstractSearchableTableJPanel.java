@@ -121,16 +121,16 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         table.getActionMap().put(enterKey, openSelectedAction);
 
         tableModel.addTableModelChangeListener(new ITableModelChangeListener() {
-            private Collection<E> previouslySelectedBooks;
+            private Collection<E> previouslySelectedObjects;
 
             @Override
             public void tableIsAboutToUpdate() {
-                previouslySelectedBooks = saveSelectedRows();
+                previouslySelectedObjects = saveSelectedRows();
             }
 
             @Override
             public void tableChanged() {
-                restoreSelectedRows(previouslySelectedBooks);
+                restoreSelectedRows(previouslySelectedObjects);
             }
         });
     }
@@ -154,9 +154,9 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
     protected Set<E> saveSelectedRows() {
         Set<E> selectedEntries = new HashSet<>(table.getSelectedRowCount());
         for (int selectionIndex : table.getSelectedRows()) {
-            E singleSelectedBook = dataList.get(table
+            E singleSelectedObject = dataList.get(table
                     .convertRowIndexToModel(selectionIndex));
-            selectedEntries.add(singleSelectedBook);
+            selectedEntries.add(singleSelectedObject);
         }
         return selectedEntries;
     }
@@ -165,7 +165,7 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
      * Reselect the given entries in the table if they still exist.
      * 
      * @param someEntriesToSelect
-     *            the books to select
+     *            the objects to select
      */
     protected void restoreSelectedRows(final Collection<E> someEntriesToSelect) {
         SwingUtilities.invokeLater(new Runnable() {

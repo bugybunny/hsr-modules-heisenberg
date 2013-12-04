@@ -28,9 +28,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -54,6 +57,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
@@ -96,16 +100,13 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     private JButton                         removeSelectedCopiesButton;
     private JLabel                          numberOfCopiesLabel;
     private JLabel                          numberOfAvailableCopiesLabel;
+    private JLabel                          errorLabel;
 
     // actions
     private AddCopyAction                   addCopyAction;
     private RemoveCopyAction                removeCopyAction;
     private SaveBookAction                  saveBookAction;
-    private JLabel                          errorLabel;
 
-    /**
-     * Creates a new instance of this class and sets the models.
-     */
     public BookDetailJPanel(BookDO aBookDo, Library aLibrary) {
         super(aBookDo);
         library = aLibrary;
@@ -399,6 +400,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                 }
             }
         });
+
         // set focus to titlefield after tab has been switched
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -431,6 +433,21 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             }
         });
 
+        ((BookCopyTableModel) bookCopyTable.getModel())
+                .addTableModelChangeListener(new ITableModelChangeListener() {
+                    private Collection<Copy> previouslySelectedObjects;
+
+                    @Override
+                    public void tableIsAboutToUpdate() {
+                        previouslySelectedObjects = saveSelectedRows();
+                    }
+
+                    @Override
+                    public void tableChanged() {
+                        restoreSelectedRows(previouslySelectedObjects);
+                    }
+                });
+
         ChangeToDirtyDocumentListener dirtyChangeListener = new ChangeToDirtyDocumentListener();
         titleTextfield.getDocument().addDocumentListener(dirtyChangeListener);
 
@@ -439,6 +456,51 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         publisherTextfield.getDocument().addDocumentListener(
                 dirtyChangeListener);
         validateSave();
+    }
+
+    /**
+     * Saves the selected entries in the table. The actual entry instances are
+     * saved since entries can be added or removed so only saving the row index
+     * is not enough.
+     * 
+     * @return set of currently selected entry instances
+     */
+    protected Set<Copy> saveSelectedRows() {
+        Set<Copy> selectedEntries = new HashSet<>(
+                bookCopyTable.getSelectedRowCount());
+        for (int selectionIndex : bookCopyTable.getSelectedRows()) {
+            Copy singleSelectedCopy = library.getCopiesOfBook(displayedObject)
+                    .get(bookCopyTable.convertRowIndexToModel(selectionIndex));
+            selectedEntries.add(singleSelectedCopy);
+        }
+        return selectedEntries;
+    }
+
+    /**
+     * Reselect the given entries in the table if they still exist.
+     * 
+     * @param someEntriesToSelect
+     *            the books to select
+     */
+    protected void restoreSelectedRows(
+            final Collection<Copy> someEntriesToSelect) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (Copy tempEntryToSelect : someEntriesToSelect) {
+
+                    int indexInList = library.getCopiesOfBook(displayedObject)
+                            .indexOf(tempEntryToSelect);
+                    // do nothing if not found and entry has been removed
+                    if (indexInList > -1) {
+                        int indexToSelectInView = bookCopyTable
+                                .convertRowIndexToView(indexInList);
+                        bookCopyTable.getSelectionModel().addSelectionInterval(
+                                indexToSelectInView, indexToSelectInView);
+                    }
+                }
+            }
+        });
     }
 
     /**

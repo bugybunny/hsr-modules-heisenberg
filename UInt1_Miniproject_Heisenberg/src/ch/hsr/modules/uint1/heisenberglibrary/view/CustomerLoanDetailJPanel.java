@@ -26,8 +26,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -44,6 +47,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Copy;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
@@ -137,6 +141,20 @@ public class CustomerLoanDetailJPanel extends
             selectCustomerComboBox.setSelectedIndex(indexOfCustomer);
             loanDetailTable.setModel(new CustomerLoanTableModel(
                     displayedObject, library));
+            ((CustomerLoanTableModel) loanDetailTable.getModel())
+                    .addTableModelChangeListener(new ITableModelChangeListener() {
+                        private Collection<Loan> previouslySelectedObjects;
+
+                        @Override
+                        public void tableIsAboutToUpdate() {
+                            previouslySelectedObjects = saveSelectedRows();
+                        }
+
+                        @Override
+                        public void tableChanged() {
+                            restoreSelectedRows(previouslySelectedObjects);
+                        }
+                    });
             checkCustomerLendabilty();
         }
         updateDisplay();
@@ -398,6 +416,53 @@ public class CustomerLoanDetailJPanel extends
         });
     }
 
+    /**
+     * Saves the selected entries in the table. The actual entry instances are
+     * saved since entries can be added or removed so only saving the row index
+     * is not enough.
+     * 
+     * @return set of currently selected entry instances
+     */
+    protected Set<Loan> saveSelectedRows() {
+        Set<Loan> selectedEntries = new HashSet<>(
+                loanDetailTable.getSelectedRowCount());
+        for (int selectionIndex : loanDetailTable.getSelectedRows()) {
+            Loan singleSelectedCopy = library.getActiveCustomerLoans(
+                    displayedObject).get(
+                    loanDetailTable.convertRowIndexToModel(selectionIndex));
+            selectedEntries.add(singleSelectedCopy);
+        }
+        return selectedEntries;
+    }
+
+    /**
+     * Reselect the given entries in the table if they still exist.
+     * 
+     * @param someEntriesToSelect
+     *            the books to select
+     */
+    protected void restoreSelectedRows(
+            final Collection<Loan> someEntriesToSelect) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (Loan tempEntryToSelect : someEntriesToSelect) {
+
+                    int indexInList = library.getActiveCustomerLoans(
+                            displayedObject).indexOf(tempEntryToSelect);
+                    // do nothing if not found and entry has been removed
+                    if (indexInList > -1) {
+                        int indexToSelectInView = loanDetailTable
+                                .convertRowIndexToView(indexInList);
+                        loanDetailTable.getSelectionModel()
+                                .addSelectionInterval(indexToSelectInView,
+                                        indexToSelectInView);
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
@@ -516,8 +581,10 @@ public class CustomerLoanDetailJPanel extends
                 JOptionPane
                         .showMessageDialog(
                                 this,
-                                UiComponentStrings.getString("CustomerLoanDetailJPanel.optionpane.alreadylentout.message"), //$NON-NLS-1$
-                                UiComponentStrings.getString("CustomerLoanDetailJPanel.optionpane.alreadylentout.title"), //$NON-NLS-1$
+                                UiComponentStrings
+                                        .getString("CustomerLoanDetailJPanel.optionpane.alreadylentout.message"), //$NON-NLS-1$
+                                UiComponentStrings
+                                        .getString("CustomerLoanDetailJPanel.optionpane.alreadylentout.title"), //$NON-NLS-1$
                                 JOptionPane.ERROR_MESSAGE);
             }
 
