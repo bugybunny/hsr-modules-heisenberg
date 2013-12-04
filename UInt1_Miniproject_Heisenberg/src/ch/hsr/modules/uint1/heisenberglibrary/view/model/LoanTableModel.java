@@ -49,6 +49,7 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
     public LoanTableModel(List<Loan> someLoans) {
         super(someLoans);
 
+        // add observer for all books so we notice booktitle changes
         for (Loan tempLoan : data) {
             addObserverForObservable(tempLoan.getCopy().getTitle(), this);
         }

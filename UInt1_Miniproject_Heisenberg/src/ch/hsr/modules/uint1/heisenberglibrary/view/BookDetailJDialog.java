@@ -21,6 +21,7 @@ import java.util.Observer;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
@@ -91,7 +92,13 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                     .addModelStateChangeListener(new BookDetailModelChangeListener());
             openObjectTabList.add(detailBookPanel);
         }
-        tabbedPane.setSelectedComponent(detailBookPanel);
+        final AbstractObservableObjectJPanel<BookDO> tabPanelToSelect = detailBookPanel;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tabbedPane.setSelectedComponent(tabPanelToSelect);
+            }
+        });
         pack();
     }
 

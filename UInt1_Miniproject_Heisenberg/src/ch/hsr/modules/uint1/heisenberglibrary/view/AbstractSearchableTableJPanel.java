@@ -93,10 +93,12 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
 
     public void setTableModel(
             AbstractExtendendedEventTableModel<E> aNewTableModel) {
-        tableModel.cleanUpBeforeDispose();
-        tableModel = aNewTableModel;
-        table.setModel(tableModel);
-        autoSizeTableColumns();
+        if (tableModel != aNewTableModel) {
+            tableModel.cleanUpBeforeDispose();
+            tableModel = aNewTableModel;
+            table.setModel(tableModel);
+            autoSizeTableColumns();
+        }
     }
 
     private void addTableHandlers() {
@@ -220,7 +222,7 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         return searchTextField;
     }
 
-    public void setDataList(List<E> aDataList) {
+    protected void setDataList(List<E> aDataList) {
         dataList = aDataList;
     }
 

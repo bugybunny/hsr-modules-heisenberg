@@ -45,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableObject;
 
@@ -433,6 +434,15 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         // close this dialog if this was the last open tab
         if (openObjectTabList.isEmpty()) {
             dispose();
+        } else {
+            // let tabbedpane scroll to active component
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    tabbedPane.setSelectedComponent(tabbedPane
+                            .getSelectedComponent());
+                }
+            });
         }
         return closed;
     }

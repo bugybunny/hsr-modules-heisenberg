@@ -37,6 +37,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -248,12 +249,19 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
     }
 
     private void tableDataUpdated() {
-        tableModel.updateTableData();
-        tableFilter.filterTable();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tableModel.updateTableData();
+                tableFilter.filterTable();
+            }
+        });
     }
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
+        System.out.println("update");
+
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
