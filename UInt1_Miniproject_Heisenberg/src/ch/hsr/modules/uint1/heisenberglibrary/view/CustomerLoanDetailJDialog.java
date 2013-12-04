@@ -20,6 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -73,6 +74,15 @@ public class CustomerLoanDetailJDialog extends
             }
             openObjectTabList.add(detailCustomerLoanPanel);
         }
+        // needed because the anonymous inner class needs a final variable
+        final AbstractObservableObjectJPanel<Customer> tabPanelToSelect = detailCustomerLoanPanel;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tabbedPane.setSelectedComponent(tabPanelToSelect);
+            }
+        });
+
         tabbedPane.setSelectedComponent(detailCustomerLoanPanel);
         pack();
     }

@@ -92,6 +92,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                     .addModelStateChangeListener(new BookDetailModelChangeListener());
             openObjectTabList.add(detailBookPanel);
         }
+        // needed because the anonymous inner class needs a final variable
         final AbstractObservableObjectJPanel<BookDO> tabPanelToSelect = detailBookPanel;
         SwingUtilities.invokeLater(new Runnable() {
             @Override

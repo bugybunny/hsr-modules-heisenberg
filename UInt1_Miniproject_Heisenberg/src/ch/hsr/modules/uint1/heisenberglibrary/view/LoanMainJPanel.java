@@ -260,8 +260,6 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
 
     @Override
     public void update(Observable anObservable, Object anArgument) {
-        System.out.println("update");
-
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();

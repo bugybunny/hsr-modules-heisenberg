@@ -32,6 +32,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -230,8 +231,13 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.ADDED
                     || type == ModelChangeTypeEnums.Book.REMOVED) {
-                tableModel.updateTableData();
-                tableFilter.filterTable();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        tableModel.updateTableData();
+                        tableFilter.filterTable();
+                    }
+                });
             } else if (type == ModelChangeTypeEnums.Book.NUMBER) {
                 numberOfBooksLabel
                         .setText(MessageFormat.format(

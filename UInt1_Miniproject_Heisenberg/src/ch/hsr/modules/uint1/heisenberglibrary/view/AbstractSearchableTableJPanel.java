@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ITableModelChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.AbstractExtendendedEventTableModel;
@@ -166,18 +167,23 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
      * @param someEntriesToSelect
      *            the books to select
      */
-    protected void restoreSelectedRows(Collection<E> someEntriesToSelect) {
-        for (E tempEntryToSelect : someEntriesToSelect) {
+    protected void restoreSelectedRows(final Collection<E> someEntriesToSelect) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (E tempEntryToSelect : someEntriesToSelect) {
 
-            int indexInList = dataList.indexOf(tempEntryToSelect);
-            // do nothing if not found and entry has been removed
-            if (indexInList > -1) {
-                int indexToSelectInView = table
-                        .convertRowIndexToView(indexInList);
-                table.getSelectionModel().addSelectionInterval(
-                        indexToSelectInView, indexToSelectInView);
+                    int indexInList = dataList.indexOf(tempEntryToSelect);
+                    // do nothing if not found and entry has been removed
+                    if (indexInList > -1) {
+                        int indexToSelectInView = table
+                                .convertRowIndexToView(indexInList);
+                        table.getSelectionModel().addSelectionInterval(
+                                indexToSelectInView, indexToSelectInView);
+                    }
+                }
             }
-        }
+        });
     }
 
     protected boolean addObserverForObservable(Observable anObservable,
