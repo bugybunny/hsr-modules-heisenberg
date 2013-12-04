@@ -34,6 +34,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -88,6 +89,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
     @Override
     protected void initHandlers() {
+
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -120,8 +122,7 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
                 getSelectedTab().createNew();
-                System.out.println("test");
-                new CloseTabButton(tabbedPane, 0);
+
             }
         };
 
@@ -435,6 +436,14 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         return closed;
     }
 
+    protected void addTab(String tabTitle, Icon icon,
+            AbstractObservableObjectJPanel<M> detailPanel, String aBookToOpen) {
+
+        tabbedPane.addTab(tabTitle, null, detailPanel, aBookToOpen.toString());
+
+        new CloseTabButton(tabbedPane, detailPanel);
+    }
+
     @SuppressWarnings("unchecked")
     private AbstractObservableObjectJPanel<M> getSelectedTab() {
         return (AbstractObservableObjectJPanel<M>) tabbedPane
@@ -491,13 +500,16 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         }
     }
 
-    protected class CloseTabButton extends JPanel implements ActionListener {
+    protected class CloseTabButton extends JPanel {
         private static final long serialVersionUID = -7102985642411917503L;
 
-        public CloseTabButton(JTabbedPane pane, int index) {
+        public CloseTabButton(JTabbedPane pane,
+                final AbstractObservableObjectJPanel<M> aDetailPanel) {
             setOpaque(false);
 
-            add(new JLabel(pane.getTitleAt(index), pane.getIconAt(index),
+            add(new JLabel(
+                    pane.getTitleAt(pane.indexOfComponent(aDetailPanel)),
+                    pane.getIconAt(pane.indexOfComponent(aDetailPanel)),
                     JLabel.LEFT));
             ImageIcon closeImage = new ImageIcon(
                     CloseTabButton.class.getResource("/images/close.gif"));
@@ -508,15 +520,14 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
             btClose.setOpaque(false);
             btClose.setContentAreaFilled(false);
             btClose.setBorderPainted(false);
-            btClose.addActionListener(this);
-            pane.setTabComponentAt(index, this);
-        }
+            btClose.addActionListener(new ActionListener() {
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            closeTab(getSelectedTab());
-            System.out.println("close");
+                @Override
+                public void actionPerformed(ActionEvent aE) {
+                    closeTab(aDetailPanel);
+                }
+            });
+            pane.setTabComponentAt(pane.indexOfComponent(aDetailPanel), this);
         }
     }
-
 }

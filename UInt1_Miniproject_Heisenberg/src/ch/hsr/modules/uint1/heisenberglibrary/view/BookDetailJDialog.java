@@ -77,15 +77,13 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                 addObserverForObservable(aBookToOpen, this);
                 tabTitle = getTabTitleForObject(aBookToOpen, false);
 
-                tabbedPane.addTab(tabTitle, null, detailBookPanel,
-                        aBookToOpen.toString());
+                addTab(tabTitle, null, detailBookPanel, aBookToOpen.toString());
             } else {
-                tabbedPane
-                        .addTab(tabTitle,
-                                null,
-                                detailBookPanel,
-                                UiComponentStrings
-                                        .getString("BookDetailJDialog.tab.title.enternewbook.tooltip")); //$NON-NLS-1$
+                addTab(tabTitle,
+                        null,
+                        detailBookPanel,
+                        UiComponentStrings
+                                .getString("BookDetailJDialog.tab.title.enternewbook.tooltip")); //$NON-NLS-1$
             }
             // add asteriks in tabtitle if tab has unsaved changes and listen
             // for added books to set the title
@@ -115,6 +113,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                 title.append(bookTitle);
             }
         }
+        title.append("  ");
         return title.toString();
     }
 
