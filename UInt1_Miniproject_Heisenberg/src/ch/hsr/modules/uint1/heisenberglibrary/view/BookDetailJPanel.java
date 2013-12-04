@@ -576,7 +576,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                     @Override
                     public void run() {
                         ((BookCopyTableModel) bookCopyTable.getModel())
-                                .fireTableDataChanged();
+                                .updateTableData();
                     }
                 });
             } else if (type == ModelChangeTypeEnums.Copy.NUMBER) {

@@ -247,6 +247,11 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         });
     }
 
+    private void tableDataUpdated() {
+        tableModel.updateTableData();
+        tableFilter.filterTable();
+    }
+
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
@@ -271,15 +276,25 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
                         Integer.valueOf(library.getOverdueLoans().size())));
                 setDataList(library.getActiveLoans());
                 setTableModel(new LoanTableModel(dataList));
-            } else if (type == ModelChangeTypeEnums.Loan.ADDED
-                    || type == ModelChangeTypeEnums.Loan.REMOVED) {
-                tableModel.updateTableData();
+                tableFilter.filterTable();
             }
-            // TODO dataList neu setzen wenn sich bei den activeLoans was ändert
-            // TODO events für remove und update und added von loans mit
-            // aktualisierung in tablemodel. achtung: getactiveloans und so muss
-            // wahrscheinlich neu aufgerufen und alle observer neu hinzugefügt
-            // werden
+            // we need an observer for the newly created loan (actually the
+            // booktitle) if not already
+            // existing so we get notified when the booktitle changes
+            else if (type == ModelChangeTypeEnums.Loan.ADDED) {
+                addObserverForObservable(((Loan) modelChange.getNewValue())
+                        .getCopy().getTitle(), this);
+                tableDataUpdated();
+
+            } else if (type == ModelChangeTypeEnums.Loan.RETURNED) {
+                deleteObserverForObservable((Observable) modelChange
+                        .getOldValue());
+                tableModel.updateTableData();
+                tableFilter.filterTable();
+            } else if (type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED
+                    || type == ModelChangeTypeEnums.Book.TITLE) {
+                tableDataUpdated();
+            }
         }
     }
 

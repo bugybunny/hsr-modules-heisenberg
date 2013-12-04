@@ -48,6 +48,10 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
 
     public LoanTableModel(List<Loan> someLoans) {
         super(someLoans);
+
+        for (Loan tempLoan : data) {
+            addObserverForObservable(tempLoan.getCopy().getTitle(), this);
+        }
     }
 
     @Override

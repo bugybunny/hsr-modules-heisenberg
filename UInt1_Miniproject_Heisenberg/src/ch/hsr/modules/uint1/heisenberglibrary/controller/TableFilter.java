@@ -114,13 +114,14 @@ public class TableFilter<M extends TableModel> {
     public void filterTable() {
         List<RowFilter<M, Object>> combiningRowFilterList = new ArrayList<>(
                 additionalFilters.size() + 1);
-        combiningRowFilterList.add(new TableTextFilter<M, Object>(
-                searchField.getText()));
+        combiningRowFilterList.add(new TableTextFilter<M, Object>(searchField
+                .getText()));
         combiningRowFilterList.addAll(additionalFilters);
         @SuppressWarnings("unchecked")
         TableRowSorter<M> tableSorter = new TableRowSorter<>(
                 (M) table.getModel());
         table.setRowSorter(tableSorter);
+        tableSorter.setSortsOnUpdates(true);
         RowFilter<M, Object> combinedFilter = null;
         if (combiningFilterType == FilterType.AND) {
             combinedFilter = RowFilter.andFilter(combiningRowFilterList);
@@ -130,6 +131,7 @@ public class TableFilter<M extends TableModel> {
 
         tableSorter.setRowFilter(combinedFilter);
         table.setRowSorter(tableSorter);
+        tableSorter.setSortsOnUpdates(true);
         if (tableSorter.getViewRowCount() > 0) {
             searchField.setPositiveBackground();
             if (tableSorter.getViewRowCount() == 1) {

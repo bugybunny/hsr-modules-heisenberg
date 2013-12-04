@@ -231,6 +231,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
             if (type == ModelChangeTypeEnums.Book.ADDED
                     || type == ModelChangeTypeEnums.Book.REMOVED) {
                 tableModel.updateTableData();
+                tableFilter.filterTable();
             } else if (type == ModelChangeTypeEnums.Book.NUMBER) {
                 numberOfBooksLabel
                         .setText(MessageFormat.format(
