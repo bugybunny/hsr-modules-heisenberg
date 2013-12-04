@@ -27,28 +27,34 @@ import ch.hsr.modules.uint1.heisenberglibrary.util.NimbusLookAndFeelInitalizer;
 import ch.hsr.modules.uint1.heisenberglibrary.view.LibraryMasterJFrame;
 
 public class LibraryApp {
-    public static void main(String[] args) throws Exception {
-        // WANNA SPEAK GERMAN O_O
-        // Locale.setDefault(new Locale("de_ch"));
-        Library library = new Library();
-        initLibrary(library);
-
+    public static void main(String[] args) {
         try {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
+            // WANNA SPEAK GERMAN O_O
+            // Locale.setDefault(new Locale("de_ch"));
+            Library library = new Library();
+            initLibrary(library);
+
+            try {
+                for (LookAndFeelInfo info : UIManager
+                        .getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
                 }
             }
+            catch (Exception e) {
+                // do nothing and just use the default look and feel for the os
+            }
+            // some properties need to be changed before the components are
+            // drawn some after oO
+            NimbusLookAndFeelInitalizer.changeColors();
+            new LibraryMasterJFrame(library);
+            NimbusLookAndFeelInitalizer.changeColors();
         }
-        catch (Exception e) {
-            // do nothing and just use the default look and feel for the os
+        catch (Throwable aThrowable) {
+            // do nothing :p
         }
-        // some properties need to be changed before the components are drawn,
-        // some after oO
-        NimbusLookAndFeelInitalizer.changeColors();
-        new LibraryMasterJFrame(library);
-        NimbusLookAndFeelInitalizer.changeColors();
     }
 
     private static void initLibrary(Library library)

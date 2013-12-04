@@ -19,8 +19,11 @@ import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -45,6 +48,24 @@ public class CustomerLoanDetailJDialog extends
         getContentPane().setLayout(new BorderLayout());
         initTabbedPane();
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    @Override
+    protected void initHandlers() {
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent aStateChangeListener) {
+                if (tabbedPane.getSelectedComponent() instanceof AbstractObservableObjectJPanel) {
+                    AbstractObservableObjectJPanel<?> selectedPane = (AbstractObservableObjectJPanel<?>) tabbedPane
+                            .getSelectedComponent();
+                    JButton defaultButton = selectedPane.getDefaultButton();
+                    if (defaultButton != null) {
+                        getRootPane().setDefaultButton(defaultButton);
+                    }
+                }
+            }
+        });
+        super.initHandlers();
     }
 
     public void openCustomerLoanTab(Customer aCustomerToOpen, Library aLibrary) {

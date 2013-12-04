@@ -54,7 +54,9 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
     }
 
     public void setData(List<E> someData) {
-        removeAllObservers();
+        for (E tempEntry : data) {
+            deleteObserverForObservable(tempEntry);
+        }
         data = someData;
 
         for (E tempEntry : data) {

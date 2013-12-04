@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.SwingUtilities;
+
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
@@ -114,10 +116,19 @@ public class CustomerLoanTableModel extends
     }
 
     private void changeTableData() {
-        setData(library.getActiveCustomerLoans(specificCustomer));
-        for (Loan tempLoan : data) {
-            addObserverForObservable(tempLoan.getCopy().getTitle(), this);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (Loan tempLoan : data) {
+                    deleteObserverForObservable(tempLoan.getCopy().getTitle());
+                }
+                setData(library.getActiveCustomerLoans(specificCustomer));
+                for (Loan tempLoan : data) {
+                    addObserverForObservable(tempLoan.getCopy().getTitle(),
+                            CustomerLoanTableModel.this);
+                }
+            }
+        });
     }
 
     @Override

@@ -265,7 +265,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
-            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            final ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
 
             if (type == ModelChangeTypeEnums.Loan.NUMBER) {
@@ -297,10 +297,15 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
                 tableDataUpdated();
 
             } else if (type == ModelChangeTypeEnums.Loan.RETURNED) {
-                deleteObserverForObservable((Observable) modelChange
-                        .getOldValue());
-                tableModel.updateTableData();
-                tableFilter.filterTable();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        deleteObserverForObservable((Observable) modelChange
+                                .getOldValue());
+                        tableModel.updateTableData();
+                        tableFilter.filterTable();
+                    }
+                });
             } else if (type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED
                     || type == ModelChangeTypeEnums.Book.TITLE) {
                 tableDataUpdated();
