@@ -93,6 +93,10 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         initComponents();
         initHandlers();
         addObserverForObservable(library, this);
+
+        for (Loan tempLoan : dataList) {
+            addObserverForObservable(tempLoan.getCopy().getTitle(), this);
+        }
     }
 
     private void initComponents() {
