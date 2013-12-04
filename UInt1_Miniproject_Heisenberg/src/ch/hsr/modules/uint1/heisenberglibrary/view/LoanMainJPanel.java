@@ -43,7 +43,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import ch.hsr.modules.uint1.heisenberglibrary.controller.LentDateUntilCellRenderer;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
@@ -207,7 +206,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         centerPanel.add(tableScrollPane);
         table.setDefaultRenderer(LoanStatus.class,
                 new OverdueLoanColorCellRenderer());
-        table.setDefaultRenderer(Date.class, new LentDateUntilCellRenderer());
+        table.setDefaultRenderer(Date.class, new DueDateCellRenderer());
     }
 
     private void initHandlers() {
