@@ -86,7 +86,6 @@ public class CustomerLoanDetailJDialog extends
         } else {
             title.append(customerString);
         }
-        title.append("  ");
         return title.toString();
     }
 

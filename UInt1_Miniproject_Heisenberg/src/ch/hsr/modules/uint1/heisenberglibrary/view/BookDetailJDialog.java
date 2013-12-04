@@ -20,6 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.IModelStateChangeListener;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.ModelStateChangeEvent;
@@ -112,7 +113,7 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                 title.append(bookTitle);
             }
         }
-        title.append("  ");
+        title.append(" ");
         return title.toString();
     }
 
@@ -138,11 +139,22 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
         AbstractObservableObjectJPanel<BookDO> detailBookPanel = getTabForObject(anUpdatedBook);
         if (detailBookPanel != null) {
             int tabIndex = tabbedPane.indexOfComponent(detailBookPanel);
-            tabbedPane.setTitleAt(
-                    tabIndex,
-                    getTabTitleForObject(anUpdatedBook,
-                            detailBookPanel.isDirty()));
-            tabbedPane.setToolTipTextAt(tabIndex, anUpdatedBook.toString());
+            if (tabbedPane.getTabComponentAt(tabIndex) instanceof AbstractTabbedPaneDialog.CloseTabButton) {
+                @SuppressWarnings("unchecked")
+                // needs to be set also in the setTabComponentAt component,
+                // something strange happens here
+                JLabel titleLabel = ((AbstractTabbedPaneDialog<BookDO>.CloseTabButton) tabbedPane
+                        .getTabComponentAt(tabIndex)).getTitleLabel();
+                titleLabel.setText(getTabTitleForObject(anUpdatedBook,
+                        detailBookPanel.isDirty()));
+                titleLabel.setToolTipText(anUpdatedBook.toString());
+
+                tabbedPane.setTitleAt(
+                        tabIndex,
+                        getTabTitleForObject(anUpdatedBook,
+                                detailBookPanel.isDirty()));
+                tabbedPane.setToolTipTextAt(tabIndex, anUpdatedBook.toString());
+            }
         }
     }
 

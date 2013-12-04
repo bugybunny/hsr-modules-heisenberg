@@ -437,12 +437,12 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         return closed;
     }
 
-    protected void addTab(String tabTitle, Icon icon,
-            AbstractObservableObjectJPanel<M> detailPanel, String aBookToOpen) {
-
-        tabbedPane.addTab(tabTitle, null, detailPanel, aBookToOpen.toString());
-
-        new CloseTabButton(tabbedPane, detailPanel);
+    protected void addTab(String aTabTitle, Icon aTabIcon,
+            final AbstractObservableObjectJPanel<M> aDetailPanel,
+            String aBookToOpen) {
+        tabbedPane
+                .addTab(aTabTitle, null, aDetailPanel, aBookToOpen.toString());
+        new CloseTabButton(tabbedPane, aDetailPanel, aTabTitle, aTabIcon);
     }
 
     @SuppressWarnings("unchecked")
@@ -503,15 +503,15 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
 
     protected class CloseTabButton extends JPanel {
         private static final long serialVersionUID = -7102985642411917503L;
+        private JLabel            titleLabel;
 
-        public CloseTabButton(JTabbedPane pane,
-                final AbstractObservableObjectJPanel<M> aDetailPanel) {
+        protected CloseTabButton(JTabbedPane aTabbedPane,
+                final AbstractObservableObjectJPanel<M> aDetailPanel,
+                String aTitle, Icon anIcon) {
             setOpaque(false);
 
-            add(new JLabel(
-                    pane.getTitleAt(pane.indexOfComponent(aDetailPanel)),
-                    pane.getIconAt(pane.indexOfComponent(aDetailPanel)),
-                    JLabel.LEFT));
+            titleLabel = new JLabel(aTitle, anIcon, JLabel.LEFT);
+            add(titleLabel);
             ImageIcon closeImage = new ImageIcon(
                     CloseTabButton.class.getResource("/images/icon_normal.png"));
             Image img = closeImage.getImage();
@@ -542,7 +542,12 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                     closeTab(aDetailPanel);
                 }
             });
-            pane.setTabComponentAt(pane.indexOfComponent(aDetailPanel), this);
+            aTabbedPane.setTabComponentAt(
+                    aTabbedPane.indexOfComponent(aDetailPanel), this);
+        }
+
+        public JLabel getTitleLabel() {
+            return titleLabel;
         }
     }
 }
