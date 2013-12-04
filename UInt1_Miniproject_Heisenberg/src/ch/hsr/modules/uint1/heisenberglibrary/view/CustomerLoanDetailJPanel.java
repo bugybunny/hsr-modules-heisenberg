@@ -87,6 +87,8 @@ public class CustomerLoanDetailJPanel extends
     private AddLoanAction                                        addLoanAction;
     private ReturnLoanAction                                     returnLoanAction;
 
+    private List<Loan>                                           dataList;
+
     public CustomerLoanDetailJPanel(Customer aCustomer, Library aLibrary) {
         super(aCustomer);
         library = aLibrary;
@@ -141,6 +143,7 @@ public class CustomerLoanDetailJPanel extends
             selectCustomerComboBox.setSelectedIndex(indexOfCustomer);
             loanDetailTable.setModel(new CustomerLoanTableModel(
                     displayedObject, library));
+            dataList = library.getActiveCustomerLoans(displayedObject);
             ((CustomerLoanTableModel) loanDetailTable.getModel())
                     .addTableModelChangeListener(new ITableModelChangeListener() {
                         private Collection<Loan> previouslySelectedObjects;
@@ -427,9 +430,7 @@ public class CustomerLoanDetailJPanel extends
         Set<Loan> selectedEntries = new HashSet<>(
                 loanDetailTable.getSelectedRowCount());
         for (int selectionIndex : loanDetailTable.getSelectedRows()) {
-            Loan singleSelectedCopy = library.getActiveCustomerLoans(
-                    displayedObject).get(
-                    loanDetailTable.convertRowIndexToModel(selectionIndex));
+            Loan singleSelectedCopy = dataList.get(selectionIndex);
             selectedEntries.add(singleSelectedCopy);
         }
         return selectedEntries;
@@ -447,9 +448,9 @@ public class CustomerLoanDetailJPanel extends
             @Override
             public void run() {
                 for (Loan tempEntryToSelect : someEntriesToSelect) {
-
-                    int indexInList = library.getActiveCustomerLoans(
-                            displayedObject).indexOf(tempEntryToSelect);
+                    List<Loan> tableModelData = ((CustomerLoanTableModel) loanDetailTable
+                            .getModel()).getData();
+                    int indexInList = tableModelData.indexOf(tempEntryToSelect);
                     // do nothing if not found and entry has been removed
                     if (indexInList > -1) {
                         int indexToSelectInView = loanDetailTable
@@ -468,14 +469,14 @@ public class CustomerLoanDetailJPanel extends
         if (anArgument instanceof ObservableModelChangeEvent) {
             ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
-            if (type == ModelChangeTypeEnums.Loan.RETURNED
-                    || type == ModelChangeTypeEnums.Loan.ADDED) {
-                checkCustomerLendabilty();
-            } else if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
+            if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        checkCustomerLendabilty();
                         updateDisplay();
+                        dataList = library
+                                .getActiveCustomerLoans(displayedObject);
                     }
                 });
             }

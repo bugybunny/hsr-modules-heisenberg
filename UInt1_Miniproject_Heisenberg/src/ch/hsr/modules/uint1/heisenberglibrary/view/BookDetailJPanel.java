@@ -107,6 +107,8 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
     private RemoveCopyAction                removeCopyAction;
     private SaveBookAction                  saveBookAction;
 
+    private List<Copy>                      dataList;
+
     public BookDetailJPanel(BookDO aBookDo, Library aLibrary) {
         super(aBookDo);
         library = aLibrary;
@@ -128,6 +130,21 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         }
         bookCopyTable
                 .setModel(new BookCopyTableModel(displayedObject, library));
+        dataList = library.getCopiesOfBook(displayedObject);
+        ((BookCopyTableModel) bookCopyTable.getModel())
+                .addTableModelChangeListener(new ITableModelChangeListener() {
+                    private Collection<Copy> previouslySelectedObjects;
+
+                    @Override
+                    public void tableIsAboutToUpdate() {
+                        previouslySelectedObjects = saveSelectedRows();
+                    }
+
+                    @Override
+                    public void tableChanged() {
+                        restoreSelectedRows(previouslySelectedObjects);
+                    }
+                });
         updateDisplay();
     }
 
@@ -469,8 +486,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
         Set<Copy> selectedEntries = new HashSet<>(
                 bookCopyTable.getSelectedRowCount());
         for (int selectionIndex : bookCopyTable.getSelectedRows()) {
-            Copy singleSelectedCopy = library.getCopiesOfBook(displayedObject)
-                    .get(bookCopyTable.convertRowIndexToModel(selectionIndex));
+            Copy singleSelectedCopy = dataList.get(selectionIndex);
             selectedEntries.add(singleSelectedCopy);
         }
         return selectedEntries;
@@ -488,9 +504,9 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             @Override
             public void run() {
                 for (Copy tempEntryToSelect : someEntriesToSelect) {
-
-                    int indexInList = library.getCopiesOfBook(displayedObject)
-                            .indexOf(tempEntryToSelect);
+                    List<Copy> tableModelData = ((BookCopyTableModel) bookCopyTable
+                            .getModel()).getData();
+                    int indexInList = tableModelData.indexOf(tempEntryToSelect);
                     // do nothing if not found and entry has been removed
                     if (indexInList > -1) {
                         int indexToSelectInView = bookCopyTable
@@ -639,6 +655,7 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
                     public void run() {
                         ((BookCopyTableModel) bookCopyTable.getModel())
                                 .updateTableData();
+                        dataList = library.getCopiesOfBook(displayedObject);
                     }
                 });
             } else if (type == ModelChangeTypeEnums.Copy.NUMBER) {
