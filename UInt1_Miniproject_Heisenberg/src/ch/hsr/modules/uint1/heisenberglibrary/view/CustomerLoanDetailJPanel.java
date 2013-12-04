@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import java.util.Observable;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,6 +44,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -387,6 +390,22 @@ public class CustomerLoanDetailJPanel extends
                 }
             }
         });
+
+        // delete default jtable behavior with enter (default=selecting next
+        // row) so default action will be invoked
+        Action addLoanActionWithEnter = new AbstractAction("addLoanWithEnter") {
+            private static final long serialVersionUID = 3744924877943386680L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getDefaultButton().getAction().actionPerformed(anActionEvent);
+            }
+        };
+
+        Object enterKey = loanDetailTable.getInputMap(
+                JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        loanDetailTable.getActionMap().put(enterKey, addLoanActionWithEnter);
     }
 
     private void initHandlersForExistingLoan() {

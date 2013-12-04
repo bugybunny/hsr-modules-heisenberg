@@ -15,6 +15,7 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -117,7 +118,7 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
 
         Object enterKey = table.getInputMap(
                 JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(
-                KeyStroke.getKeyStroke("ENTER"));
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         table.getActionMap().put(enterKey, openSelectedAction);
 
         tableModel.addTableModelChangeListener(new ITableModelChangeListener() {
