@@ -426,26 +426,33 @@ public class CustomerLoanDetailJPanel extends
     }
 
     private void disableSelectAvailableCopies() {
-        availableCopiesComboBox.setEnabled(false);
-        if (!library.getOverdueLoansForCustomer(displayedObject).isEmpty()) {
-            String disabledToolTip = UiComponentStrings
-                    .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans"); //$NON-NLS-1$
-            addLoanButton.setDisabledToolTip(disabledToolTip);
-            availableCopiesComboBox
-                    .setToolTipText(UiComponentStrings
+        // number of active loans in displayablecustomer has not been updated if
+        // not queued
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                availableCopiesComboBox.setEnabled(false);
+                if (!library.getOverdueLoansForCustomer(displayedObject)
+                        .isEmpty()) {
+                    String disabledToolTip = UiComponentStrings
+                            .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans"); //$NON-NLS-1$
+                    addLoanButton.setDisabledToolTip(disabledToolTip);
+                    availableCopiesComboBox.setToolTipText(UiComponentStrings
                             .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.overdueloans")); //$NON-NLS-1$
-        } else {
-            DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
-                    .getModel())
-                    .getDisplayableCustomerForCustomer(displayedObject);
-            String disabledToolTip = MessageFormat
-                    .format(UiComponentStrings
-                            .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.maxloans"), //$NON-NLS-1$
+                } else {
+                    DisplayableCustomer selectedDisplayableCustomer = ((CustomerComboboxModel) selectCustomerComboBox
+                            .getModel())
+                            .getDisplayableCustomerForCustomer(displayedObject);
+                    String disabledToolTip = MessageFormat.format(
+                            UiComponentStrings
+                                    .getString("CustomerLoanDetailJPanel.button.addloan.disabled.tooltip.maxloans"), //$NON-NLS-1$
                             Integer.valueOf(selectedDisplayableCustomer
                                     .getActiveLoanCount()));
-            addLoanButton.setDisabledToolTip(disabledToolTip);
-            availableCopiesComboBox.setToolTipText(disabledToolTip);
-        }
+                    addLoanButton.setDisabledToolTip(disabledToolTip);
+                    availableCopiesComboBox.setToolTipText(disabledToolTip);
+                }
+            }
+        });
     }
 
     private void enableSelectAvailableCopies() {

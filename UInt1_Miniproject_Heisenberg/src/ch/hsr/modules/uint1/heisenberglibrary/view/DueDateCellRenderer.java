@@ -23,7 +23,6 @@ import java.util.Date;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import ch.hsr.modules.uint1.heisenberglibrary.util.DateUtil;
-import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
  * @author msyfrig
