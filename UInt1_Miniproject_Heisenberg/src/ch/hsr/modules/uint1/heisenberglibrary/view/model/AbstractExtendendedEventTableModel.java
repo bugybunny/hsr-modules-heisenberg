@@ -54,13 +54,13 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
     }
 
     public void setData(List<E> someData) {
-        data = someData;
-        fireTableDataChanged();
         removeAllObservers();
+        data = someData;
 
         for (E tempEntry : data) {
             addObserverForObservable(tempEntry, this);
         }
+        updateTableData();
     }
 
     public List<E> getData() {

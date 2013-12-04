@@ -113,6 +113,13 @@ public class CustomerLoanTableModel extends
         return ret;
     }
 
+    private void changeTableData() {
+        setData(library.getActiveCustomerLoans(specificCustomer));
+        for (Loan tempLoan : data) {
+            addObserverForObservable(tempLoan.getCopy().getTitle(), this);
+        }
+    }
+
     @Override
     public void update(Observable aAnObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
@@ -120,8 +127,7 @@ public class CustomerLoanTableModel extends
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Loan.ADDED
                     || type == ModelChangeTypeEnums.Loan.RETURNED) {
-                data = library.getActiveCustomerLoans(specificCustomer);
-                updateTableData();
+                changeTableData();
             } else if (type == ModelChangeTypeEnums.Book.TITLE
                     || type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED) {
                 updateTableData();
