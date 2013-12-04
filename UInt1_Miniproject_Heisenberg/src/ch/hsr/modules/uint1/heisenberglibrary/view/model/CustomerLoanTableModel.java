@@ -56,6 +56,9 @@ public class CustomerLoanTableModel extends
         library = aLibrary;
         specificCustomer = aDisplayedCustomer;
         addObserverForObservable(library, this);
+        for (Loan tempLoan : data) {
+            addObserverForObservable(tempLoan.getCopy().getTitle(), this);
+        }
     }
 
     @Override
@@ -118,6 +121,9 @@ public class CustomerLoanTableModel extends
             if (type == ModelChangeTypeEnums.Loan.ADDED
                     || type == ModelChangeTypeEnums.Loan.RETURNED) {
                 data = library.getActiveCustomerLoans(specificCustomer);
+                updateTableData();
+            } else if (type == ModelChangeTypeEnums.Book.TITLE
+                    || type == ModelChangeTypeEnums.Book.EVERYTHING_CHANGED) {
                 updateTableData();
             }
         }

@@ -14,6 +14,7 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.model;
 
+
 /**
  * 
  * @author mstolze
