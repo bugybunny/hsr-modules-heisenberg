@@ -14,17 +14,12 @@
  */
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
-import java.text.ChoiceFormat;
-import java.text.Format;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.Loan;
 import ch.hsr.modules.uint1.heisenberglibrary.model.LoanStatus;
-import ch.hsr.modules.uint1.heisenberglibrary.util.DateUtil;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -35,35 +30,9 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
  * 
  * @author msyfrig
  */
-//@formatter:off
 public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
-    private static final long         serialVersionUID               = 4449419618706874102L;
-    private static List<String>       columnNames                    = new ArrayList<>(
-                                                                             4);
-
-    // things to format the days until duedate string
-    private static final double[] DAY_RULES = { ChoiceFormat.previousDouble(-1), -1, 0, 1, ChoiceFormat.nextDouble(1) };
-
-    private static final String ONE_DAY_LEFT_PATTERN = UiComponentStrings
-            .getString("LoanTableModel.column.lentuntil.content.choice.oneDayLeft");  //$NON-NLS-1$
-    private static final String ZERO_OR_MORE_DAYS_LEFT_PATTERN = UiComponentStrings
-            .getString("LoanTableModel.column.lentuntil.content.choice.moreDaysLeft"); //$NON-NLS-1$
-    private static final String ONE_DAY_LATE_PATTERN = UiComponentStrings
-            .getString("LoanTableModel.column.lentuntil.content.choice.oneDayLate");  //$NON-NLS-1$
-    private static final String MORE_DAYS_LATE_PATTERN = UiComponentStrings
-            .getString("LoanTableModel.column.lentuntil.content.choice.moreDaysLate"); //$NON-NLS-1$
-
-    private static final String[] DAY_STRINGS = {MORE_DAYS_LATE_PATTERN, ONE_DAY_LATE_PATTERN,
-            ZERO_OR_MORE_DAYS_LEFT_PATTERN, ONE_DAY_LEFT_PATTERN,
-            ZERO_OR_MORE_DAYS_LEFT_PATTERN};
-
-    private static final ChoiceFormat DAY_FORMATTER_CHOICE = new ChoiceFormat(DAY_RULES, DAY_STRINGS);
-    private static final Format[] DAYS_UNTIL_FORMATS = { null, DAY_FORMATTER_CHOICE, NumberFormat.getInstance() };
-    private static final MessageFormat DAYS_UNTIL_FORMATTER = new MessageFormat(UiComponentStrings.
-            getString("LoanTableModel.column.lentuntil.content")); //$NON-NLS-1$
-    
-
-    //@formatter:on
+    private static final long   serialVersionUID = 4449419618706874102L;
+    private static List<String> columnNames      = new ArrayList<>(4);
     static {
         columnNames.add(UiComponentStrings
                 .getString("LoanTableModel.loanTableColumn.status")); //$NON-NLS-1$
@@ -75,8 +44,6 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
                 .getString("LoanTableModel.loanTableColumn.lentuntil")); //$NON-NLS-1$
         columnNames.add(UiComponentStrings
                 .getString("LoanTableModel.loanTableColumn.lentto")); //$NON-NLS-1$
-
-        DAYS_UNTIL_FORMATTER.setFormats(DAYS_UNTIL_FORMATS);
     }
 
     public LoanTableModel(List<Loan> someLoans) {
@@ -110,15 +77,7 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
                 ret = currentLoan.getCopy().getTitle().getTitle();
                 break;
             case 3:
-                // TODO return only date and use cellrenderer to format the
-                // string
-                long daysFromTodayToDueDate = DateUtil.daysDiff(new Date(),
-                        currentLoan.getDueDate().getTime());
-                Object[] messageArguments = {
-                        DateUtil.getFormattedDate(currentLoan.getDueDate()),
-                        Long.valueOf(daysFromTodayToDueDate),
-                        Long.valueOf(Math.abs(daysFromTodayToDueDate)) };
-                ret = DAYS_UNTIL_FORMATTER.format(messageArguments);
+                ret = currentLoan.getDueDate().getTime();
                 break;
             case 4:
                 ret = currentLoan.getCustomer().getSurname() + " "
@@ -138,13 +97,15 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
     @Override
     public Class<?> getColumnClass(int aColumnIndex) {
         Class<?> ret = String.class;
-        // TODO return Date for lent until
         switch (aColumnIndex) {
             case 0:
                 ret = LoanStatus.class;
                 break;
             case 1:
                 ret = Long.class;
+                break;
+            case 3:
+                ret = Date.class;
                 break;
             default:
                 ret = String.class;

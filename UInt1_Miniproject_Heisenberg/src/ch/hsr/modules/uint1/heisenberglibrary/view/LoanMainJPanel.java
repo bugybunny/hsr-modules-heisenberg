@@ -23,6 +23,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
@@ -42,6 +43,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import ch.hsr.modules.uint1.heisenberglibrary.controller.LentDateUntilCellRenderer;
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
 import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
@@ -205,6 +207,7 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
         centerPanel.add(tableScrollPane);
         table.setDefaultRenderer(LoanStatus.class,
                 new OverdueLoanColorCellRenderer());
+        table.setDefaultRenderer(Date.class, new LentDateUntilCellRenderer());
     }
 
     private void initHandlers() {

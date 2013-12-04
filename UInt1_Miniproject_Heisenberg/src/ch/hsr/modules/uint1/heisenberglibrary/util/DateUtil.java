@@ -27,6 +27,13 @@ import java.util.GregorianCalendar;
 public class DateUtil {
     private static DateFormat df = SimpleDateFormat.getDateInstance();
 
+    public static String getFormattedDate(Date aDate) {
+        if (aDate != null) {
+            return df.format(aDate);
+        }
+        return "00.00.00";
+    }
+
     public static String getFormattedDate(GregorianCalendar aDate) {
         if (aDate != null) {
             return df.format(aDate.getTime());
