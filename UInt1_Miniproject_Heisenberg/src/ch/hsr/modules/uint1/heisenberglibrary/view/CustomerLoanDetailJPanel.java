@@ -360,7 +360,9 @@ public class CustomerLoanDetailJPanel extends
             @Override
             public void actionPerformed(ActionEvent anActionEvent) {
                 if (library.isCustomerAllowedToLendOut(displayedObject)) {
-                    addLoanAction.setEnabled(true);
+                    if (availableCopiesComboBox.getSelectedItem() != null) {
+                        addLoanAction.setEnabled(true);
+                    }
                 }
             }
         });
