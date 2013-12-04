@@ -62,6 +62,9 @@ public class CustomerLoanTableModel extends
     public Class<?> getColumnClass(int aColumnIndex) {
         Class<?> ret = String.class;
         switch (aColumnIndex) {
+            case 1:
+                ret = Long.class;
+                break;
             case 2:
                 ret = Date.class;
                 break;
