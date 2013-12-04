@@ -507,10 +507,19 @@ public class CustomerLoanDetailJPanel extends
             // misuse this method for adding a loan so we have default behavior
             // with
             // enter
-            library.createAndAddLoan(displayedObject,
+            Loan tempLoan = library.createAndAddLoan(displayedObject,
                     (Copy) availableCopiesComboBox.getSelectedItem());
             availableCopiesComboBox.setModel(new AvailableCopiesComboBoxModel(
                     library));
+
+            if (tempLoan == null) {
+                JOptionPane
+                        .showMessageDialog(
+                                this,
+                                "The loan couldn't be created because the copy is already lent out.",
+                                "Create new loan error",
+                                JOptionPane.ERROR_MESSAGE);
+            }
 
             addLoanAction.setEnabled(false);
 
