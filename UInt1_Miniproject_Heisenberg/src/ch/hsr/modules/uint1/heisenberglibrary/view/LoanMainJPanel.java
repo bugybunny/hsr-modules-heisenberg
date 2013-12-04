@@ -41,7 +41,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Customer;
@@ -264,13 +263,17 @@ public class LoanMainJPanel extends AbstractSearchableTableJPanel<Loan>
                                 UiComponentStrings
                                         .getString("LoanMainJPanel.label.currentlyloaned.text"), //$NON-NLS-1$
                                 modelChange.getNewValue()));
+
+                overdueLabel.setText(MessageFormat.format(UiComponentStrings
+                        .getString("LoanMainJPanel.label.overdueloans.text"), //$NON-NLS-1$
+                        Integer.valueOf(library.getOverdueLoans().size())));
+                setDataList(library.getActiveLoans());
+                setTableModel(new LoanTableModel(dataList));
             } else if (type == ModelChangeTypeEnums.Loan.ADDED
                     || type == ModelChangeTypeEnums.Loan.REMOVED) {
-                ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+                tableModel.updateTableData();
             }
             // TODO dataList neu setzen wenn sich bei den activeLoans was ändert
-            // TODO event für overdue loan Anzahl Verniedrigung, sobald ein eine
-            // overdue Ausleihe zurückgegeben wurde
             // TODO events für remove und update und added von loans mit
             // aktualisierung in tablemodel. achtung: getactiveloans und so muss
             // wahrscheinlich neu aufgerufen und alle observer neu hinzugefügt

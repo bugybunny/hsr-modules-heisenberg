@@ -116,7 +116,7 @@ public abstract class AbstractExtendendedEventTableModel<E extends Observable>
      * after the update if they still can be found. Very bad performance but
      * user friendly.
      */
-    protected void updateTableData() {
+    public void updateTableData() {
         notifyListenersBeforeUpdate();
         /*
          * since we cannot easily determine the column or even the row that has

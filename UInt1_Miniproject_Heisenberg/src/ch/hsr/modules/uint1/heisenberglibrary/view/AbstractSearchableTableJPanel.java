@@ -42,19 +42,20 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
  */
 public abstract class AbstractSearchableTableJPanel<E extends Observable>
         extends JPanel implements IPanelActions, IDisposable {
-    private static final long         serialVersionUID = 3953982564280733109L;
-    protected JTable                  table;
-    protected JScrollPane             tableScrollPane;
-    protected GhostHintJTextField     searchTextField;
+    private static final long                       serialVersionUID = 3953982564280733109L;
+    protected JTable                                table;
+    protected JScrollPane                           tableScrollPane;
+    protected GhostHintJTextField                   searchTextField;
+    protected AbstractExtendendedEventTableModel<E> tableModel;
 
-    protected List<E>                 dataList;
+    protected List<E>                               dataList;
 
     /**
      * Map that holds all added observers for a panel. The corresponding
      * observers will be removed bevor this panel is closed so the gc can
      * collect all the dead references.
      */
-    private Map<Observable, Observer> observerMap      = new HashMap<>();
+    private Map<Observable, Observer>               observerMap      = new HashMap<>();
 
     public AbstractSearchableTableJPanel(List<E> aDataList) {
         this(aDataList, new JTable(), new GhostHintJTextField(
@@ -73,7 +74,8 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         if (table == null) {
             table = new JTable();
         }
-        table.setModel(aTableModel);
+        tableModel = aTableModel;
+        table.setModel(tableModel);
         table.getTableHeader().setReorderingAllowed(false);
         table.setAutoCreateRowSorter(true);
         table.setCellSelectionEnabled(true);
@@ -89,7 +91,14 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
         autoSizeTableColumns();
     }
 
-    @SuppressWarnings("unchecked")
+    public void setTableModel(
+            AbstractExtendendedEventTableModel<E> aNewTableModel) {
+        tableModel.cleanUpBeforeDispose();
+        tableModel = aNewTableModel;
+        table.setModel(tableModel);
+        autoSizeTableColumns();
+    }
+
     private void addTableHandlers() {
         // delete default jtable behavior with enter (default=selecting next
         // row) so default action will be invoked
@@ -108,25 +117,19 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
                 KeyStroke.getKeyStroke("ENTER"));
         table.getActionMap().put(enterKey, openSelectedAction);
 
-        // well we have checked, no way to tell the compiler we did
-        if (table.getModel() instanceof AbstractExtendendedEventTableModel) {
-            AbstractExtendendedEventTableModel<E> tableModel = (AbstractExtendendedEventTableModel<E>) table
-                    .getModel();
-            tableModel
-                    .addTableModelChangeListener(new ITableModelChangeListener() {
-                        private Collection<E> previouslySelectedBooks;
+        tableModel.addTableModelChangeListener(new ITableModelChangeListener() {
+            private Collection<E> previouslySelectedBooks;
 
-                        @Override
-                        public void tableIsAboutToUpdate() {
-                            previouslySelectedBooks = saveSelectedRows();
-                        }
+            @Override
+            public void tableIsAboutToUpdate() {
+                previouslySelectedBooks = saveSelectedRows();
+            }
 
-                        @Override
-                        public void tableChanged() {
-                            restoreSelectedRows(previouslySelectedBooks);
-                        }
-                    });
-        }
+            @Override
+            public void tableChanged() {
+                restoreSelectedRows(previouslySelectedBooks);
+            }
+        });
     }
 
     protected void initSearchTextField(String aHint) {
@@ -215,6 +218,10 @@ public abstract class AbstractSearchableTableJPanel<E extends Observable>
 
     GhostHintJTextField getSearchTextField() {
         return searchTextField;
+    }
+
+    public void setDataList(List<E> aDataList) {
+        dataList = aDataList;
     }
 
     @Override

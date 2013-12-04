@@ -119,7 +119,6 @@ public class CustomerComboboxModel extends
                 } else {
                     setSelectedItem(getElementAt(0));
                 }
-
             }
         }
     }

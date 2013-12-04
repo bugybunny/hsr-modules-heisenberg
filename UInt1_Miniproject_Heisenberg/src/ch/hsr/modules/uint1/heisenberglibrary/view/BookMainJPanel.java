@@ -37,7 +37,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
 
 import ch.hsr.modules.uint1.heisenberglibrary.controller.TableFilter;
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
@@ -231,7 +230,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.ADDED
                     || type == ModelChangeTypeEnums.Book.REMOVED) {
-                ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+                tableModel.updateTableData();
             } else if (type == ModelChangeTypeEnums.Book.NUMBER) {
                 numberOfBooksLabel
                         .setText(MessageFormat.format(

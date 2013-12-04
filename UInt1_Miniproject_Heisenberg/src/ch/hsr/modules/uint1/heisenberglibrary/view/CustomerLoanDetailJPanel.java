@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -403,6 +404,13 @@ public class CustomerLoanDetailJPanel extends
             if (type == ModelChangeTypeEnums.Loan.RETURNED
                     || type == ModelChangeTypeEnums.Loan.ADDED) {
                 checkCustomerLendabilty();
+            } else if (type == ModelChangeTypeEnums.Loan.ACTIVE_NUMBER) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateDisplay();
+                    }
+                });
             }
         }
     }
@@ -452,12 +460,9 @@ public class CustomerLoanDetailJPanel extends
 
     @Override
     protected boolean save() {
-        // misuse this method for adding a loan so we have default behavior with
-        // enter
-        library.createAndAddLoan(displayedObject,
-                (Copy) availableCopiesComboBox.getSelectedItem());
-        availableCopiesComboBox.setModel(new AvailableCopiesComboBoxModel(
-                library));
+        addLoanIfAllowed();
+
+        // return false, otherwise the tab will be closed and we don't want that
         return false;
     }
 
@@ -488,11 +493,21 @@ public class CustomerLoanDetailJPanel extends
         }
     }
 
-    private void addLoanIfAllowed() {
+    private boolean addLoanIfAllowed() {
         if (addLoanAction.isEnabled()) {
-            save();
+            // misuse this method for adding a loan so we have default behavior
+            // with
+            // enter
+            library.createAndAddLoan(displayedObject,
+                    (Copy) availableCopiesComboBox.getSelectedItem());
+            availableCopiesComboBox.setModel(new AvailableCopiesComboBoxModel(
+                    library));
+
             addLoanAction.setEnabled(false);
+
+            return true;
         }
+        return false;
     }
 
     private void returnSelectedLoansIfAllowed() {

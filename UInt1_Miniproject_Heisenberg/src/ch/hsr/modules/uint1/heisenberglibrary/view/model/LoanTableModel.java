@@ -35,14 +35,12 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
  * 
  * @author msyfrig
  */
+//@formatter:off
 public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
-
-
     private static final long         serialVersionUID               = 4449419618706874102L;
     private static List<String>       columnNames                    = new ArrayList<>(
                                                                              4);
 
-    //@formatter:off
     // things to format the days until duedate string
     private static final double[] DAY_RULES = { ChoiceFormat.previousDouble(-1), -1, 0, 1, ChoiceFormat.nextDouble(1) };
 
@@ -112,6 +110,8 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
                 ret = currentLoan.getCopy().getTitle().getTitle();
                 break;
             case 3:
+                // TODO return only date and use cellrenderer to format the
+                // string
                 long daysFromTodayToDueDate = DateUtil.daysDiff(new Date(),
                         currentLoan.getDueDate().getTime());
                 Object[] messageArguments = {
@@ -138,10 +138,9 @@ public class LoanTableModel extends AbstractExtendendedEventTableModel<Loan> {
     @Override
     public Class<?> getColumnClass(int aColumnIndex) {
         Class<?> ret = String.class;
+        // TODO return Date for lent until
         switch (aColumnIndex) {
             case 0:
-                // TODO days until hier anzeigen damit das Datum sortiert werden
-                // kann, Filter anpassen in LoanMainJPanel
                 ret = LoanStatus.class;
                 break;
             case 1:

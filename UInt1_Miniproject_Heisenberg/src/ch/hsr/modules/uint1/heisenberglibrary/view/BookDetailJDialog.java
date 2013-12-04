@@ -76,7 +76,6 @@ public class BookDetailJDialog extends AbstractTabbedPaneDialog<BookDO>
                 // changed
                 addObserverForObservable(aBookToOpen, this);
                 tabTitle = getTabTitleForObject(aBookToOpen, false);
-
                 addTab(tabTitle, null, detailBookPanel, aBookToOpen.toString());
             } else {
                 addTab(tabTitle,
