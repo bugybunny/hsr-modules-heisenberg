@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -514,20 +513,28 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
                     pane.getIconAt(pane.indexOfComponent(aDetailPanel)),
                     JLabel.LEFT));
             ImageIcon closeImage = new ImageIcon(
-                    CloseTabButton.class.getResource("/images/close15.png"));
+                    CloseTabButton.class.getResource("/images/icon_normal.png"));
+            Image img = closeImage.getImage();
+            Image newimg = img.getScaledInstance(16, 16,
+                    java.awt.Image.SCALE_SMOOTH);
+            ImageIcon closeIcon = new ImageIcon(newimg);
 
-            Image grayImage = GrayFilter.createDisabledImage(closeImage
-                    .getImage());
-            JButton btClose = new JButton(new ImageIcon(grayImage));
-            btClose.setPreferredSize(new Dimension(closeImage.getIconWidth(),
-                    closeImage.getIconHeight()));
+            ImageIcon closeImageRollover = new ImageIcon(
+                    CloseTabButton.class.getResource("/images/icon_roll.png"));
+            Image imgRoll = closeImageRollover.getImage();
+            Image newimgRoll = imgRoll.getScaledInstance(16, 16,
+                    java.awt.Image.SCALE_SMOOTH);
+            ImageIcon closeIconRoll = new ImageIcon(newimgRoll);
+
+            JButton btClose = new JButton(closeIcon);
+            btClose.setPreferredSize(new Dimension(15, 15));
 
             add(btClose);
             btClose.setOpaque(false);
             btClose.setContentAreaFilled(false);
             btClose.setBorderPainted(false);
 
-            btClose.setRolloverIcon(closeImage);
+            btClose.setRolloverIcon(closeIconRoll);
             btClose.addActionListener(new ActionListener() {
 
                 @Override
