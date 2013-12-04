@@ -44,10 +44,11 @@ public class LibraryApp {
         catch (Exception e) {
             // do nothing and just use the default look and feel for the os
         }
+        // some properties need to be changed before the components are drawn,
+        // some after oO
         NimbusLookAndFeelInitalizer.changeColors();
         new LibraryMasterJFrame(library);
         NimbusLookAndFeelInitalizer.changeColors();
-        // this somehow need to be after all components have been drawn, dafuq
     }
 
     private static void initLibrary(Library library)

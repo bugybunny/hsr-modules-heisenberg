@@ -516,8 +516,8 @@ public class CustomerLoanDetailJPanel extends
                 JOptionPane
                         .showMessageDialog(
                                 this,
-                                "The loan couldn't be created because the copy is already lent out.",
-                                "Create new loan error",
+                                UiComponentStrings.getString("CustomerLoanDetailJPanel.optionpane.alreadylentout.message"), //$NON-NLS-1$
+                                UiComponentStrings.getString("CustomerLoanDetailJPanel.optionpane.alreadylentout.title"), //$NON-NLS-1$
                                 JOptionPane.ERROR_MESSAGE);
             }
 
