@@ -212,6 +212,7 @@ public abstract class AbstractObservableObjectJPanel<M extends ObservableObject>
     @Override
     public void setSelectedCheckBox() {
         // not supported, but do not throw NotSupportedException just do nothing
+        // or can be used for something else
     }
 
     /**

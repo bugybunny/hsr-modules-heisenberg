@@ -727,6 +727,20 @@ public class CustomerLoanDetailJPanel extends
     }
 
     @Override
+    public void setSelectedCheckBox() {
+        if (selectCustomerComboBox.isEnabled()) {
+            selectCustomerComboBox.requestFocus();
+        }
+    }
+
+    @Override
+    public void searchFieldRequestFocus() {
+        if (availableCopiesComboBox.isEnabled()) {
+            availableCopiesComboBox.requestFocus();
+        }
+    }
+
+    @Override
     public JButton getDefaultButton() {
         return addLoanButton;
     }

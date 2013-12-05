@@ -225,6 +225,45 @@ public abstract class AbstractTabbedPaneDialog<M extends ObservableObject>
         getRootPane().getActionMap().put(
                 saveDisposeAction.getValue(Action.NAME), saveDisposeAction);
 
+        // alt+c: select a component specified by underlying classes
+        Action selectComponentAction = new AbstractAction(
+                "selectComponentAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = 1457978064983357787L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().setSelectedCheckBox();
+            }
+        };
+        KeyStroke altC = KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                InputEvent.ALT_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(altC, selectComponentAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                selectComponentAction.getValue(Action.NAME),
+                selectComponentAction);
+
+        // alt+l: select another component specified by underlying classes
+        Action selectAnotherComponentAction = new AbstractAction(
+                "selectAnotherComponentAction") { //$NON-NLS-1$
+            private static final long serialVersionUID = 8921954682842606688L;
+
+            @Override
+            public void actionPerformed(ActionEvent anActionEvent) {
+                getSelectedTab().searchFieldRequestFocus();
+            }
+        };
+
+        KeyStroke altL = KeyStroke.getKeyStroke(KeyEvent.VK_L,
+                InputEvent.ALT_DOWN_MASK);
+        getRootPane()
+                .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(altL, selectAnotherComponentAction.getValue(Action.NAME));
+        getRootPane().getActionMap().put(
+                selectAnotherComponentAction.getValue(Action.NAME),
+                selectAnotherComponentAction);
+
     }
 
     private void addTabbedPaneHandlers() {
