@@ -2,10 +2,14 @@ package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Observer;
 
 import ch.hsr.modules.uint1.heisenberglibrary.model.BookDO;
+import ch.hsr.modules.uint1.heisenberglibrary.model.IModelChangeType;
 import ch.hsr.modules.uint1.heisenberglibrary.model.Library;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ModelChangeTypeEnums;
+import ch.hsr.modules.uint1.heisenberglibrary.model.ObservableModelChangeEvent;
 import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 /**
@@ -94,6 +98,20 @@ public class BookTableModel extends AbstractExtendendedEventTableModel<BookDO>
             }
         }
         updateTableData();
+    }
+
+    @Override
+    public void update(Observable anObservable, Object anArgument) {
+        if (anArgument instanceof ObservableModelChangeEvent) {
+            final ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            IModelChangeType type = modelChange.getChangeType();
+            if (type == ModelChangeTypeEnums.Book.ADDED) {
+                addObserverForObservable(
+                        (Observable) modelChange.getNewValue(), this);
+            }
+        }
+
+        super.update(anObservable, anArgument);
     }
 
     @Override

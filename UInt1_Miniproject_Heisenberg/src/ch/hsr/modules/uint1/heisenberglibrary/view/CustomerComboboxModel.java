@@ -31,8 +31,6 @@ import ch.hsr.modules.uint1.heisenberglibrary.view.CustomerComboboxModel.Display
 import ch.hsr.modules.uint1.heisenberglibrary.view.model.IDisposable;
 
 /**
- * TODO COMMENT ME!
- * 
  * @author msyfrig
  */
 public class CustomerComboboxModel extends

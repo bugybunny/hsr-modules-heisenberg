@@ -87,8 +87,6 @@ public abstract class NonModalJDialog extends JDialog implements IDisposable {
 
     private void initEverything(String aTitle) {
         if (aTitle.isEmpty()) {
-            // TODO dient nur dazu, dass wir nicht ausversehen irgendwo den
-            // titel vergessen
             throw new InvalidParameterException("please set a title"); //$NON-NLS-1$
         }
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

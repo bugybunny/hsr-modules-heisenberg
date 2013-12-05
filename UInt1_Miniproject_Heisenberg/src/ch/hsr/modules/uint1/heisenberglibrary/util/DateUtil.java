@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * TODO COMMENT ME!
- * 
  * @author msyfrig
  */
 public class DateUtil {

@@ -203,7 +203,6 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
 
         addBookAction = new AddBookAction(addBookButton.getText());
         addBookButton.setAction(addBookAction);
-        // TODO googlen wieso zur Hölle das so ist
         addBookButton.setMnemonic('n');
 
         table.getSelectionModel().addListSelectionListener(
@@ -227,7 +226,7 @@ public class BookMainJPanel extends AbstractSearchableTableJPanel<BookDO>
     @Override
     public void update(Observable anObservable, Object anArgument) {
         if (anArgument instanceof ObservableModelChangeEvent) {
-            ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
+            final ObservableModelChangeEvent modelChange = (ObservableModelChangeEvent) anArgument;
             IModelChangeType type = modelChange.getChangeType();
             if (type == ModelChangeTypeEnums.Book.ADDED
                     || type == ModelChangeTypeEnums.Book.REMOVED) {

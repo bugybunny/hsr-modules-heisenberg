@@ -15,8 +15,6 @@
 package ch.hsr.modules.uint1.heisenberglibrary.view.model;
 
 /**
- * TODO COMMENT ME!
- * 
  * @author msyfrig
  */
 public interface IDisposable {

@@ -18,8 +18,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * TODO COMMENT ME!
- *
  * @author msyfrig
  */
 public class UiComponentStrings {

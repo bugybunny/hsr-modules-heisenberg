@@ -37,7 +37,6 @@ public class BookDO extends ObservableObject {
         author = aAuthor;
         publisher = aPublisher;
         shelf = aShelf;
-        // TODO buch clonen falls möglich und als oldvalue übergeben
         doNotify(new ObservableModelChangeEvent(
                 ModelChangeTypeEnums.Book.EVERYTHING_CHANGED, null, this));
     }

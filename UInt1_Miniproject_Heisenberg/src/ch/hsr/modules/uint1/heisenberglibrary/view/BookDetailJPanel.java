@@ -599,7 +599,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             // Check if book-title + author already exist, but only if it is a
             // new book we can't check this way when dealing with existing
             // books.
-            // TODO set book need to be checked too
             errorLabel.setText(UiComponentStrings.getString("empty")); //$NON-NLS-1$
             ArrayList<BookDO> tempBooks = library.findAllBooksByTitle(title);
             for (BookDO b : tempBooks) {
@@ -694,7 +693,6 @@ public class BookDetailJPanel extends AbstractObservableObjectJPanel<BookDO>
             publisherTextfield.setEnabled(true);
 
         } else {
-            // TODO save caret position
             titleTextfield.setText(displayedObject.getTitle());
             titleTextfield.setEnabled(true);
             authorTextfield.setText(displayedObject.getAuthor());

@@ -17,8 +17,6 @@ package ch.hsr.modules.uint1.heisenberglibrary.view;
 import javax.swing.JButton;
 
 /**
- * TODO COMMENT ME!
- * 
  * @author msyfrig
  */
 public class PanelActionsAdapter implements IPanelActions {
