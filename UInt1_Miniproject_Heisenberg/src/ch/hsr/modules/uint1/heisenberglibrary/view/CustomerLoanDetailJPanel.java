@@ -333,11 +333,11 @@ public class CustomerLoanDetailJPanel extends
 
         String addLoanButtonText = MessageFormat
                 .format(UiComponentStrings
-                        .getString("CustomerLoanDetailJPanel.button.addloan.text"), Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); //$NON-NLS-1$
+                        .getString("CustomerLoanDetailJPanel.button.addloan.text"), Integer.valueOf(Loan.daysToReturnBook)); //$NON-NLS-1$
         String addNewLoanButtonEnabledTooltip = MessageFormat
                 .format(UiComponentStrings
                         .getString("CustomerLoanDetailJPanel.button.addloan.enabled.tooltip"), //$NON-NLS-1$
-                        Integer.valueOf(Loan.DAYS_TO_RETURN_BOOK)); // ;
+                        Integer.valueOf(Loan.daysToReturnBook)); // ;
         addLoanButton = new ToolTipJButton(addLoanButtonText,
                 addNewLoanButtonEnabledTooltip,
                 UiComponentStrings.getString("empty")); //$NON-NLS-1$
@@ -641,7 +641,7 @@ public class CustomerLoanDetailJPanel extends
                         .format(UiComponentStrings
                                 .getString("CustomerLoanDetailJPanel.optionpane.overduefines.message"), //$NON-NLS-1$
                                 customerName, Double
-                                        .valueOf(Loan.OVERDUE_FINES_PER_BOOK
+                                        .valueOf(Loan.overdueFinesPerBook
                                                 * numberOfOverdueLoans));
 
                 String title = UiComponentStrings

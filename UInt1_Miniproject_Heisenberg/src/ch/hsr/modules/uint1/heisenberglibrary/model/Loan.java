@@ -6,14 +6,33 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import ch.hsr.modules.uint1.heisenberglibrary.util.DateUtil;
+import ch.hsr.modules.uint1.heisenberglibrary.view.UiComponentStrings;
 
 public class Loan extends ObservableObject {
 
-    private Copy               copy;
-    private Customer           customer;
-    private GregorianCalendar  pickupDate, returnDate, dueDate;
-    public static final int    DAYS_TO_RETURN_BOOK    = 30;
-    public static final double OVERDUE_FINES_PER_BOOK = 3.00;
+    private Copy     copy;
+    private Customer customer;
+    private GregorianCalendar pickupDate, returnDate, dueDate;
+    public static int         daysToReturnBook = 30;
+    public static double      overdueFinesPerBook = 3.0;
+
+    static {
+        try {
+            overdueFinesPerBook = Double.parseDouble(UiComponentStrings
+                    .getString("Loan.book.overduefine"));
+        }
+        catch (Exception anEx) {
+            // just use the default value of 3.0
+        }
+        try {
+            daysToReturnBook = Integer.parseInt(UiComponentStrings
+                    .getString("Loan.loanperiod.days"));
+        }
+        catch (Exception anEx) {
+            // just use the default value of 30
+        }
+
+    }
 
     public Loan(Customer aCustomer, Copy aCopy) {
         copy = aCopy;
@@ -24,7 +43,7 @@ public class Loan extends ObservableObject {
 
     private void calculateDueDate() {
         dueDate = (GregorianCalendar) pickupDate.clone();
-        dueDate.add(GregorianCalendar.DAY_OF_YEAR, DAYS_TO_RETURN_BOOK);
+        dueDate.add(GregorianCalendar.DAY_OF_YEAR, daysToReturnBook);
         dueDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
         dueDate.add(GregorianCalendar.MINUTE, 59);
         dueDate.add(GregorianCalendar.SECOND, 59);
